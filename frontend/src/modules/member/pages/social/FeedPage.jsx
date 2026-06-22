@@ -118,7 +118,7 @@ const FeedPage = () => {
       {/* FAB */}
       <button 
         onClick={() => navigate('/member/social/create')}
-        className="fixed bottom-20 right-4 w-14 h-14 bg-social-module text-white rounded-full shadow-lg flex items-center justify-center press-scale z-20"
+        className="responsive-fixed-fab w-14 h-14 bg-social-module text-white rounded-full shadow-lg flex items-center justify-center press-scale"
       >
         <PlusCircle size={28} />
       </button>

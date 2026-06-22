@@ -167,7 +167,7 @@ const MatrimonialHomePage = () => {
       </div>
 
       {/* Profile Grid */}
-      <div className="px-4 grid grid-cols-2 gap-2.5">
+      <div className="px-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
         {matrimonialProfiles.map((profile, i) => (
           <MatrimonialCard key={profile.id} profile={profile} index={i} />
         ))}

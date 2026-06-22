@@ -28,7 +28,7 @@ export const BottomNav = () => {
 
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 z-40 bg-card border-t border-gray-200/80 shadow-[0_-1px_3px_rgba(0,0,0,0.05)]"
+      className="responsive-fixed-bottom z-40 bg-card border-t border-gray-200/80 shadow-[0_-1px_3px_rgba(0,0,0,0.05)] md:hidden"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <div className="flex items-center justify-around h-[56px]">

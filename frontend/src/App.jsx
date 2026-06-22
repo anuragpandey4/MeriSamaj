@@ -6,15 +6,19 @@ import { DataProvider } from './modules/member/context/DataProvider';
 const App = () => {
   return (
     <DataProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Default entry → splash screen for onboarding demo */}
-          <Route path="/" element={<Navigate to="/member/splash" replace />} />
-          
-          {/* Route all /member/* requests to MemberRoutes */}
-          <Route path="/member/*" element={<MemberRoutes />} />
-        </Routes>
-      </BrowserRouter>
+      <div className="desktop-wrapper">
+        <div className="app-container">
+          <BrowserRouter>
+            <Routes>
+              {/* Default entry → splash screen for onboarding demo */}
+              <Route path="/" element={<Navigate to="/member/splash" replace />} />
+              
+              {/* Route all /member/* requests to MemberRoutes */}
+              <Route path="/member/*" element={<MemberRoutes />} />
+            </Routes>
+          </BrowserRouter>
+        </div>
+      </div>
     </DataProvider>
   );
 };

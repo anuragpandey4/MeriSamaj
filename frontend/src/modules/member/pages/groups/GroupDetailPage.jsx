@@ -82,7 +82,7 @@ const GroupDetailPage = () => {
       </div>
 
       {/* Input Area */}
-      <div className="bg-surface border-t border-gray-200 px-3 py-2.5 flex items-center gap-2 fixed bottom-0 left-0 right-0 z-30" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 10px)' }}>
+      <div className="responsive-fixed-bottom bg-surface border-t border-gray-200 px-3 py-2.5 flex items-center gap-2 z-30" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 10px)' }}>
         <button className="p-2 text-gray-400 press-scale shrink-0">
           <Paperclip size={20} />
         </button>

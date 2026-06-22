@@ -108,7 +108,7 @@ const PostDetailPage = () => {
       </div>
 
       {/* Comment Input (fixed bottom) */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-gray-200 px-4 py-2.5 z-30 flex items-center gap-2" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 10px)' }}>
+      <div className="responsive-fixed-bottom bg-card border-t border-gray-200 px-4 py-2.5 z-30 flex items-center gap-2" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 10px)' }}>
         <Avatar initials={currentUser?.initials || 'U'} size="sm" />
         <div className="flex-1 flex items-center bg-gray-100 rounded-full px-3 py-2 gap-2">
           <input

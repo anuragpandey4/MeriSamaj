@@ -145,3 +145,83 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Responsive Layout Utilities */
+.desktop-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f8fafc; /* Light slate gray background for browser window */
+}
+
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--color-surface);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+}
+
+.responsive-fixed-top {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100% !important;
+  margin: 0 auto !important;
+  max-width: 100% !important;
+}
+
+.responsive-fixed-bottom {
+  position: fixed !important;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100% !important;
+  margin: 0 auto !important;
+  max-width: 100% !important;
+}
+
+.responsive-fixed-fab {
+  position: fixed !important;
+  bottom: 80px !important;
+  right: 16px !important;
+  z-index: 20;
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    width: 100%;
+    /* No max-width for desktop, let it expand like a real app */
+    border-left: 1px solid #e2e8f0;
+    border-right: 1px solid #e2e8f0;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  }
+
+  .responsive-fixed-top,
+  .responsive-fixed-bottom {
+    /* Instead of constrained width, they should align with the app container if needed, but since it's 100%, it's fine */
+  }
+
+  .responsive-fixed-fab {
+    right: 32px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-container {
+    /* Let it take full width or a wide max-width like 1440px */
+    max-width: 1440px; 
+    margin: 0 auto;
+  }
+
+  .responsive-fixed-top,
+  .responsive-fixed-bottom {
+    max-width: 1440px !important;
+  }
+
+  .responsive-fixed-fab {
+    right: calc(50% - 720px + 32px) !important;
+  }
+}

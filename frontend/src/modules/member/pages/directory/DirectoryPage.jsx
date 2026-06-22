@@ -9,7 +9,7 @@ import { useDraggableScroll } from '../../../../hooks/useDraggableScroll';
 const MemberCard = ({ member, index, onClick }) => (
   <div 
     onClick={onClick}
-    className="flex items-center gap-3 bg-card px-4 py-3 border-b border-gray-50 card-press animate-stagger-fade-in cursor-pointer hover:bg-gray-50/50 transition-colors"
+    className="flex items-center gap-3 bg-card px-4 py-3.5 border border-gray-100 rounded-2xl shadow-sm card-press animate-stagger-fade-in cursor-pointer hover:bg-gray-50/50 transition-all duration-200"
     style={{ animationDelay: `${index * 60}ms` }}
   >
     <Avatar initials={member.initials} size="md" />
@@ -103,7 +103,7 @@ const DirectoryPage = () => {
       </div>
 
       {/* Member List */}
-      <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-4 pb-4 mt-4">
         {filteredMembers.map((member, i) => (
           <MemberCard 
             key={member.id} 

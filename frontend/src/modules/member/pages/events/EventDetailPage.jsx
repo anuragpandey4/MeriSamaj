@@ -108,7 +108,7 @@ const EventDetailPage = () => {
       </div>
 
       {/* CTA */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-card border-t border-gray-100 pb-safe z-40">
+      <div className="responsive-fixed-bottom p-4 bg-card border-t border-gray-100 pb-safe z-40">
         <button
           onClick={() => toggleEventRSVP(event.id)}
           className={`w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 press-scale transition-all ${

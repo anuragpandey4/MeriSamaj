@@ -153,7 +153,7 @@ const MatrimonialProfilePage = () => {
       </div>
 
       {/* Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-pink-100 p-4 z-40 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}>
+      <div className="responsive-fixed-bottom bg-card border-t border-pink-100 p-4 z-40 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}>
         <button
           onClick={() => setInterested(!interested)}
           className={`w-full py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 press-scale transition-all duration-300 ${

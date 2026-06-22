@@ -126,7 +126,7 @@ const HomePage = () => {
 
       {/* ─── QUICK ACTIONS ─── */}
       <div className="px-4 mt-5">
-        <div className="grid grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-2.5">
           {quickActions.map((action) => (
             <button
               key={action.label}
@@ -312,7 +312,7 @@ const HomePage = () => {
       {/* ─── MEDIA FAB ─── */}
       <button
         onClick={() => navigate('/member/social/create')}
-        className="fixed bottom-20 right-4 w-14 h-14 bg-social-module text-white rounded-full shadow-lg flex items-center justify-center press-scale z-20"
+        className="responsive-fixed-fab w-14 h-14 bg-social-module text-white rounded-full shadow-lg flex items-center justify-center press-scale"
       >
         <ImagePlus size={24} />
       </button>
