@@ -31,7 +31,7 @@ const VotingPage = () => {
           </div>
           <div>
             <h3 className="text-sm font-bold text-amber-900 mb-1">Your Voice Matters</h3>
-            <p className="text-[11px] text-amber-700 leading-relaxed">
+            <p className="text-xs text-amber-700 leading-relaxed">
               Participate in community decisions, elect leaders, and share your opinion securely. Only verified members can vote.
             </p>
           </div>
@@ -62,7 +62,7 @@ const PollCard = ({ poll, onClick }) => (
         {poll.type}
       </Badge>
       {poll.voted && (
-        <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+        <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
           <CheckCircle2 size={12} /> Voted
         </span>
       )}

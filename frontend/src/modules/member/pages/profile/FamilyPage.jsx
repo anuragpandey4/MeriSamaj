@@ -95,11 +95,11 @@ const AddFamilyForm = ({ onCancel, onSave }) => {
       <h2 className="text-lg font-bold text-text-primary mb-4">Add Member</h2>
       <div className="space-y-4">
         <div>
-          <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Full Name</label>
+          <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Full Name</label>
           <input type="text" placeholder="Enter full name" value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} className="w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-brand-primary" />
         </div>
         <div>
-          <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Relation</label>
+          <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Relation</label>
           <select 
             value={form.relation}
             onChange={(e) => setForm({...form, relation: e.target.value})}
@@ -115,7 +115,7 @@ const AddFamilyForm = ({ onCancel, onSave }) => {
           </select>
         </div>
         <div>
-          <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Date of Birth</label>
+          <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Date of Birth</label>
           <input 
             type="date" 
             value={form.dob}
@@ -124,7 +124,7 @@ const AddFamilyForm = ({ onCancel, onSave }) => {
           />
         </div>
         <div>
-          <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Mobile Number (Optional)</label>
+          <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Mobile Number (Optional)</label>
           <input type="tel" placeholder="For their own login access" className="w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-brand-primary" />
         </div>
       </div>

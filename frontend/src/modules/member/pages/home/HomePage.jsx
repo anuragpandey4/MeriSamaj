@@ -63,8 +63,8 @@ const HomePage = () => {
           <div className="flex items-center gap-3">
             <Avatar initials={currentUser.initials} size="md" color="bg-white/20 text-white" />
             <div>
-              <p className="text-white/60 text-[11px] font-medium">Jai Samaj 🙏</p>
-              <h2 className="text-white font-semibold text-[15px] leading-tight">{currentUser.name}</h2>
+              <p className="text-white/60 text-sm font-medium">Jai Samaj 🙏</p>
+              <h2 className="text-white font-semibold text-base leading-tight">{currentUser.name}</h2>
             </div>
           </div>
           <div className="flex items-center gap-1.5">
@@ -74,7 +74,7 @@ const HomePage = () => {
             <button className="relative p-2 rounded-full press-scale hover:bg-white/10" onClick={() => navigate('/member/notifications')}>
               <Bell size={20} className="text-white" />
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-brand-primary">
+                <span className="absolute top-1 right-1 w-4.5 h-4.5 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-brand-primary">
                   {unreadCount}
                 </span>
               )}
@@ -82,10 +82,10 @@ const HomePage = () => {
           </div>
         </div>
         <div className="flex items-center gap-1.5 mt-2">
-          <span className="bg-white/15 text-white/90 text-[11px] px-2.5 py-0.5 rounded-full flex items-center gap-1">
+          <span className="bg-white/15 text-white/90 text-xs px-2.5 py-0.5 rounded-full flex items-center gap-1">
             <MapPin size={10} /> {currentUser.city}
           </span>
-          <span className="bg-white/15 text-white/90 text-[11px] px-2.5 py-0.5 rounded-full">
+          <span className="bg-white/15 text-white/90 text-xs px-2.5 py-0.5 rounded-full">
             {currentUser.community}
           </span>
         </div>
@@ -107,7 +107,7 @@ const HomePage = () => {
             <div key={a.id} className={`snap-center shrink-0 w-[calc(100%-8px)] bg-gradient-to-r ${a.color} rounded-2xl p-4 shadow-md relative overflow-hidden`}>
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-8 translate-x-8" />
               <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-6 -translate-x-4" />
-              <p className="text-white/70 text-[10px] uppercase tracking-widest font-semibold relative z-10">📢 Announcement</p>
+              <p className="text-white/70 text-xs uppercase tracking-widest font-semibold relative z-10">📢 Announcement</p>
               <h3 className="text-white font-bold text-base mt-1 leading-snug relative z-10">{a.title}</h3>
               <p className="text-white/80 text-xs mt-1 relative z-10">{a.subtitle}</p>
               <button onClick={() => navigate('/member/events')} className="mt-3 bg-white text-gray-800 text-xs font-semibold px-4 py-1.5 rounded-full press-scale relative z-10 shadow-sm">
@@ -136,7 +136,7 @@ const HomePage = () => {
               <div className={`w-10 h-10 rounded-xl ${action.color} flex items-center justify-center`}>
                 <action.icon size={20} className="text-white" />
               </div>
-              <span className="text-[11px] font-medium text-text-primary">{action.label}</span>
+              <span className="text-xs font-medium text-text-primary">{action.label}</span>
             </button>
           ))}
         </div>
@@ -145,7 +145,7 @@ const HomePage = () => {
       {/* ─── COMMUNITY LEADERSHIP HIERARCHY ─── */}
       <div className="px-4 mt-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[15px] font-semibold text-text-primary">Community Leadership</h3>
+          <h3 className="text-base font-semibold text-text-primary">Community Leadership</h3>
         </div>
 
         {/* Main Head */}
@@ -160,10 +160,10 @@ const HomePage = () => {
                 <div className="flex items-center gap-1.5">
                   <h4 className="text-sm font-semibold text-text-primary">{mainHead.name}</h4>
                 </div>
-                <p className="text-[11px] text-amber-700 font-medium flex items-center gap-1">
+                <p className="text-xs text-amber-700 font-medium flex items-center gap-1">
                   <Crown size={10} /> {mainHead.role} · {mainHead.city}
                 </p>
-                <p className="text-[11px] text-text-secondary mt-0.5">Manages all sub-heads and member approvals</p>
+                <p className="text-xs text-text-secondary mt-0.5">Manages all sub-heads and member approvals</p>
               </div>
             </div>
           </div>
@@ -178,23 +178,23 @@ const HomePage = () => {
                 <Shield size={12} className="text-brand-primary" />
               </div>
               <h4 className="text-xs font-semibold text-text-primary leading-tight line-clamp-2 min-h-[34px]">{head.name}</h4>
-              <p className="text-[10px] text-brand-primary font-medium mt-0.5">{head.role}</p>
+              <p className="text-xs text-brand-primary font-medium mt-0.5">{head.role}</p>
               <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50">
-                <span className="text-[10px] text-text-secondary flex items-center gap-1 min-w-0 truncate pr-1">
+                <span className="text-xs text-text-secondary flex items-center gap-1 min-w-0 truncate pr-1">
                   <MapPin size={10} className="shrink-0" /> <span className="truncate">{head.area || head.city}</span>
                 </span>
-                <span className="text-[10px] text-text-secondary shrink-0">{head.members}</span>
+                <span className="text-xs text-text-secondary shrink-0">{head.members}</span>
               </div>
             </div>
           ))}
         </div>
-        <p className="text-[10px] text-text-secondary mt-2 px-1">Sub-heads verify and approve new member registrations in their area</p>
+        <p className="text-xs text-text-secondary mt-2 px-1">Sub-heads verify and approve new member registrations in their area</p>
       </div>
 
       {/* ─── UPCOMING EVENT ─── */}
       <div className="px-4 mt-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[15px] font-semibold text-text-primary">Upcoming Events</h3>
+          <h3 className="text-base font-semibold text-text-primary">Upcoming Events</h3>
           <button onClick={() => navigate('/member/events')} className="text-xs text-brand-primary font-medium press-scale flex items-center gap-0.5">
             View All <ChevronRight size={14} />
           </button>
@@ -203,16 +203,16 @@ const HomePage = () => {
           <div className="flex gap-3">
             <div className="w-14 h-14 bg-brand-primary/10 rounded-xl flex flex-col items-center justify-center shrink-0">
               <span className="text-brand-primary font-bold text-lg leading-none">15</span>
-              <span className="text-brand-primary text-[10px] font-medium">JUL</span>
+              <span className="text-brand-primary text-xs font-medium">JUL</span>
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="font-semibold text-sm text-text-primary">{mockEvents[0].title}</h4>
-              <p className="text-[11px] text-text-secondary mt-0.5">{mockEvents[0].time}</p>
-              <p className="text-[11px] text-text-secondary flex items-center gap-1 mt-0.5">
+              <p className="text-xs text-text-secondary mt-0.5">{mockEvents[0].time}</p>
+              <p className="text-xs text-text-secondary flex items-center gap-1 mt-0.5">
                 <MapPin size={10} /> {mockEvents[0].venue}
               </p>
               <div className="flex items-center justify-between mt-2">
-                <span className="text-[11px] text-text-secondary">{mockEvents[0].attendees} attending</span>
+                <span className="text-xs text-text-secondary">{mockEvents[0].attendees} attending</span>
                 <Badge variant="success">Registered ✓</Badge>
               </div>
             </div>
@@ -223,7 +223,7 @@ const HomePage = () => {
       {/* ─── COMMUNITY FEED PREVIEW (same community only) ─── */}
       <div className="px-4 mt-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[15px] font-semibold text-text-primary">Community Feed</h3>
+          <h3 className="text-base font-semibold text-text-primary">Community Feed</h3>
           <button onClick={() => navigate('/member/social')} className="text-xs text-social-module font-medium press-scale flex items-center gap-0.5">
             View All <ChevronRight size={14} />
           </button>
@@ -234,13 +234,13 @@ const HomePage = () => {
               <Avatar initials={post.author.initials} size="sm" />
               <div>
                 <h4 className="text-xs font-semibold text-text-primary">{post.author.name}</h4>
-                <p className="text-[10px] text-text-secondary">{post.community} · {post.timestamp}</p>
+                <p className="text-xs text-text-secondary">{post.community} · {post.timestamp}</p>
               </div>
             </div>
             <p className="text-xs text-text-primary leading-relaxed line-clamp-2">{post.content}</p>
             <div className="flex items-center gap-4 mt-2 pt-2 border-t border-gray-50">
-              <span className="text-[11px] text-text-secondary">❤️ {post.likes}</span>
-              <span className="text-[11px] text-text-secondary">💬 {post.comments}</span>
+              <span className="text-xs text-text-secondary">❤️ {post.likes}</span>
+              <span className="text-xs text-text-secondary">💬 {post.comments}</span>
             </div>
           </div>
         ))}
@@ -249,7 +249,7 @@ const HomePage = () => {
       {/* ─── COMMUNITY MEMBERS (Gender Tabs) ─── */}
       <div className="px-4 mt-5">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[15px] font-semibold text-text-primary">Community Members</h3>
+          <h3 className="text-base font-semibold text-text-primary">Community Members</h3>
           <button onClick={() => navigate('/member/directory')} className="text-xs text-brand-primary font-medium press-scale flex items-center gap-0.5">
             See All <ChevronRight size={14} />
           </button>
@@ -259,7 +259,7 @@ const HomePage = () => {
             <button
               key={tab}
               onClick={() => setGenderTab(tab)}
-              className={`px-3.5 py-1.5 rounded-full text-[11px] font-medium transition-all duration-200 press-scale ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 press-scale ${
                 genderTab === tab
                   ? 'bg-brand-primary text-white shadow-sm'
                   : 'bg-gray-100 text-text-secondary'
@@ -278,9 +278,9 @@ const HomePage = () => {
               style={{ animationDelay: `${i * 60}ms` }}
             >
               <Avatar initials={member.initials} size="lg" />
-              <h4 className="text-[11px] font-semibold text-text-primary mt-1.5 leading-tight truncate w-full">{member.name.split(' ')[0]}</h4>
-              <p className="text-[9px] text-text-secondary truncate w-full">{member.profession}</p>
-              <p className="text-[9px] text-text-secondary flex items-center gap-0.5 mt-0.5">
+              <h4 className="text-xs font-semibold text-text-primary mt-1.5 leading-tight truncate w-full">{member.name.split(' ')[0]}</h4>
+              <p className="text-xs text-text-secondary truncate w-full">{member.profession}</p>
+              <p className="text-xs text-text-secondary flex items-center gap-0.5 mt-0.5">
                 <MapPin size={7} /> {member.city}
               </p>
             </div>
@@ -290,7 +290,7 @@ const HomePage = () => {
 
       {/* ─── COMMUNITY STATS ─── */}
       <div className="px-4 mt-6 mb-4">
-        <h3 className="text-[15px] font-semibold text-text-primary mb-3">Community Stats</h3>
+        <h3 className="text-base font-semibold text-text-primary mb-3">Community Stats</h3>
         <div className="grid grid-cols-2 gap-2.5">
           {[
             { label: 'Total Members', value: '1,247', icon: Users, color: 'text-blue-600 bg-blue-50' },
@@ -303,7 +303,7 @@ const HomePage = () => {
                 <stat.icon size={16} />
               </div>
               <p className="text-lg font-bold text-text-primary leading-tight">{stat.value}</p>
-              <p className="text-[10px] text-text-secondary">{stat.label}</p>
+              <p className="text-xs text-text-secondary">{stat.label}</p>
             </div>
           ))}
         </div>

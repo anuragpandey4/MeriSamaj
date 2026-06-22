@@ -29,7 +29,7 @@ const PostCard = ({ post, index }) => {
             <div className="flex items-center gap-1.5">
               <h4 className="text-sm font-semibold text-text-primary">{post.author.name}</h4>
             </div>
-            <p className="text-[11px] text-text-secondary">{post.community} · {post.city} · {post.timestamp}</p>
+            <p className="text-xs text-text-secondary">{post.community} · {post.city} · {post.timestamp}</p>
           </div>
         </div>
         <button className="p-1 press-scale">
@@ -51,7 +51,7 @@ const PostCard = ({ post, index }) => {
 
       {/* Stats */}
       <div className="px-4 pb-1">
-        <div className="flex items-center justify-between text-[11px] text-text-secondary border-b border-gray-50 pb-2">
+        <div className="flex items-center justify-between text-xs text-text-secondary border-b border-gray-50 pb-2">
           <span>{post.likes} likes</span>
           <span>{post.comments?.length || 0} comments</span>
         </div>

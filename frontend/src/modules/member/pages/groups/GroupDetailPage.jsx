@@ -53,7 +53,7 @@ const GroupDetailPage = () => {
             <Avatar initials="AY" size="md" color="bg-white/20 text-white" />
             <div>
               <h1 className="text-white font-semibold text-sm leading-tight">Agrawal Youth Indore</h1>
-              <p className="text-white/70 text-[10px]">342 members</p>
+              <p className="text-white/70 text-xs">342 members</p>
             </div>
           </div>
         </div>
@@ -69,10 +69,10 @@ const GroupDetailPage = () => {
             <div className={`flex gap-2 max-w-[85%] ${msg.isMe ? 'flex-row-reverse' : 'flex-row'}`}>
               {!msg.isMe && <Avatar initials={msg.initials} size="sm" className="shrink-0 mt-auto" />}
               <div>
-                {!msg.isMe && <p className="text-[10px] text-gray-500 ml-1 mb-0.5">{msg.senderName}</p>}
+                {!msg.isMe && <p className="text-xs text-gray-500 ml-1 mb-0.5">{msg.senderName}</p>}
                 <div className={`px-3.5 py-2 rounded-2xl ${msg.isMe ? 'bg-social-module text-white rounded-br-sm' : 'bg-white text-text-primary rounded-bl-sm shadow-sm'}`}>
                   <p className="text-sm leading-relaxed">{msg.text}</p>
-                  <p className={`text-[9px] mt-1 text-right ${msg.isMe ? 'text-white/70' : 'text-gray-400'}`}>{msg.time}</p>
+                  <p className={`text-xs mt-1 text-right ${msg.isMe ? 'text-white/70' : 'text-gray-400'}`}>{msg.time}</p>
                 </div>
               </div>
             </div>

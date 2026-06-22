@@ -84,14 +84,14 @@ const InterestsPage = () => {
               
               {activeTab === 'Sent' && (
                 <div className="mt-3 pt-3 border-t border-gray-50 flex justify-between items-center">
-                  <span className="text-[10px] text-matrimonial-module font-semibold uppercase tracking-wider bg-pink-50 px-2 py-1 rounded-md">Pending</span>
+                  <span className="text-xs text-matrimonial-module font-semibold uppercase tracking-wider bg-pink-50 px-2 py-1 rounded-md">Pending</span>
                   <button className="text-xs text-text-secondary font-medium press-scale">Cancel Request</button>
                 </div>
               )}
 
               {activeTab === 'Accepted' && (
                 <div className="mt-3 pt-3 border-t border-gray-50 flex justify-between items-center">
-                  <span className="text-[10px] text-emerald-600 font-semibold uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded-md">Connected</span>
+                  <span className="text-xs text-emerald-600 font-semibold uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded-md">Connected</span>
                   <button className="text-xs text-brand-primary font-medium press-scale">View Details</button>
                 </div>
               )}

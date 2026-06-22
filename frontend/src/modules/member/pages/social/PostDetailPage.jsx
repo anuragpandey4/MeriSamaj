@@ -46,7 +46,7 @@ const PostDetailPage = () => {
               <Avatar initials={post.author.initials} size="md" />
               <div>
                 <h4 className="text-sm font-semibold text-text-primary">{post.author.name}</h4>
-                <p className="text-[11px] text-text-secondary">{post.community} · {post.city} · {post.timestamp}</p>
+                <p className="text-xs text-text-secondary">{post.community} · {post.city} · {post.timestamp}</p>
               </div>
             </div>
             <button className="p-1 press-scale">
@@ -97,9 +97,9 @@ const PostDetailPage = () => {
                   <p className="text-xs text-text-primary mt-0.5 leading-relaxed">{comment.text}</p>
                 </div>
                 <div className="flex items-center gap-3 mt-1 px-1">
-                  <span className="text-[10px] text-text-secondary">{comment.time}</span>
-                  <button className="text-[10px] text-text-secondary font-medium press-scale">Like ({comment.likes})</button>
-                  <button className="text-[10px] text-text-secondary font-medium press-scale">Reply</button>
+                  <span className="text-xs text-text-secondary">{comment.time}</span>
+                  <button className="text-xs text-text-secondary font-medium press-scale">Like ({comment.likes})</button>
+                  <button className="text-xs text-text-secondary font-medium press-scale">Reply</button>
                 </div>
               </div>
             </div>

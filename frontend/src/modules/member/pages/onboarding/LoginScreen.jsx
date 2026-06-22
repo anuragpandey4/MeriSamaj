@@ -149,20 +149,20 @@ const LoginScreen = () => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-8 translate-x-8" />
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-6 -translate-x-4" />
           <h1 className="text-3xl font-extrabold text-white text-center leading-tight">MeriSamaj</h1>
-          <p className="text-white/80 text-xs text-center mt-1.5 font-medium">Connecting Communities. Uniting Families.</p>
+          <p className="text-white/80 text-sm text-center mt-1.5 font-medium">Connecting Communities. Uniting Families.</p>
         </div>
 
         <div className="flex-1 px-5 pt-5 overflow-y-auto pb-4 relative z-0">
           <div className="space-y-4">
             {/* Quick Sign In Section */}
             <div className="bg-card rounded-2xl p-4 shadow-md border border-gray-100/50">
-              <div className="flex items-center gap-2 mb-2.5">
-                <div className="w-7 h-7 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary">
-                  <LogIn size={14} />
+              <div className="flex items-center gap-2.5 mb-2.5">
+                <div className="w-8 h-8 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary">
+                  <LogIn size={16} />
                 </div>
-                <h2 className="text-xs font-bold text-text-primary">Quick Sign In / Switch Profile</h2>
+                <h2 className="text-sm font-bold text-text-primary">Quick Sign In / Switch Profile</h2>
               </div>
-              <p className="text-[10px] text-text-secondary mb-3 leading-normal">
+              <p className="text-xs text-text-secondary mb-3 leading-relaxed">
                 Choose a preloaded profile to instantly test dynamic, personalized contents tailored to each community.
               </p>
               
@@ -171,16 +171,16 @@ const LoginScreen = () => {
                   <button
                     key={user.id}
                     onClick={() => handleMockLogin(user)}
-                    className="w-full flex items-center gap-3 p-2 bg-gray-50/70 hover:bg-brand-primary/5 border border-gray-100 hover:border-brand-primary/20 rounded-xl transition-all text-left press-scale"
+                    className="w-full flex items-center gap-3 p-2.5 bg-gray-50/70 hover:bg-brand-primary/5 border border-gray-100 hover:border-brand-primary/20 rounded-xl transition-all text-left press-scale"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-brand-primary text-white font-bold flex items-center justify-center text-xs shadow-sm">
+                    <div className="w-10 h-10 rounded-lg bg-brand-primary text-white font-bold flex items-center justify-center text-sm shadow-sm">
                       {user.initials}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-bold text-text-primary truncate">{user.name}</p>
-                      <p className="text-[9px] text-text-secondary font-semibold mt-0.5">{user.community} · {user.city}</p>
+                      <p className="text-sm font-bold text-text-primary truncate">{user.name}</p>
+                      <p className="text-xs text-text-secondary font-medium mt-0.5">{user.community} · {user.city}</p>
                     </div>
-                    <ArrowRight size={12} className="text-brand-primary shrink-0" />
+                    <ArrowRight size={16} className="text-brand-primary shrink-0" />
                   </button>
                 ))}
               </div>
@@ -188,28 +188,28 @@ const LoginScreen = () => {
 
             {/* Sign Up Section */}
             <div className="bg-card rounded-2xl p-4 shadow-md border border-gray-100/50">
-              <div className="flex items-center gap-2 mb-2.5">
-                <div className="w-7 h-7 bg-social-module/10 rounded-lg flex items-center justify-center text-social-module">
-                  <UserPlus size={14} />
+              <div className="flex items-center gap-2.5 mb-2.5">
+                <div className="w-8 h-8 bg-social-module/10 rounded-lg flex items-center justify-center text-social-module">
+                  <UserPlus size={16} />
                 </div>
-                <h2 className="text-xs font-bold text-text-primary">Create New Account</h2>
+                <h2 className="text-sm font-bold text-text-primary">Create New Account</h2>
               </div>
-              <p className="text-[10px] text-text-secondary mb-3 leading-normal">
+              <p className="text-xs text-text-secondary mb-3 leading-relaxed">
                 Sign up as a new member with any community and city to explore from scratch.
               </p>
               
               <button
                 onClick={() => setStep('phone')}
-                className="w-full py-2.5 bg-brand-primary text-white font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-brand-primary/25 press-scale"
+                className="w-full py-3 bg-brand-primary text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2 shadow-md shadow-brand-primary/25 press-scale"
               >
-                Register as Member <ArrowRight size={12} />
+                Register as Member <ArrowRight size={14} />
               </button>
             </div>
           </div>
         </div>
 
         <div className="px-6 pt-2">
-          <p className="text-[9px] text-text-secondary text-center">
+          <p className="text-xs text-text-secondary text-center">
             MeriSamaj © 2026. Made with ❤️ for Indian Communities.
           </p>
         </div>
@@ -262,7 +262,7 @@ const LoginScreen = () => {
           >
             Get OTP <ArrowRight size={16} />
           </button>
-          <p className="text-[11px] text-text-secondary text-center mt-3">
+          <p className="text-xs text-text-secondary text-center mt-3">
             By continuing, you agree to our Terms of Service
           </p>
         </div>
@@ -467,7 +467,7 @@ const LoginScreen = () => {
       </div>
 
       <div className="px-6 pb-8 pt-4">
-        <p className="text-[10px] text-text-secondary text-center mb-3">
+        <p className="text-xs text-text-secondary text-center mb-3">
           Your profile will be reviewed and verified by the community head of <strong>{selectedCity}</strong>
         </p>
         <button

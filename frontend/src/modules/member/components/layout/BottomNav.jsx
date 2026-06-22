@@ -49,7 +49,7 @@ export const BottomNav = () => {
                 className={`transition-all duration-300 ${isActive ? 'scale-110' : 'scale-100'}`}
                 fill={isActive && item.icon === Heart ? 'currentColor' : 'none'}
               />
-              <span className={`text-[10px] mt-0.5 transition-all duration-200 ${isActive ? 'font-semibold' : 'font-medium'}`}>
+              <span className={`text-xs mt-0.5 transition-all duration-200 ${isActive ? 'font-semibold' : 'font-medium'}`}>
                 {item.name}
               </span>
             </NavLink>

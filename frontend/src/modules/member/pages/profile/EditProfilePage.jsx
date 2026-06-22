@@ -63,7 +63,7 @@ const EditProfilePage = () => {
           
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Gender</label>
+              <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Gender</label>
               <select 
                 name="gender" 
                 value={formData.gender} 
@@ -94,7 +94,7 @@ const EditProfilePage = () => {
 
 const InputField = ({ label, disabled, ...props }) => (
   <div>
-    <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">{label}</label>
+    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">{label}</label>
     <input
       className={`w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none transition-all placeholder-gray-400 ${
         disabled ? 'opacity-60 bg-gray-50 cursor-not-allowed' : 'focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10'

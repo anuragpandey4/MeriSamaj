@@ -41,7 +41,7 @@ const PollDetailPage = () => {
             <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-bold text-emerald-800 mb-0.5">Vote Recorded</p>
-              <p className="text-[10px] text-emerald-600 leading-relaxed">
+              <p className="text-xs text-emerald-600 leading-relaxed">
                 Your vote is completely anonymous. Current results are shown below.
               </p>
             </div>
@@ -49,7 +49,7 @@ const PollDetailPage = () => {
         )}
 
         <div className="mb-6">
-          <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md uppercase tracking-wider">Election</span>
+          <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md uppercase tracking-wider">Election</span>
           <h2 className="text-lg font-bold text-text-primary mt-3 leading-snug">Election for City President (Indore)</h2>
           <p className="text-xs text-text-secondary mt-2 leading-relaxed">
             Please select your preferred candidate for the position of City President. The elected candidate will serve a 2-year term.
@@ -87,7 +87,7 @@ const PollDetailPage = () => {
                     <Avatar initials={c.initials} size="md" />
                     <div>
                       <h4 className="text-sm font-bold text-text-primary">{c.name}</h4>
-                      <p className="text-[10px] text-text-secondary mt-0.5">{c.subtitle}</p>
+                      <p className="text-xs text-text-secondary mt-0.5">{c.subtitle}</p>
                     </div>
                   </div>
                   
@@ -108,7 +108,7 @@ const PollDetailPage = () => {
           <div className="responsive-fixed-bottom p-4 bg-card border-t border-gray-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-40">
             <div className="flex items-start gap-2 mb-3 px-2">
               <AlertCircle size={14} className="text-gray-400 shrink-0 mt-0.5" />
-              <p className="text-[10px] text-gray-500 leading-relaxed">
+              <p className="text-xs text-gray-500 leading-relaxed">
                 Votes cannot be changed once submitted. Ensure your selection is correct.
               </p>
             </div>

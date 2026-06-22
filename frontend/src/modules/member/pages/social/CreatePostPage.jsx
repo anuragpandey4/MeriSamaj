@@ -43,10 +43,10 @@ const CreatePostPage = () => {
         <div>
           <h4 className="text-sm font-semibold text-text-primary">{currentUser.name}</h4>
           <div className="flex items-center gap-1 mt-0.5">
-            <span className="text-[10px] bg-social-module/10 text-social-module px-2 py-0.5 rounded-full font-medium">
+            <span className="text-xs bg-social-module/10 text-social-module px-2 py-0.5 rounded-full font-medium">
               {currentUser.community}
             </span>
-            <span className="text-[10px] text-text-secondary flex items-center gap-0.5">
+            <span className="text-xs text-text-secondary flex items-center gap-0.5">
               <MapPin size={8} /> {currentUser.city}
             </span>
           </div>

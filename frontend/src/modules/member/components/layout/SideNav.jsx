@@ -50,7 +50,7 @@ export const SideNav = () => {
                 className={`mr-3 transition-transform duration-300 ${isActive ? 'scale-110' : ''}`}
                 fill={isActive && item.icon === Heart ? 'currentColor' : 'none'}
               />
-              <span className="text-[15px]">
+              <span className="text-base">
                 {item.name}
               </span>
             </NavLink>
@@ -64,13 +64,13 @@ export const SideNav = () => {
           className="flex items-center px-4 py-3 text-text-secondary hover:bg-gray-50 hover:text-text-primary rounded-xl transition-all"
         >
           <Settings size={20} className="mr-3" />
-          <span className="text-[15px] font-medium">Settings</span>
+          <span className="text-base font-medium">Settings</span>
         </NavLink>
         <button 
           className="w-full flex items-center px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl transition-all mt-1"
         >
           <LogOut size={20} className="mr-3" />
-          <span className="text-[15px] font-medium">Logout</span>
+          <span className="text-base font-medium">Logout</span>
         </button>
       </div>
     </div>

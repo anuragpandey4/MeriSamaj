@@ -24,7 +24,7 @@ const NotificationsPage = () => {
         title="Notifications"
         showBack={true}
         rightContent={
-          <button onClick={markAllRead} className="text-[11px] text-brand-primary font-medium press-scale flex items-center gap-1">
+          <button onClick={markAllRead} className="text-xs text-brand-primary font-medium press-scale flex items-center gap-1">
             <Check size={12} /> Mark all read
           </button>
         }
@@ -50,7 +50,7 @@ const NotificationsPage = () => {
                   {!n.isRead && <div className="w-2 h-2 bg-brand-primary rounded-full shrink-0 mt-1.5" />}
                 </div>
                 <p className="text-xs text-text-secondary mt-0.5">{n.message}</p>
-                <p className="text-[10px] text-text-secondary mt-1">{n.time}</p>
+                <p className="text-xs text-text-secondary mt-1">{n.time}</p>
               </div>
             </div>
           );

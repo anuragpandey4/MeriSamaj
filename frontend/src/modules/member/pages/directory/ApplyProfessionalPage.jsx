@@ -48,7 +48,7 @@ const ApplyProfessionalPage = () => {
           </div>
           <div>
             <h3 className="text-sm font-bold text-purple-900 mb-1">Grow your reach</h3>
-            <p className="text-[11px] text-purple-700 leading-relaxed">
+            <p className="text-xs text-purple-700 leading-relaxed">
               Join the community's professional directory to offer your services. Verified listings build trust and attract local business.
             </p>
           </div>
@@ -56,7 +56,7 @@ const ApplyProfessionalPage = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Category</label>
+            <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Category</label>
             <select required className="w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-brand-primary transition-all">
               <option value="">Select Category</option>
               <option>Finance</option>
@@ -69,27 +69,27 @@ const ApplyProfessionalPage = () => {
           </div>
 
           <div>
-            <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Profession / Title</label>
+            <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Profession / Title</label>
             <input required type="text" placeholder="e.g. Chartered Accountant" className="w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-brand-primary transition-all" />
           </div>
 
           <div>
-            <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Company / Business Name</label>
+            <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Company / Business Name</label>
             <input required type="text" placeholder="e.g. Agrawal & Associates" className="w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-brand-primary transition-all" />
           </div>
 
           <div>
-            <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Years of Experience</label>
+            <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Years of Experience</label>
             <input required type="number" placeholder="e.g. 5" className="w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-brand-primary transition-all" />
           </div>
 
           <div>
-            <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Work Address / City</label>
+            <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Work Address / City</label>
             <input required type="text" placeholder="e.g. MG Road, Indore" className="w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-brand-primary transition-all" />
           </div>
 
           <div>
-            <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">About Your Service</label>
+            <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">About Your Service</label>
             <textarea required placeholder="Briefly describe what you do..." className="w-full h-24 mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-brand-primary transition-all resize-none" />
           </div>
 
@@ -97,7 +97,7 @@ const ApplyProfessionalPage = () => {
             <button type="submit" className="w-full py-3.5 bg-purple-600 text-white rounded-xl text-sm font-semibold press-scale shadow-md flex justify-center items-center gap-2">
               <FileText size={16} /> Submit Application
             </button>
-            <p className="text-[10px] text-center text-text-secondary mt-3">
+            <p className="text-xs text-center text-text-secondary mt-3">
               By submitting, you agree to the community verification process.
             </p>
           </div>

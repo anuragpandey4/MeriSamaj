@@ -126,7 +126,7 @@ const MemberDetailPage = () => {
 
       {/* Personal Info */}
       <div className="mt-3">
-        <p className="px-4 text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Personal Information</p>
+        <p className="px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Personal Information</p>
         <div className="bg-card mx-4 rounded-2xl overflow-hidden border border-gray-100">
           <InfoRow icon={Briefcase} label="Profession" value={member.profession} />
           <InfoRow icon={MapPin} label="City" value={member.city} />
@@ -139,7 +139,7 @@ const MemberDetailPage = () => {
 
       {/* Professional Info */}
       <div className="mt-4">
-        <p className="px-4 text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Professional Details</p>
+        <p className="px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Professional Details</p>
         <div className="bg-card mx-4 rounded-2xl overflow-hidden border border-gray-100">
           <InfoRow icon={Briefcase} label="Designation" value={member.profession} />
           <InfoRow icon={Building} label="Company" value={memberCompany} />
@@ -149,13 +149,13 @@ const MemberDetailPage = () => {
 
       {/* Family Members */}
       <div className="mt-4">
-        <p className="px-4 text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Family Members</p>
+        <p className="px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Family Members</p>
         <div className="px-4 flex gap-2.5 overflow-x-auto scrollbar-hide pb-2" ref={scrollRef}>
           {memberFamily.map((fm, i) => (
             <div key={fm.id || i} className="shrink-0 bg-card rounded-2xl p-3 border border-gray-100 flex flex-col items-center w-24">
               <Avatar initials={fm.initials} size="sm" />
-              <p className="text-[11px] font-medium text-text-primary mt-1.5 truncate w-full text-center">{fm.name.split(' ')[0]}</p>
-              <p className="text-[9px] text-text-secondary">{fm.relation}</p>
+              <p className="text-xs font-medium text-text-primary mt-1.5 truncate w-full text-center">{fm.name.split(' ')[0]}</p>
+              <p className="text-xs text-text-secondary">{fm.relation}</p>
             </div>
           ))}
         </div>
@@ -184,7 +184,7 @@ const InfoRow = ({ icon: Icon, label, value, last = false }) => (
   <div className={`flex items-center gap-3 px-4 py-3 ${!last ? 'border-b border-gray-50' : ''}`}>
     <Icon size={16} className="text-text-secondary shrink-0" />
     <div className="flex-1">
-      <p className="text-[10px] text-text-secondary">{label}</p>
+      <p className="text-xs text-text-secondary">{label}</p>
       <p className="text-xs font-medium text-text-primary">{value}</p>
     </div>
   </div>

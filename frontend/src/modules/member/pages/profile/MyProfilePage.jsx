@@ -63,15 +63,15 @@ const MyProfilePage = () => {
         <div className="bg-card rounded-2xl shadow-md p-4 grid grid-cols-3 divide-x divide-gray-100">
           <div className="flex flex-col items-center">
             <span className="text-lg font-bold text-brand-primary">12</span>
-            <span className="text-[10px] text-text-secondary mt-0.5">Posts</span>
+            <span className="text-xs text-text-secondary mt-0.5">Posts</span>
           </div>
           <div className="flex flex-col items-center">
             <span className="text-lg font-bold text-social-module">3</span>
-            <span className="text-[10px] text-text-secondary mt-0.5">Groups</span>
+            <span className="text-xs text-text-secondary mt-0.5">Groups</span>
           </div>
           <div className="flex flex-col items-center">
             <span className="text-lg font-bold text-matrimonial-module">2</span>
-            <span className="text-[10px] text-text-secondary mt-0.5">Events</span>
+            <span className="text-xs text-text-secondary mt-0.5">Events</span>
           </div>
         </div>
       </div>
@@ -117,12 +117,12 @@ const MyProfilePage = () => {
             <div key={fm.id} className="shrink-0 bg-card rounded-2xl p-3 border border-gray-100 flex flex-col items-center w-24 card-press">
               <Avatar initials={fm.initials} size="md" />
               <p className="text-xs font-medium text-text-primary mt-1.5 truncate w-full text-center">{fm.name.split(' ')[0]}</p>
-              <p className="text-[10px] text-text-secondary">{fm.relation}</p>
+              <p className="text-xs text-text-secondary">{fm.relation}</p>
             </div>
           ))}
           <button onClick={() => navigate('/member/profile/family')} className="shrink-0 w-24 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center gap-1 press-scale">
             <span className="text-xl text-gray-300">+</span>
-            <span className="text-[10px] text-text-secondary">Add</span>
+            <span className="text-xs text-text-secondary">Add</span>
           </button>
         </div>
       </div>

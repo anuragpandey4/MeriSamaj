@@ -64,19 +64,19 @@ const MatrimonialProfilePage = () => {
           
           <div className="grid grid-cols-2 gap-y-3 mt-4">
             <div>
-              <p className="text-[10px] text-text-secondary">Height</p>
+              <p className="text-xs text-text-secondary">Height</p>
               <p className="text-xs font-medium text-text-primary mt-0.5">{profile.height}</p>
             </div>
             <div>
-              <p className="text-[10px] text-text-secondary">Gotra</p>
+              <p className="text-xs text-text-secondary">Gotra</p>
               <p className="text-xs font-medium text-text-primary mt-0.5">{profile.gotra}</p>
             </div>
             <div>
-              <p className="text-[10px] text-text-secondary">Manglik</p>
+              <p className="text-xs text-text-secondary">Manglik</p>
               <p className="text-xs font-medium text-text-primary mt-0.5">{profile.manglik || 'No'}</p>
             </div>
             <div>
-              <p className="text-[10px] text-text-secondary">Diet</p>
+              <p className="text-xs text-text-secondary">Diet</p>
               <p className="text-xs font-medium text-text-primary mt-0.5">Vegetarian</p>
             </div>
           </div>
@@ -89,15 +89,15 @@ const MatrimonialProfilePage = () => {
           </h3>
           <div className="space-y-3">
             <div>
-              <p className="text-[10px] text-text-secondary">Highest Education</p>
+              <p className="text-xs text-text-secondary">Highest Education</p>
               <p className="text-sm font-medium text-text-primary mt-0.5">{profile.education}</p>
             </div>
             <div>
-              <p className="text-[10px] text-text-secondary">Occupation</p>
+              <p className="text-xs text-text-secondary">Occupation</p>
               <p className="text-sm font-medium text-text-primary mt-0.5">{profile.profession}</p>
             </div>
             <div>
-              <p className="text-[10px] text-text-secondary">Annual Income</p>
+              <p className="text-xs text-text-secondary">Annual Income</p>
               <p className="text-sm font-medium text-text-primary mt-0.5">₹10L - ₹15L (Mock)</p>
             </div>
           </div>
@@ -108,23 +108,23 @@ const MatrimonialProfilePage = () => {
           <h3 className="text-xs font-semibold text-matrimonial-module uppercase tracking-wider mb-3">Family Details</h3>
           <div className="grid grid-cols-2 gap-y-3">
             <div>
-              <p className="text-[10px] text-text-secondary">Father's Status</p>
+              <p className="text-xs text-text-secondary">Father's Status</p>
               <p className="text-xs font-medium text-text-primary mt-0.5">Business</p>
             </div>
             <div>
-              <p className="text-[10px] text-text-secondary">Mother's Status</p>
+              <p className="text-xs text-text-secondary">Mother's Status</p>
               <p className="text-xs font-medium text-text-primary mt-0.5">Homemaker</p>
             </div>
             <div>
-              <p className="text-[10px] text-text-secondary">Brothers</p>
+              <p className="text-xs text-text-secondary">Brothers</p>
               <p className="text-xs font-medium text-text-primary mt-0.5">1 (Married)</p>
             </div>
             <div>
-              <p className="text-[10px] text-text-secondary">Sisters</p>
+              <p className="text-xs text-text-secondary">Sisters</p>
               <p className="text-xs font-medium text-text-primary mt-0.5">None</p>
             </div>
             <div className="col-span-2">
-              <p className="text-[10px] text-text-secondary">Family Values</p>
+              <p className="text-xs text-text-secondary">Family Values</p>
               <p className="text-xs font-medium text-text-primary mt-0.5">Traditional</p>
             </div>
           </div>
@@ -137,15 +137,15 @@ const MatrimonialProfilePage = () => {
           </h3>
           <div className="grid grid-cols-2 gap-y-3">
             <div>
-              <p className="text-[10px] text-text-secondary">Age Range</p>
+              <p className="text-xs text-text-secondary">Age Range</p>
               <p className="text-xs font-medium text-text-primary mt-0.5">24 - 28</p>
             </div>
             <div>
-              <p className="text-[10px] text-text-secondary">Height</p>
+              <p className="text-xs text-text-secondary">Height</p>
               <p className="text-xs font-medium text-text-primary mt-0.5">5'5" to 5'10"</p>
             </div>
             <div className="col-span-2">
-              <p className="text-[10px] text-text-secondary">Education</p>
+              <p className="text-xs text-text-secondary">Education</p>
               <p className="text-xs font-medium text-text-primary mt-0.5">Graduate or above</p>
             </div>
           </div>

@@ -32,9 +32,9 @@ const EventCard = ({ event, index }) => {
       } flex items-center justify-center relative`}>
         <CalendarDays size={40} className="text-white/20" />
         <div className="absolute top-2 left-2">
-          <Badge variant="new" className="bg-white/90 !text-text-primary text-[10px]">{event.category}</Badge>
+          <Badge variant="new" className="bg-white/90 !text-text-primary text-xs">{event.category}</Badge>
         </div>
-        <div className="absolute bottom-2 right-2 bg-black/40 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg">
+        <div className="absolute bottom-2 right-2 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-lg">
           {event.date}
         </div>
       </div>
@@ -44,13 +44,13 @@ const EventCard = ({ event, index }) => {
         <p className="text-xs text-text-secondary mt-1 line-clamp-2">{event.description}</p>
 
         <div className="flex flex-col gap-1 mt-2.5">
-          <p className="text-[11px] text-text-secondary flex items-center gap-1.5">
+          <p className="text-xs text-text-secondary flex items-center gap-1.5">
             <Clock size={11} className="text-brand-primary" /> {event.time}
           </p>
-          <p className="text-[11px] text-text-secondary flex items-center gap-1.5">
+          <p className="text-xs text-text-secondary flex items-center gap-1.5">
             <MapPin size={11} className="text-brand-primary" /> {event.venue}
           </p>
-          <p className="text-[11px] text-text-secondary flex items-center gap-1.5">
+          <p className="text-xs text-text-secondary flex items-center gap-1.5">
             <UsersIcon size={11} className="text-brand-primary" /> {event.attendees} members attending
           </p>
         </div>
@@ -96,7 +96,7 @@ const EventsPage = () => {
             <button
               key={c}
               onClick={() => setActiveCategory(c)}
-              className={`shrink-0 px-3.5 py-1.5 rounded-full text-[11px] font-medium press-scale transition-all ${
+              className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium press-scale transition-all ${
                 activeCategory === c
                   ? 'bg-brand-primary text-white shadow-sm'
                   : 'bg-card text-text-secondary border border-gray-200'

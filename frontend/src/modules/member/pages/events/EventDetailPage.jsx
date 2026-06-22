@@ -84,7 +84,7 @@ const EventDetailPage = () => {
           {mockAttendees.map((a, i) => (
             <div key={i} className="shrink-0 flex flex-col items-center w-16">
               <Avatar initials={a.initials} size="md" />
-              <p className="text-[10px] text-text-secondary mt-1 truncate w-full text-center">{a.name}</p>
+              <p className="text-xs text-text-secondary mt-1 truncate w-full text-center">{a.name}</p>
             </div>
           ))}
           <div className="shrink-0 flex flex-col items-center justify-center w-16">

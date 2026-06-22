@@ -65,7 +65,7 @@ const MatrimonialSetupPage = () => {
 
             <div className="bg-pink-50 rounded-xl p-3 flex items-start gap-2 mb-4">
               <Lock size={14} className="text-matrimonial-module shrink-0 mt-0.5" />
-              <p className="text-[10px] text-matrimonial-module/80 leading-relaxed">
+              <p className="text-xs text-matrimonial-module/80 leading-relaxed">
                 Photos will be blurred by default. They are only visible to profiles whose interest you accept.
               </p>
             </div>
@@ -75,7 +75,7 @@ const MatrimonialSetupPage = () => {
             
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Manglik</label>
+                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Manglik</label>
                 <select className="w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-matrimonial-module transition-all">
                   <option>No</option>
                   <option>Yes</option>
@@ -83,7 +83,7 @@ const MatrimonialSetupPage = () => {
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Diet</label>
+                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Diet</label>
                 <select className="w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-matrimonial-module transition-all">
                   <option>Vegetarian</option>
                   <option>Non-Vegetarian</option>
@@ -126,7 +126,7 @@ const MatrimonialSetupPage = () => {
               <CheckCircle size={20} className="text-emerald-500 shrink-0 mt-0.5" />
               <div>
                 <p className="text-sm font-semibold text-emerald-800">Ready to publish</p>
-                <p className="text-[10px] text-emerald-600 mt-1">Your profile will be visible to community members looking for matches.</p>
+                <p className="text-xs text-emerald-600 mt-1">Your profile will be visible to community members looking for matches.</p>
               </div>
             </div>
           </div>
@@ -145,7 +145,7 @@ const MatrimonialSetupPage = () => {
         <div className="flex-1">
           <h1 className="text-base font-semibold text-text-primary">Matrimonial Profile</h1>
         </div>
-        <span className="text-[10px] font-semibold text-matrimonial-module bg-pink-50 px-2 py-1 rounded-md">Step {step}/4</span>
+        <span className="text-xs font-semibold text-matrimonial-module bg-pink-50 px-2 py-1 rounded-md">Step {step}/4</span>
       </div>
 
       {/* Progress Bar */}
@@ -175,7 +175,7 @@ const MatrimonialSetupPage = () => {
 
 const InputField = ({ label, ...props }) => (
   <div>
-    <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider">{label}</label>
+    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">{label}</label>
     <input
       type="text"
       className="w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-matrimonial-module focus:ring-2 focus:ring-pink-100 transition-all placeholder-gray-400"

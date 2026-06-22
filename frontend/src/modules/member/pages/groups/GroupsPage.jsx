@@ -67,15 +67,15 @@ const GroupsPage = () => {
                   <div className="flex items-center gap-1.5">
                     <h3 className="text-sm font-semibold text-text-primary truncate">{group.name}</h3>
                   </div>
-                  <p className="text-[11px] text-text-secondary mt-0.5 line-clamp-1">{group.description}</p>
+                  <p className="text-xs text-text-secondary mt-0.5 line-clamp-1">{group.description}</p>
                   <div className="flex items-center gap-3 mt-1.5">
-                    <span className="text-[10px] text-text-secondary flex items-center gap-0.5">
+                    <span className="text-xs text-text-secondary flex items-center gap-0.5">
                       <Users size={10} /> {group.members}
                     </span>
-                    <span className="text-[10px] text-text-secondary flex items-center gap-0.5">
+                    <span className="text-xs text-text-secondary flex items-center gap-0.5">
                       <MessageCircle size={10} /> {group.posts} posts
                     </span>
-                    <span className="text-[10px] text-text-secondary">· {group.lastActivity}</span>
+                    <span className="text-xs text-text-secondary">· {group.lastActivity}</span>
                   </div>
                 </div>
               </div>
