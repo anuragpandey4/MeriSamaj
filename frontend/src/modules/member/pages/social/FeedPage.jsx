@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, MessageCircle, Share2, MoreHorizontal, PlusCircle, ImagePlus, Send } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ThumbsUp, MessageCircle, Share2, MoreHorizontal, PlusCircle, ImagePlus, Send, Menu, Search, Bell, Radio, Clock } from 'lucide-react';
 import { Avatar } from '../../components/common/Avatar';
 import { Badge } from '../../components/common/Badge';
 import { useData } from '../../context/DataProvider';
+import { PostSkeleton } from '../../components/common/Skeleton';
 
 const PostCard = ({ post, index }) => {
   const navigate = useNavigate();
@@ -18,63 +20,81 @@ const PostCard = ({ post, index }) => {
 
   return (
     <div 
-      className="bg-card border-b border-gray-100 animate-stagger-fade-in"
+      className="card-std card-press animate-stagger-fade-in relative"
       style={{ animationDelay: `${index * 80}ms` }}
     >
+      {/* Offline pending badge */}
+      {post.status === 'pending' && (
+        <div className="absolute top-4 right-4 bg-yellow-100 text-yellow-800 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1 z-10">
+          <Clock size={10} /> Pending
+        </div>
+      )}
+
       {/* Author */}
-      <div className="flex items-center justify-between px-4 pt-3 pb-2">
+      <div className="flex items-center justify-between px-4 pt-4 pb-3">
         <div className="flex items-center gap-3">
           <Avatar initials={post.author.initials} size="md" />
           <div>
-            <div className="flex items-center gap-1.5">
-              <h4 className="text-sm font-semibold text-text-primary">{post.author.name}</h4>
-            </div>
-            <p className="text-xs text-text-secondary">{post.community} · {post.city} · {post.timestamp}</p>
+            <h4 className="text-[15px] font-bold text-text-primary leading-tight">{post.author.name}</h4>
+            <p className="text-[13px] text-text-secondary mt-0.5">{post.community} · {post.timestamp}</p>
           </div>
         </div>
-        <button className="p-1 press-scale">
-          <MoreHorizontal size={18} className="text-text-secondary" />
+        <button className="p-2 -mr-2 text-text-secondary hover:bg-gray-50 rounded-full transition-colors">
+          <MoreHorizontal size={20} />
         </button>
       </div>
 
       {/* Content */}
-      <div className="px-4 pb-2" onClick={() => navigate(`/member/social/${post.id}`)}>
-        <p className="text-sm text-text-primary leading-relaxed">{post.content}</p>
+      <div className="px-4 pb-3" onClick={() => navigate(`/member/social/${post.id}`)}>
+        {post.type === 'audio' ? (
+          <div className="bg-rose-50 border border-rose-100 rounded-2xl p-4 flex flex-col gap-3">
+            <div className="flex items-center gap-2 text-rose-600 mb-1">
+              <Radio size={16} className="animate-pulse" />
+              <span className="text-[12px] font-bold uppercase tracking-widest">Community Broadcast</span>
+            </div>
+            <audio src={post.audioUrl} controls className="w-full h-10 outline-none" />
+          </div>
+        ) : (
+          <p className="text-[15px] text-text-primary leading-relaxed">{post.content}</p>
+        )}
       </div>
 
-      {/* Image placeholder */}
+      {/* Image placeholder - Full Bleed */}
       {post.image && (
-        <div className="mx-4 mb-2 h-48 bg-gradient-to-br from-brand-primary/10 to-brand-secondary/10 rounded-xl flex items-center justify-center cursor-pointer" onClick={() => navigate(`/member/social/${post.id}`)}>
-          <span className="text-xs text-text-secondary">📷 Community Photo</span>
+        <div className="w-full mb-3 h-64 bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center cursor-pointer overflow-hidden relative" onClick={() => navigate(`/member/social/${post.id}`)}>
+          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_#2563EB_1px,_transparent_1px)] bg-[length:12px_12px]" />
+          <span className="text-sm font-medium text-blue-600 relative z-10 flex items-center gap-2"><ImagePlus size={18} /> Community Photo</span>
         </div>
       )}
 
       {/* Stats */}
-      <div className="px-4 pb-1">
-        <div className="flex items-center justify-between text-xs text-text-secondary border-b border-gray-50 pb-2">
+      <div className="px-4 pb-2">
+        <div className="flex items-center justify-between text-[13px] text-text-secondary">
           <span>{post.likes} likes</span>
           <span>{post.comments?.length || 0} comments</span>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-4 px-4 py-3">
-        <button 
+      <div className="flex items-center justify-between px-2 py-1 border-t border-gray-100">
+        <motion.button 
+          whileTap={{ scale: 0.85 }}
           onClick={(e) => { e.stopPropagation(); togglePostLike(post.id); }}
-          className={`flex items-center gap-1.5 text-xs font-semibold press-scale ${post.isLiked ? 'text-pink-500' : 'text-text-secondary'}`}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 text-[14px] font-medium transition-colors duration-200 rounded-lg hover:bg-gray-50 ${post.isLiked ? 'text-[#1877F2]' : 'text-text-secondary'}`}
         >
-          <Heart size={16} fill={post.isLiked ? 'currentColor' : 'none'} /> 
-          {post.likes > 0 && post.likes}
-        </button>
+          <ThumbsUp size={20} className={post.isLiked ? 'drop-shadow-sm' : ''} fill={post.isLiked ? 'currentColor' : 'none'} /> 
+          Like
+        </motion.button>
         <button 
           onClick={(e) => { e.stopPropagation(); navigate(`/member/social/${post.id}`); }}
-          className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary press-scale"
+          className="flex-1 flex items-center justify-center gap-2 py-2 text-[14px] font-medium text-text-secondary hover:bg-gray-50 rounded-lg transition-colors duration-200"
         >
-          <MessageCircle size={16} /> {post.comments?.length > 0 && post.comments.length}
+          <MessageCircle size={20} /> 
+          Comment
         </button>
-        <button className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary press-scale">
-          <Share2 size={16} />
-          <span>Share</span>
+        <button className="flex-1 flex items-center justify-center gap-2 py-2 text-[14px] font-medium text-text-secondary hover:bg-gray-50 rounded-lg transition-colors duration-200">
+          <Share2 size={20} />
+          Share
         </button>
       </div>
     </div>
@@ -84,41 +104,132 @@ const PostCard = ({ post, index }) => {
 const FeedPage = () => {
   const navigate = useNavigate();
   const { posts, currentUser } = useData();
+  const [activeTab, setActiveTab] = useState('community');
+  const [showBroadcastBanner, setShowBroadcastBanner] = useState(false);
+  const [feedPosts, setFeedPosts] = useState(posts);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading state
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [activeTab]);
+
+  // Sync feedPosts when global posts context changes
+  useEffect(() => {
+    setFeedPosts(posts);
+  }, [posts]);
+
+  // Offline-to-Online Delivery Logic
+  useEffect(() => {
+    const handleOnline = () => {
+      // Check if there are any pending posts
+      const hasPending = feedPosts.some(p => p.status === 'pending');
+      
+      if (hasPending) {
+        // Automatically publish them
+        setFeedPosts(prev => prev.map(p => p.status === 'pending' ? { ...p, status: 'published' } : p));
+        // Show banner
+        setShowBroadcastBanner(true);
+        setTimeout(() => setShowBroadcastBanner(false), 5000);
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [feedPosts]);
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
-      {/* Header */}
-      <div className="bg-card sticky top-0 z-30 border-b border-gray-100">
-        <div className="flex items-center justify-between px-4 h-14">
-          <h1 className="text-lg font-bold text-social-module">Social Feed</h1>
-          <Badge variant="social">Community</Badge>
+    <div className="min-h-screen bg-surface pb-28">
+      {/* Broadcast Delivery Banner */}
+      {showBroadcastBanner && (
+        <div className="fixed top-14 left-0 right-0 z-50 px-4 py-2 animate-fade-in-down">
+          <div className="bg-emerald-500 text-white shadow-lg rounded-full px-4 py-2.5 flex items-center gap-3 text-sm font-bold">
+            <Radio size={18} className="animate-pulse" />
+            📥 New Broadcast Delivered!
+          </div>
+        </div>
+      )}
+
+      {/* Global Header */}
+      <div className="bg-white sticky top-0 z-40 border-b border-gray-100">
+        <div className="flex items-center justify-between px-5 h-16">
+          <div className="flex items-center gap-4">
+            <button className="text-text-primary">
+              <Menu size={24} />
+            </button>
+            <h1 className="text-[20px] font-semibold text-text-primary tracking-tight">Meri Samaj</h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <button className="text-text-primary">
+              <Search size={22} />
+            </button>
+            <button className="relative text-text-primary">
+              <Bell size={22} />
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                3
+              </span>
+            </button>
+            <Avatar initials={currentUser?.initials || 'U'} size="sm" color="bg-blue-100 text-blue-700" />
+          </div>
         </div>
       </div>
-
-      {/* Create Post */}
-      <div className="bg-card px-4 py-3 border-b border-gray-100 cursor-pointer" onClick={() => navigate('/member/social/create')}>
-        <div className="flex items-center gap-3">
-          <Avatar initials={currentUser?.initials || 'U'} size="md" />
-          <div className="flex-1 text-left bg-gray-50 rounded-full px-4 py-2.5 text-sm text-text-secondary">
-            Share an update or photo...
-          </div>
-          <button className="p-2 text-social-module press-scale">
-            <ImagePlus size={22} />
+      
+      <div className="px-5 pt-5">
+        {/* Tab Toggle */}
+        <div className="flex bg-white rounded-2xl border border-gray-200 overflow-hidden mb-4 shadow-sm p-1 gap-1">
+          <button className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#1877F2] text-white rounded-xl font-medium text-sm transition-colors">
+            <div className="w-5 h-5 rounded-full bg-white text-[#1877F2] flex items-center justify-center">
+              <span className="text-[12px] font-bold">f</span>
+            </div>
+            Social Feed
+          </button>
+          <button onClick={() => navigate('/member/groups')} className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-transparent text-text-secondary rounded-xl font-medium text-sm transition-colors hover:bg-gray-50">
+            <MessageCircle size={18} />
+            Groups
           </button>
         </div>
-      </div>
 
-      {/* Feed */}
-      <div className="divide-y divide-gray-50">
-        {posts.map((post, i) => (
-          <PostCard key={post.id} post={post} index={i} />
-        ))}
+        {/* Create Post */}
+        <div className="card-std px-4 py-4 mb-4 cursor-pointer card-press flex items-center gap-3" onClick={() => navigate('/member/social/create')}>
+          <Avatar initials={currentUser?.initials || 'U'} size="md" color="bg-blue-100 text-blue-700" />
+          <div className="flex-1 text-left text-[15px] text-text-secondary">
+            Share an update or photo...
+          </div>
+          <div className="flex items-center gap-3 border-l border-gray-200 pl-3">
+            <button className="text-[#1877F2]">
+              <ImagePlus size={22} />
+            </button>
+            <button className="flex items-center gap-1 text-red-500">
+              <Radio size={20} />
+              <span className="text-xs font-semibold">Live</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Feed */}
+        <div className="px-5 mt-5 space-y-4">
+          {isLoading ? (
+            <>
+              <PostSkeleton />
+              <PostSkeleton />
+              <PostSkeleton />
+            </>
+          ) : (
+            feedPosts.filter(p => activeTab === 'all' || p.community === currentUser.community).map((post, index) => (
+              <PostCard key={post.id} post={post} index={index} />
+            ))
+          )}
+        </div>
       </div>
 
       {/* FAB */}
       <button 
         onClick={() => navigate('/member/social/create')}
-        className="responsive-fixed-fab w-14 h-14 bg-social-module text-white rounded-full shadow-lg flex items-center justify-center press-scale"
+        className="responsive-fixed-fab w-14 h-14 bg-[#1877F2] text-white rounded-full shadow-lg flex items-center justify-center press-scale hover:bg-blue-600 transition-colors"
       >
         <PlusCircle size={28} />
       </button>

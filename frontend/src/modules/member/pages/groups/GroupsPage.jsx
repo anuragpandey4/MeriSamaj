@@ -33,24 +33,24 @@ const GroupsPage = () => {
     : mockGroups;
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface pb-28">
       <PageHeader title="Community Groups" showBack={true} />
 
       <div className="pt-14">
         {/* Tabs */}
-        <div className="px-4 py-3 flex gap-2">
+        <div className="px-5 py-4 flex gap-3">
           <button
             onClick={() => setTab('my')}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-semibold press-scale transition-all ${
-              tab === 'my' ? 'bg-social-module text-white shadow-sm' : 'bg-gray-100 text-text-secondary'
+            className={`flex-1 py-3 rounded-2xl text-[14px] font-semibold press-scale transition-all ${
+              tab === 'my' ? 'bg-social-module text-white shadow-sm' : 'bg-white border border-gray-100 text-text-secondary'
             }`}
           >
             My Groups
           </button>
           <button
             onClick={() => setTab('discover')}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-semibold press-scale transition-all ${
-              tab === 'discover' ? 'bg-social-module text-white shadow-sm' : 'bg-gray-100 text-text-secondary'
+            className={`flex-1 py-3 rounded-2xl text-[14px] font-semibold press-scale transition-all ${
+              tab === 'discover' ? 'bg-social-module text-white shadow-sm' : 'bg-white border border-gray-100 text-text-secondary'
             }`}
           >
             Discover
@@ -58,43 +58,43 @@ const GroupsPage = () => {
         </div>
 
         {/* Group Cards */}
-        <div className="px-4 space-y-2.5">
+        <div className="px-5 space-y-3">
           {displayed.map((group, i) => (
-            <div key={group.id} className="bg-card rounded-2xl p-3.5 shadow-sm border border-gray-100 card-press animate-stagger-fade-in" style={{ animationDelay: `${i * 70}ms` }}>
-              <div className="flex items-start gap-3">
+            <div key={group.id} className="card-std p-4 card-press animate-stagger-fade-in" style={{ animationDelay: `${i * 70}ms` }}>
+              <div className="flex items-start gap-4">
                 <Avatar initials={group.initials} size="lg" color={groupColors[group.category] || 'bg-gray-100 text-gray-600'} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <h3 className="text-sm font-semibold text-text-primary truncate">{group.name}</h3>
+                    <h3 className="text-[15px] font-bold text-text-primary truncate">{group.name}</h3>
                   </div>
-                  <p className="text-xs text-text-secondary mt-0.5 line-clamp-1">{group.description}</p>
-                  <div className="flex items-center gap-3 mt-1.5">
-                    <span className="text-xs text-text-secondary flex items-center gap-0.5">
-                      <Users size={10} /> {group.members}
+                  <p className="text-[13px] text-text-secondary mt-0.5 line-clamp-2 leading-relaxed">{group.description}</p>
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className="text-[12px] text-text-secondary flex items-center gap-1 font-medium">
+                      <Users size={12} /> {group.members}
                     </span>
-                    <span className="text-xs text-text-secondary flex items-center gap-0.5">
-                      <MessageCircle size={10} /> {group.posts} posts
+                    <span className="text-[12px] text-text-secondary flex items-center gap-1 font-medium">
+                      <MessageCircle size={12} /> {group.posts} posts
                     </span>
-                    <span className="text-xs text-text-secondary">· {group.lastActivity}</span>
+                    <span className="text-[12px] text-text-secondary">· {group.lastActivity}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 mt-3">
+              <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-50">
                 {joinedGroups[group.id] ? (
-                  <button onClick={() => navigate(`/member/groups/${group.id}`)} className="flex-1 py-2 bg-social-module/10 text-social-module rounded-xl text-xs font-semibold press-scale flex items-center justify-center gap-1">
-                    <MessageCircle size={13} /> Open Discussion
+                  <button onClick={() => navigate(`/member/groups/${group.id}`)} className="flex-1 py-2.5 bg-social-module/10 text-social-module rounded-xl text-[14px] font-semibold press-scale flex items-center justify-center gap-1.5">
+                    <MessageCircle size={16} /> Open Discussion
                   </button>
                 ) : (
                   <button
                     onClick={() => setJoinedGroups(prev => ({ ...prev, [group.id]: true }))}
-                    className="flex-1 py-2 bg-social-module text-white rounded-xl text-xs font-semibold press-scale flex items-center justify-center gap-1"
+                    className="flex-1 py-2.5 bg-social-module text-white rounded-xl text-[14px] font-semibold press-scale flex items-center justify-center gap-1.5"
                   >
-                    <Plus size={13} /> Join Group
+                    <Plus size={16} /> Join Group
                   </button>
                 )}
-                <button className="p-2 bg-gray-50 rounded-xl press-scale">
-                  <Bell size={14} className="text-text-secondary" />
+                <button className="p-2.5 bg-gray-50 rounded-xl press-scale border border-gray-100 hover:bg-gray-100">
+                  <Bell size={18} className="text-text-secondary" />
                 </button>
               </div>
             </div>

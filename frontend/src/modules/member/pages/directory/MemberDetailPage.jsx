@@ -5,11 +5,13 @@ import { Avatar } from '../../components/common/Avatar';
 import { Badge } from '../../components/common/Badge';
 import { useData } from '../../context/DataProvider';
 import { useDraggableScroll } from '../../../../hooks/useDraggableScroll';
+import BranchingFamilyTree from '../../components/family/BranchingFamilyTree';
+import { t } from '../../utils/translations';
 
 const MemberDetailPage = () => {
   const { memberId } = useParams();
   const navigate = useNavigate();
-  const { members } = useData();
+  const { members, language } = useData();
   const scrollRef = useDraggableScroll();
 
   const member = members.find(m => m.id === memberId) || members[0];
@@ -148,16 +150,13 @@ const MemberDetailPage = () => {
       </div>
 
       {/* Family Members */}
-      <div className="mt-4">
-        <p className="px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Family Members</p>
-        <div className="px-4 flex gap-2.5 overflow-x-auto scrollbar-hide pb-2" ref={scrollRef}>
-          {memberFamily.map((fm, i) => (
-            <div key={fm.id || i} className="shrink-0 bg-card rounded-2xl p-3 border border-gray-100 flex flex-col items-center w-24">
-              <Avatar initials={fm.initials} size="sm" />
-              <p className="text-xs font-medium text-text-primary mt-1.5 truncate w-full text-center">{fm.name.split(' ')[0]}</p>
-              <p className="text-xs text-text-secondary">{fm.relation}</p>
-            </div>
-          ))}
+      <div className="mt-5 pb-6">
+        <p className="px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider mb-3">{t('Family Tree', language)}</p>
+        <div className="w-full bg-white border-y border-gray-100 overflow-hidden relative">
+          <BranchingFamilyTree 
+            primaryMember={member} 
+            familyMembers={memberFamily} 
+          />
         </div>
       </div>
 
@@ -169,12 +168,12 @@ const MemberDetailPage = () => {
         >
           <Phone size={14} /> Call
         </a>
-        <a 
-          href={`mailto:${memberEmail}`} 
+        <button 
+          onClick={() => navigate(`/member/chat/${member.id}`)} 
           className="flex-1 py-3 bg-gray-100 text-text-primary rounded-2xl text-xs font-semibold flex items-center justify-center gap-1.5 press-scale text-center"
         >
           <Mail size={14} /> Message
-        </a>
+        </button>
       </div>
     </div>
   );

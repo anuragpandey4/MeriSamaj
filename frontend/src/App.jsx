@@ -7,7 +7,8 @@ const App = () => {
   return (
     <DataProvider>
       <div className="desktop-wrapper">
-        <div className="app-container">
+        <div className="app-container bg-transparent">
+          <div className="aura-bg" />
           <BrowserRouter>
             <Routes>
               {/* Default entry → splash screen for onboarding demo */}

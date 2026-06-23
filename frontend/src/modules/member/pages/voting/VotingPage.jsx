@@ -24,7 +24,7 @@ const VotingPage = () => {
         </div>
       </div>
 
-      <div className="px-4 pt-6 pb-20">
+      <div className="px-5 pt-6 pb-28">
         <div className="bg-amber-50 rounded-2xl p-4 flex gap-3 mb-6 border border-amber-100">
           <div className="w-10 h-10 bg-amber-200 rounded-full flex items-center justify-center shrink-0">
             <Vote size={20} className="text-amber-700" />
@@ -37,14 +37,14 @@ const VotingPage = () => {
           </div>
         </div>
 
-        <h3 className="text-sm font-semibold text-text-primary mb-3">Active Polls</h3>
+        <h3 className="text-[15px] font-bold text-text-primary mb-4 tracking-tight">Active Polls</h3>
         <div className="space-y-3 mb-6">
           {mockPolls.filter(p => p.status === 'Active').map(poll => (
             <PollCard key={poll.id} poll={poll} onClick={() => navigate(`/member/voting/${poll.id}`)} />
           ))}
         </div>
 
-        <h3 className="text-sm font-semibold text-text-primary mb-3">Past Results</h3>
+        <h3 className="text-[15px] font-bold text-text-primary mb-4 tracking-tight">Past Results</h3>
         <div className="space-y-3">
           {mockPolls.filter(p => p.status === 'Closed').map(poll => (
             <PollCard key={poll.id} poll={poll} onClick={() => navigate(`/member/voting/${poll.id}`)} />
@@ -56,25 +56,25 @@ const VotingPage = () => {
 };
 
 const PollCard = ({ poll, onClick }) => (
-  <div onClick={onClick} className="bg-card rounded-2xl p-4 border border-gray-100 shadow-sm card-press">
-    <div className="flex items-start justify-between mb-2">
-      <Badge variant={poll.status === 'Active' ? 'warning' : 'default'} className="!px-2">
+  <div onClick={onClick} className="card-std p-4 card-press">
+    <div className="flex items-start justify-between mb-3">
+      <Badge variant={poll.status === 'Active' ? 'warning' : 'default'} className="!px-3 !py-1 text-[11px] font-bold">
         {poll.type}
       </Badge>
       {poll.voted && (
-        <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-          <CheckCircle2 size={12} /> Voted
+        <span className="flex items-center gap-1.5 text-[12px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+          <CheckCircle2 size={14} /> Voted
         </span>
       )}
     </div>
-    <h4 className="text-sm font-bold text-text-primary leading-snug mb-3 pr-4">{poll.title}</h4>
+    <h4 className="text-[15px] font-bold text-text-primary leading-snug mb-4 pr-4">{poll.title}</h4>
     
-    <div className="flex items-center justify-between text-xs text-text-secondary border-t border-gray-50 pt-3">
-      <div className="flex items-center gap-4">
-        <span className="flex items-center gap-1"><PieChart size={14} /> {poll.votes} votes</span>
-        <span className="flex items-center gap-1"><Calendar size={14} /> {poll.closes}</span>
+    <div className="flex items-center justify-between text-[13px] text-text-secondary border-t border-gray-50 pt-4 mt-2">
+      <div className="flex items-center gap-4 font-medium">
+        <span className="flex items-center gap-1.5"><PieChart size={15} className="text-brand-primary" /> {poll.votes} votes</span>
+        <span className="flex items-center gap-1.5"><Calendar size={15} className="text-brand-primary" /> {poll.closes}</span>
       </div>
-      <ChevronRight size={16} className="text-gray-300" />
+      <ChevronRight size={18} className="text-gray-300" />
     </div>
   </div>
 );

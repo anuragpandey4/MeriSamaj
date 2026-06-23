@@ -28,10 +28,10 @@ export const BottomNav = () => {
 
   return (
     <div 
-      className="responsive-fixed-bottom z-40 bg-card border-t border-gray-200/80 shadow-[0_-1px_3px_rgba(0,0,0,0.05)] md:hidden"
+      className="responsive-fixed-bottom z-40 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] md:hidden"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      <div className="flex items-center justify-around h-[56px]">
+      <div className="flex items-center justify-around h-[64px]">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
           return (
@@ -39,19 +39,24 @@ export const BottomNav = () => {
               key={item.name}
               to={item.path}
               replace
-              className={`flex flex-col items-center justify-center w-full h-full press-scale transition-colors duration-200 ${
-                isActive ? 'text-brand-primary' : 'text-text-secondary'
+              className={`flex flex-col items-center justify-center w-full h-full transition-all duration-300 relative ${
+                isActive ? (item.name === 'Social' ? 'text-[#1877F2]' : item.name === 'Matrimony' ? 'text-matrimonial-module' : 'text-brand-primary') : 'text-text-secondary'
               }`}
             >
-              <item.icon 
-                size={22} 
-                strokeWidth={isActive ? 2.5 : 1.8} 
-                className={`transition-all duration-300 ${isActive ? 'scale-110' : 'scale-100'}`}
-                fill={isActive && item.icon === Heart ? 'currentColor' : 'none'}
-              />
-              <span className={`text-xs mt-0.5 transition-all duration-200 ${isActive ? 'font-semibold' : 'font-medium'}`}>
+              <div className={`transition-all duration-300 ${isActive ? 'scale-110 -translate-y-0.5' : 'scale-100'}`}>
+                <item.icon 
+                  size={22} 
+                  strokeWidth={isActive ? 2.5 : 1.8} 
+                  fill={isActive && (item.icon === Heart || item.icon === Home) ? 'currentColor' : 'none'}
+                />
+              </div>
+              <span className={`text-[10px] mt-1 transition-all duration-200 ${isActive ? 'font-bold' : 'font-medium'}`}>
                 {item.name}
               </span>
+              {/* Active indicator dot */}
+              {isActive && (
+                <div className={`absolute -bottom-0.5 w-5 h-[3px] rounded-full animate-scale-pop ${item.name === 'Social' ? 'bg-[#1877F2]' : item.name === 'Matrimony' ? 'bg-matrimonial-module' : 'bg-brand-primary'}`} />
+              )}
             </NavLink>
           );
         })}

@@ -19,13 +19,13 @@ const NotificationsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface pb-28">
       <PageHeader
         title="Notifications"
         showBack={true}
         rightContent={
-          <button onClick={markAllRead} className="text-xs text-brand-primary font-medium press-scale flex items-center gap-1">
-            <Check size={12} /> Mark all read
+          <button onClick={markAllRead} className="text-[13px] text-brand-primary font-bold press-scale flex items-center gap-1.5">
+            <Check size={14} /> Mark all read
           </button>
         }
       />
@@ -36,21 +36,21 @@ const NotificationsPage = () => {
           return (
             <div
               key={n.id}
-              className={`flex items-start gap-3 px-4 py-3.5 border-b border-gray-50 card-press animate-stagger-fade-in ${
-                !n.isRead ? 'bg-brand-primary/[0.03]' : 'bg-card'
+              className={`flex items-start gap-4 px-5 py-4 border-b border-gray-100 card-press animate-stagger-fade-in ${
+                !n.isRead ? 'bg-brand-primary/[0.04]' : 'bg-white'
               }`}
               style={{ animationDelay: `${i * 60}ms` }}
             >
-              <div className={`w-9 h-9 rounded-xl ${config.color} flex items-center justify-center shrink-0 mt-0.5`}>
+              <div className={`w-10 h-10 rounded-xl ${config.color} flex items-center justify-center shrink-0 mt-0.5`}>
                 <config.icon size={16} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <h4 className={`text-sm ${!n.isRead ? 'font-semibold' : 'font-medium'} text-text-primary`}>{n.title}</h4>
-                  {!n.isRead && <div className="w-2 h-2 bg-brand-primary rounded-full shrink-0 mt-1.5" />}
+                  <h4 className={`text-[15px] ${!n.isRead ? 'font-bold' : 'font-medium'} text-text-primary`}>{n.title}</h4>
+                  {!n.isRead && <div className="w-2.5 h-2.5 bg-brand-primary rounded-full shrink-0 mt-1.5" />}
                 </div>
-                <p className="text-xs text-text-secondary mt-0.5">{n.message}</p>
-                <p className="text-xs text-text-secondary mt-1">{n.time}</p>
+                <p className="text-[13px] text-text-secondary mt-1 leading-relaxed">{n.message}</p>
+                <p className="text-[12px] text-text-secondary font-medium mt-1.5">{n.time}</p>
               </div>
             </div>
           );

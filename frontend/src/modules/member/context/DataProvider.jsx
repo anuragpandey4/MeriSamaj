@@ -5,6 +5,7 @@ import { currentUser as initialUser, mockMembers as initialMembers, mockAdmins a
 import { mockPosts as initialPosts } from '../data/mockPosts';
 import { mockEvents as initialEvents } from '../data/mockEvents';
 import { mockMatrimonialProfiles as initialMatrimonial } from '../data/mockMatrimonial';
+import { mockObituaries as initialObituaries } from '../data/mockObituaries';
 
 const getCommunitySurname = (community) => {
   if (!community) return 'Agrawal';
@@ -73,18 +74,24 @@ const adaptPosts = (postsList, community) => {
   });
 };
 
-const adaptMatrimonial = (profilesList, community) => {
+const adaptMatrimonial = (profilesList, currentUser) => {
+  if (!currentUser) return profilesList;
+  const community = currentUser.community;
   const surname = getCommunitySurname(community);
-  return profilesList.map(p => {
-    const newName = p.name.replaceAll('Agrawal', surname);
-    const newInitials = newName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-    return {
-      ...p,
-      name: newName,
-      initials: newInitials,
-      community: community
-    };
-  });
+  const oppositeGender = currentUser.gender === 'Male' ? 'Female' : 'Male';
+
+  return profilesList
+    .filter(p => p.gender === oppositeGender)
+    .map(p => {
+      const newName = p.name.replaceAll('Agrawal', surname);
+      const newInitials = newName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      return {
+        ...p,
+        name: newName,
+        initials: newInitials,
+        community: community
+      };
+    });
 };
 
 const DataContext = createContext(null);
@@ -93,10 +100,10 @@ export const DataProvider = ({ children }) => {
   // Helpers for localStorage
   const loadState = (key, defaultState) => {
     try {
-      const serialized = localStorage.getItem(`merisamaj_v2_${key}`);
+      const serialized = localStorage.getItem(`merisamaj_v3_${key}`);
       if (serialized === null) {
         // Save initial to localStorage so it's persisted immediately
-        localStorage.setItem(`merisamaj_v2_${key}`, JSON.stringify(defaultState));
+        localStorage.setItem(`merisamaj_v3_${key}`, JSON.stringify(defaultState));
         return defaultState;
       }
       return JSON.parse(serialized);
@@ -107,7 +114,7 @@ export const DataProvider = ({ children }) => {
 
   const saveState = (key, state) => {
     try {
-      localStorage.setItem(`merisamaj_v2_${key}`, JSON.stringify(state));
+      localStorage.setItem(`merisamaj_v3_${key}`, JSON.stringify(state));
     } catch (err) {
       console.error(`Could not save ${key} to localStorage`, err);
     }
@@ -117,9 +124,15 @@ export const DataProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(() => loadState('currentUser', initialUser));
   const [members, setMembers] = useState(() => loadState('members', initialMembers));
   const [admins, setAdmins] = useState(() => loadState('admins', initialAdmins));
-  const [posts, setPosts] = useState(() => loadState('posts', initialPosts));
+  const [posts, setPosts] = useState(() => {
+    const saved = loadState('posts', null);
+    if (!saved || saved.length === 0) return initialPosts;
+    return saved;
+  });
   const [events, setEvents] = useState(() => loadState('events', initialEvents));
+  const [obituaries, setObituaries] = useState(() => loadState('obituaries', initialObituaries));
   const [matrimonialProfiles, setMatrimonialProfiles] = useState(() => loadState('matrimonialProfiles', initialMatrimonial));
+  const [language, setLanguage] = useState(() => loadState('language', 'en'));
 
   // Sync to localStorage when state changes
   useEffect(() => saveState('currentUser', currentUser), [currentUser]);
@@ -127,7 +140,9 @@ export const DataProvider = ({ children }) => {
   useEffect(() => saveState('admins', admins), [admins]);
   useEffect(() => saveState('posts', posts), [posts]);
   useEffect(() => saveState('events', events), [events]);
+  useEffect(() => saveState('obituaries', obituaries), [obituaries]);
   useEffect(() => saveState('matrimonialProfiles', matrimonialProfiles), [matrimonialProfiles]);
+  useEffect(() => saveState('language', language), [language]);
 
   // Actions
   
@@ -139,6 +154,11 @@ export const DataProvider = ({ children }) => {
     setCurrentUser(userData);
   };
 
+  const logoutUser = () => {
+    localStorage.removeItem('posts');
+    setPosts(initialPosts);
+  };
+
   const addFamilyMember = (newMember) => {
     const memberWithId = { ...newMember, id: `f${Date.now()}`, initials: newMember.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() };
     setCurrentUser(prev => ({
@@ -147,7 +167,7 @@ export const DataProvider = ({ children }) => {
     }));
   };
 
-  const createPost = (postContent, images = []) => {
+  const createPost = (postContent, images = [], options = {}) => {
     const newPost = {
       id: `p${Date.now()}`,
       author: {
@@ -162,7 +182,8 @@ export const DataProvider = ({ children }) => {
       timestamp: 'Just now',
       likes: 0,
       comments: 0,
-      isLiked: false
+      isLiked: false,
+      ...options
     };
     setPosts(prev => [newPost, ...prev]);
   };
@@ -220,6 +241,23 @@ export const DataProvider = ({ children }) => {
     setMatrimonialProfiles(prev => [newProfile, ...prev]);
   };
 
+  const addObituary = (obituary) => {
+    setObituaries([obituary, ...obituaries]);
+  };
+
+  const toggleObituaryShraddhanjali = (obId) => {
+    setObituaries(obituaries.map(ob => {
+      if (ob.id === obId) {
+        return {
+          ...ob,
+          hasOfferedShraddhanjali: !ob.hasOfferedShraddhanjali,
+          shraddhanjaliCount: ob.hasOfferedShraddhanjali ? ob.shraddhanjaliCount - 1 : ob.shraddhanjaliCount + 1
+        };
+      }
+      return ob;
+    }));
+  };
+
   const resetAllData = () => {
     localStorage.clear();
     setCurrentUser(initialUser);
@@ -235,7 +273,7 @@ export const DataProvider = ({ children }) => {
   const adaptedMembersList = adaptMembers(members, activeCommunity);
   const adaptedAdminsList = adaptAdmins(admins, activeCommunity);
   const adaptedPostsList = adaptPosts(posts, activeCommunity);
-  const adaptedMatrimonialList = adaptMatrimonial(matrimonialProfiles, activeCommunity);
+  const adaptedMatrimonialList = adaptMatrimonial(matrimonialProfiles, currentUser);
 
   const value = {
     currentUser,
@@ -246,13 +284,19 @@ export const DataProvider = ({ children }) => {
     matrimonialProfiles: adaptedMatrimonialList,
     updateProfile,
     loginUser,
+    logoutUser,
     addFamilyMember,
     createPost,
     toggleEventRSVP,
     togglePostLike,
     addPostComment,
     addMatrimonialProfile,
-    resetAllData
+    obituaries,
+    addObituary,
+    toggleObituaryShraddhanjali,
+    resetAllData,
+    language,
+    setLanguage
   };
 
   return (
