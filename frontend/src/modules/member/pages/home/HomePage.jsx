@@ -8,6 +8,7 @@ import { Badge } from '../../components/common/Badge';
 import { useData } from '../../context/DataProvider';
 import { t } from '../../utils/translations';
 import { StoryViewer } from '../../components/common/StoryViewer';
+import { CityLandscape } from '../../components/common/CityLandscape';
 
 const announcements = [
   { id: 1, title: 'Annual Samaj Mahotsav 2026', subtitle: 'Registration Open — Jul 15, Indore', gradient: 'from-blue-500 via-indigo-500 to-purple-600', icon: Sparkles },
@@ -394,6 +395,23 @@ const HomePage = () => {
               <p className="text-[13px] text-text-secondary mt-1">{stat.label}</p>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* ─── END OF FEED ILLUSTRATION ─── */}
+      <div className="mt-8 relative w-full h-[450px] flex flex-col items-center justify-end overflow-hidden pb-[160px] -mb-[120px] bg-gradient-to-b from-transparent to-brand-primary/5">
+        {/* The SVG Collage fills the background entirely */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none select-none text-brand-primary">
+          <CityLandscape className="w-full h-full" />
+        </div>
+        
+        {/* The text sits in the middle/bottom, integrated nicely like Rapido */}
+        <div className="relative z-10 flex flex-col items-center">
+           <h3 className="text-brand-primary/40 text-[42px] font-black italic tracking-tighter mb-2 drop-shadow-sm leading-none">#MeriSamaj</h3>
+           <div className="bg-surface/80 backdrop-blur-md px-6 py-2 rounded-full border border-brand-primary/10 shadow-sm flex flex-col items-center">
+             <span className="text-text-secondary text-[14px] font-bold tracking-wide">You're all caught up!</span>
+             <span className="text-text-secondary/60 text-[11px] font-medium mt-0.5">Check back later for new updates</span>
+           </div>
         </div>
       </div>
 
