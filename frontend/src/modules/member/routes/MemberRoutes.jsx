@@ -29,6 +29,7 @@ import ChatPage from '../pages/social/ChatPage';
 
 // Phase B Pages
 import GroupDetailPage from '../pages/groups/GroupDetailPage';
+import SocialHubPage from '../pages/social/SocialHubPage';
 import MatrimonialProfilePage from '../pages/matrimonial/MatrimonialProfilePage';
 import MatrimonialSetupPage from '../pages/matrimonial/MatrimonialSetupPage';
 import InterestsPage from '../pages/matrimonial/InterestsPage';
@@ -67,7 +68,7 @@ export const MemberRoutes = () => {
 
           {/* Main Tabs */}
           <Route path="home" element={<AnimatedPage><HomePage /></AnimatedPage>} />
-          <Route path="social" element={<AnimatedPage><FeedPage /></AnimatedPage>} />
+          <Route path="social" element={<AnimatedPage><SocialHubPage initialTab="feed" /></AnimatedPage>} />
           <Route path="matrimonial" element={<AnimatedPage><MatrimonialHomePage /></AnimatedPage>} />
           <Route path="directory" element={<AnimatedPage><DirectoryPage /></AnimatedPage>} />
           <Route path="profile" element={<AnimatedPage><MyProfilePage /></AnimatedPage>} />
@@ -76,7 +77,8 @@ export const MemberRoutes = () => {
           <Route path="events" element={<AnimatedPage><EventsPage /></AnimatedPage>} />
           <Route path="events/:eventId" element={<AnimatedPage><EventDetailPage /></AnimatedPage>} />
 
-          <Route path="groups" element={<AnimatedPage><GroupsPage /></AnimatedPage>} />
+          {/* Groups base route mapped to SocialHub */}
+          <Route path="groups" element={<AnimatedPage><SocialHubPage initialTab="groups" /></AnimatedPage>} />
           <Route path="groups/:groupId" element={<AnimatedPage><GroupDetailPage /></AnimatedPage>} />
 
           <Route path="social/create" element={<AnimatedPage><CreatePostPage /></AnimatedPage>} />
@@ -102,7 +104,8 @@ export const MemberRoutes = () => {
 
           <Route path="leadership" element={<AnimatedPage><LeadershipPage /></AnimatedPage>} />
 
-          <Route path="chat" element={<AnimatedPage><ChatListPage /></AnimatedPage>} />
+          {/* Chat base route mapped to SocialHub */}
+          <Route path="chat" element={<AnimatedPage><SocialHubPage initialTab="chat" /></AnimatedPage>} />
           <Route path="chat/:chatId" element={<AnimatedPage><ChatRoomPage /></AnimatedPage>} />
           <Route path="chat/call/:chatId" element={<AnimatedPage><CallScreen /></AnimatedPage>} />
 

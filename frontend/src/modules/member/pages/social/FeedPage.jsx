@@ -104,7 +104,7 @@ const PostCard = ({ post, index }) => {
   );
 };
 
-const FeedPage = () => {
+const FeedPage = ({ isHub = false }) => {
   const navigate = useNavigate();
   const { posts, members: mockMembers, currentUser, language } = useData();
   const [activeTab, setActiveTab] = useState('community');
@@ -159,29 +159,31 @@ const FeedPage = () => {
         </div>
       )}
 
-      {/* Global Header */}
-      <div className="bg-white sticky top-0 z-40 border-b border-gray-100">
-        <div className="flex items-center justify-between px-5 h-16">
-          <div className="flex items-center gap-4">
-            <button className="text-text-primary">
-              <Menu size={24} />
-            </button>
-            <h1 className="text-[20px] font-semibold text-text-primary tracking-tight">Meri Samaj</h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="text-text-primary">
-              <Search size={22} />
-            </button>
-            <button className="relative text-text-primary">
-              <Bell size={22} />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                3
-              </span>
-            </button>
-            <Avatar initials={currentUser?.initials || 'U'} size="sm" color="bg-blue-100 text-blue-700" />
+      {/* Global Header (Hide if in Hub) */}
+      {!isHub && (
+        <div className="bg-white sticky top-0 z-40 border-b border-gray-100">
+          <div className="flex items-center justify-between px-5 h-16">
+            <div className="flex items-center gap-4">
+              <button className="text-text-primary">
+                <Menu size={24} />
+              </button>
+              <h1 className="text-[20px] font-semibold text-text-primary tracking-tight">Meri Samaj</h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <button className="text-text-primary">
+                <Search size={22} />
+              </button>
+              <button className="relative text-text-primary">
+                <Bell size={22} />
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                  3
+                </span>
+              </button>
+              <Avatar initials={currentUser?.initials || 'U'} size="sm" color="bg-blue-100 text-blue-700" />
+            </div>
           </div>
         </div>
-      </div>
+      )}
       
       <div className="px-5 pt-5">
         {/* ─── STORY RINGS (ACTIVE MEMBERS) ─── */}
@@ -234,19 +236,21 @@ const FeedPage = () => {
           </div>
         </div>
 
-        {/* Tab Toggle */}
-        <div className="flex bg-white rounded-2xl border border-gray-200 overflow-hidden mb-4 shadow-sm p-1 gap-1">
-          <button className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#1877F2] text-white rounded-xl font-medium text-sm transition-colors">
-            <div className="w-5 h-5 rounded-full bg-white text-[#1877F2] flex items-center justify-center">
-              <span className="text-[12px] font-bold">f</span>
-            </div>
-            Social Feed
-          </button>
-          <button onClick={() => navigate('/member/groups')} className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-transparent text-text-secondary rounded-xl font-medium text-sm transition-colors hover:bg-gray-50">
-            <MessageCircle size={18} />
-            Groups
-          </button>
-        </div>
+        {/* Tab Toggle (Hide if in Hub) */}
+        {!isHub && (
+          <div className="flex bg-white rounded-2xl border border-gray-200 overflow-hidden mb-4 shadow-sm p-1 gap-1">
+            <button className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#1877F2] text-white rounded-xl font-medium text-sm transition-colors">
+              <div className="w-5 h-5 rounded-full bg-white text-[#1877F2] flex items-center justify-center">
+                <span className="text-[12px] font-bold">f</span>
+              </div>
+              Social Feed
+            </button>
+            <button onClick={() => navigate('/member/groups')} className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-transparent text-text-secondary rounded-xl font-medium text-sm transition-colors hover:bg-gray-50">
+              <MessageCircle size={18} />
+              Groups
+            </button>
+          </div>
+        )}
 
         {/* Create Post */}
         <div className="card-std px-4 py-4 mb-4 cursor-pointer card-press flex items-center gap-3" onClick={() => navigate('/member/social/create')}>
@@ -281,13 +285,15 @@ const FeedPage = () => {
         </div>
       </div>
 
-      {/* FAB */}
-      <button 
-        onClick={() => navigate('/member/social/create')}
-        className="responsive-fixed-fab w-14 h-14 bg-[#1877F2] text-white rounded-full shadow-lg flex items-center justify-center press-scale hover:bg-blue-600 transition-colors"
-      >
-        <PlusCircle size={28} />
-      </button>
+      {/* FAB (Hide if in Hub, handled by Hub) */}
+      {!isHub && (
+        <button 
+          onClick={() => navigate('/member/social/create')}
+          className="responsive-fixed-fab w-14 h-14 bg-[#1877F2] text-white rounded-full shadow-lg flex items-center justify-center press-scale hover:bg-blue-600 transition-colors"
+        >
+          <PlusCircle size={28} />
+        </button>
+      )}
 
       {/* ─── STORY VIEWER MODAL ─── */}
       <StoryViewer 

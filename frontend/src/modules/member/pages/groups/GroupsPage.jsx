@@ -21,7 +21,7 @@ const groupColors = {
   Education: 'bg-purple-100 text-purple-700',
 };
 
-const GroupsPage = () => {
+const GroupsPage = ({ isHub = false }) => {
   const navigate = useNavigate();
   const [tab, setTab] = useState('my'); // my | discover
   const [joinedGroups, setJoinedGroups] = useState(
@@ -33,10 +33,10 @@ const GroupsPage = () => {
     : mockGroups;
 
   return (
-    <div className="min-h-screen bg-surface pb-28">
-      <PageHeader title="Community Groups" showBack={true} />
+    <div className={`bg-surface ${isHub ? '' : 'min-h-screen pb-28'}`}>
+      {!isHub && <PageHeader title="Community Groups" showBack={true} />}
 
-      <div className="pt-14">
+      <div className={isHub ? 'pt-4' : 'pt-14'}>
         {/* Tabs */}
         <div className="px-5 py-4 flex gap-3">
           <button

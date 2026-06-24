@@ -26,7 +26,7 @@ const formatTime = (isoString) => {
   return date.toLocaleDateString([], { day: '2-digit', month: 'short' });
 };
 
-const ChatListPage = () => {
+const ChatListPage = ({ isHub = false }) => {
   const navigate = useNavigate();
   const { language } = useData();
   const [activeTab, setActiveTab] = useState('chats'); // 'chats' or 'calls'
@@ -37,32 +37,34 @@ const ChatListPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className={`bg-gray-50 ${isHub ? 'h-full' : 'min-h-screen pb-20'}`}>
       {/* ─── HEADER ─── */}
-      <div className="bg-brand-primary text-white pt-12 pb-4 px-5 sticky top-0 z-20 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-[24px] font-bold tracking-tight">{t('Samaj Netrutva', language) === 'Samaj Netrutva' ? 'Community Chat' : 'सामुदायिक चैट'}</h1>
-          <div className="flex items-center gap-3">
-            <button className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center active:bg-white/20 transition-colors">
-              <Search size={20} />
-            </button>
-            <button className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center active:bg-white/20 transition-colors">
-              <MoreVertical size={20} />
-            </button>
+      <div className={`${isHub ? 'bg-white text-text-primary border-b border-gray-100' : 'bg-brand-primary text-white pt-12 shadow-sm'} pb-4 px-5 sticky top-0 z-20`}>
+        {!isHub && (
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-[24px] font-bold tracking-tight">{t('Samaj Netrutva', language) === 'Samaj Netrutva' ? 'Community Chat' : 'सामुदायिक चैट'}</h1>
+            <div className="flex items-center gap-3">
+              <button className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center active:bg-white/20 transition-colors">
+                <Search size={20} />
+              </button>
+              <button className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center active:bg-white/20 transition-colors">
+                <MoreVertical size={20} />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-white/10 p-1 rounded-xl">
+        <div className={`flex gap-1 p-1 rounded-xl mt-2 ${isHub ? 'bg-gray-100' : 'bg-white/10'}`}>
           <button 
             onClick={() => setActiveTab('chats')}
-            className={`flex-1 py-2 text-[14px] font-bold rounded-lg transition-colors ${activeTab === 'chats' ? 'bg-white text-brand-primary shadow-sm' : 'text-white/80'}`}
+            className={`flex-1 py-2 text-[14px] font-bold rounded-lg transition-colors ${activeTab === 'chats' ? (isHub ? 'bg-white text-brand-primary shadow-sm' : 'bg-white text-brand-primary shadow-sm') : (isHub ? 'text-text-secondary' : 'text-white/80')}`}
           >
             {t('Chats', language)}
           </button>
           <button 
             onClick={() => setActiveTab('calls')}
-            className={`flex-1 py-2 text-[14px] font-bold rounded-lg transition-colors ${activeTab === 'calls' ? 'bg-white text-brand-primary shadow-sm' : 'text-white/80'}`}
+            className={`flex-1 py-2 text-[14px] font-bold rounded-lg transition-colors ${activeTab === 'calls' ? (isHub ? 'bg-white text-brand-primary shadow-sm' : 'bg-white text-brand-primary shadow-sm') : (isHub ? 'text-text-secondary' : 'text-white/80')}`}
           >
             {t('Calls', language)}
           </button>
