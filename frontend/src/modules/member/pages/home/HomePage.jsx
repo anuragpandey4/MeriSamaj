@@ -170,8 +170,7 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* Bottom rounded edge transition */}
-        <div className="absolute -bottom-1 left-0 right-0 h-5 bg-surface rounded-t-[24px] z-[2]" />
+        {/* Bottom edge transition removed for flush slider */}
       </div>
 
       {/* ─── PREMIUM ANNOUNCEMENT CAROUSEL ─── */}
@@ -179,18 +178,18 @@ const HomePage = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="pt-2 pb-2 relative z-10"
+        className="pb-2 relative z-10"
       >
         <div
           ref={carouselRef}
-          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3"
+          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-0"
           onScroll={(e) => {
             const idx = Math.round(e.target.scrollLeft / e.target.clientWidth);
             if (idx !== activeAnnouncementIndex) setActiveAnnouncementIndex(idx);
           }}
         >
           {announcements.map((a) => (
-            <div key={a.id} onClick={() => navigate(a.link)} className="snap-center shrink-0 w-full h-[220px] rounded-[32px] relative overflow-hidden shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)] press-scale group cursor-pointer bg-gray-100 border border-gray-100">
+            <div key={a.id} onClick={() => navigate(a.link)} className="snap-center shrink-0 w-full h-[220px] rounded-none relative overflow-hidden shadow-sm press-scale group cursor-pointer bg-gray-100">
               <img src={a.image} alt="Announcement" className="absolute inset-0 w-full h-full object-cover" />
             </div>
           ))}
