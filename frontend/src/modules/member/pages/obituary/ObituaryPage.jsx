@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Clock, MapPin, Calendar } from 'lucide-react';
+import { Plus, Clock, MapPin, Calendar, Send, MessageCircle } from 'lucide-react';
 import { useData } from '../../context/DataProvider';
 import { PageHeader } from '../../components/layout/PageHeader';
 import { AnimatedPage } from '../../components/layout/AnimatedPage';
@@ -9,7 +9,22 @@ import { Avatar } from '../../components/common/Avatar';
 
 const ObituaryPage = () => {
   const navigate = useNavigate();
-  const { obituaries, toggleObituaryShraddhanjali } = useData();
+  const { currentUser, obituaries, toggleObituaryShraddhanjali, addObituaryComment } = useData();
+  const [commentTexts, setCommentTexts] = useState({});
+  const [expandedComments, setExpandedComments] = useState({});
+
+  const handleCommentSubmit = (obId) => {
+    const text = commentTexts[obId]?.trim();
+    if (text) {
+      addObituaryComment(obId, text);
+      setCommentTexts({ ...commentTexts, [obId]: '' });
+      setExpandedComments({ ...expandedComments, [obId]: true });
+    }
+  };
+
+  const toggleComments = (obId) => {
+    setExpandedComments(prev => ({ ...prev, [obId]: !prev[obId] }));
+  };
 
   return (
     <AnimatedPage>
@@ -69,7 +84,7 @@ const ObituaryPage = () => {
             </div>
 
             {/* Footer / Author & Action */}
-            <div className="px-5 py-4 border-t border-gray-50 flex items-center justify-between bg-white">
+            <div className="px-5 py-4 border-t border-gray-50 flex items-center justify-between bg-white relative z-10">
               <div className="flex items-center gap-2.5">
                 <Avatar initials={ob.author.initials} size="sm" />
                 <div>
@@ -78,18 +93,84 @@ const ObituaryPage = () => {
                 </div>
               </div>
               
-              <button 
-                onClick={() => toggleObituaryShraddhanjali(ob.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-colors ${
-                  ob.hasOfferedShraddhanjali 
-                    ? 'bg-amber-50 border-amber-200 text-amber-700' 
-                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <span className="text-[14px]">🙏</span>
-                <span className="text-[12px] font-bold">{ob.shraddhanjaliCount}</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => toggleComments(ob.id)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 bg-white hover:bg-gray-50 transition-colors"
+                >
+                  <MessageCircle size={16} />
+                  <span className="text-[12px] font-bold">{ob.comments?.length || 0}</span>
+                </button>
+                <button 
+                  onClick={() => toggleObituaryShraddhanjali(ob.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-colors ${
+                    ob.hasOfferedShraddhanjali 
+                      ? 'bg-amber-50 border-amber-200 text-amber-700' 
+                      : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <span className="text-[14px]">🙏</span>
+                  <span className="text-[12px] font-bold">{ob.shraddhanjaliCount}</span>
+                </button>
+              </div>
             </div>
+
+            {/* Comments Section */}
+            {expandedComments[ob.id] && (
+              <div className="bg-[#faf9f7] px-5 py-5 border-t border-gray-100">
+                {/* Existing Comments */}
+                {ob.comments && ob.comments.length > 0 ? (
+                  <div className="space-y-4 mb-4">
+                    {ob.comments.map(comment => (
+                      <div key={comment.id} className="flex gap-3 items-start">
+                        <div className="shrink-0 mt-1">
+                          <Avatar initials={comment.name.substring(0, 2).toUpperCase()} size="sm" />
+                        </div>
+                        <div className="flex-1 min-w-0 border-b border-gray-100 pb-4">
+                          <div className="flex justify-between items-baseline mb-1">
+                            <p className="text-[13px] font-bold text-gray-900">{comment.name}</p>
+                            <span className="text-[10px] text-gray-400 shrink-0 ml-2">{comment.timestamp}</span>
+                          </div>
+                          <p className="text-[14px] text-gray-700 leading-relaxed italic font-serif opacity-90">"{comment.text}"</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6 pb-8 border-b border-gray-100 mb-4">
+                    <span className="text-[24px] mb-2 block opacity-40">🕊️</span>
+                    <p className="text-[13px] text-gray-500 font-medium">Be the first to offer condolences.</p>
+                  </div>
+                )}
+
+                {/* Add Comment Input */}
+                <div className="flex items-center gap-3 bg-white rounded-2xl p-1 border border-gray-200 shadow-sm focus-within:border-amber-300 focus-within:ring-1 focus-within:ring-amber-300 transition-all">
+                  <div className="shrink-0 pl-2">
+                    <Avatar initials={currentUser?.initials || 'ME'} size="w-8 h-8 text-[11px]" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Write a message of sympathy..."
+                    className="flex-1 bg-transparent border-none py-3 text-[13px] text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0"
+                    value={commentTexts[ob.id] || ''}
+                    onChange={(e) => setCommentTexts({ ...commentTexts, [ob.id]: e.target.value })}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleCommentSubmit(ob.id);
+                      }
+                    }}
+                  />
+                  <button 
+                    onClick={() => handleCommentSubmit(ob.id)}
+                    disabled={!commentTexts[ob.id]?.trim()}
+                    className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 disabled:opacity-50 disabled:bg-gray-50 disabled:text-gray-400 transition-colors mr-1"
+                  >
+                    <Send size={16} className="ml-0.5" />
+                  </button>
+                </div>
+              </div>
+            )}
           </motion.div>
         ))}
       </div>

@@ -20,7 +20,11 @@ export const mockObituaries = [
     shraddhanjaliCount: 142,
     hasOfferedShraddhanjali: false,
     timestamp: '2 hours ago',
-    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1000' // Using a generic peaceful floral/light image
+    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1000',
+    comments: [
+      { id: 'c1', name: 'Sanjay Agrawal', text: 'Om Shanti 🙏', timestamp: '1 hour ago' },
+      { id: 'c2', name: 'Neha Agrawal', text: 'Bhagwan inki aatma ko shanti de.', timestamp: '30 mins ago' }
+    ]
   },
   {
     id: 'ob-2',
@@ -43,6 +47,9 @@ export const mockObituaries = [
     shraddhanjaliCount: 89,
     hasOfferedShraddhanjali: true,
     timestamp: '1 day ago',
-    image: 'https://images.unsplash.com/photo-1518599904199-0ca897819ddb?auto=format&fit=crop&q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1518599904199-0ca897819ddb?auto=format&fit=crop&q=80&w=1000',
+    comments: [
+      { id: 'c3', name: 'Vikas Agrawal', text: 'Bhavpurn Shradhanjali. A great loss.', timestamp: '5 hours ago' }
+    ]
   }
 ];

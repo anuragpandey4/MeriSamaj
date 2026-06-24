@@ -1,11 +1,11 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Users, Heart, BookOpen, User } from 'lucide-react';
+import { Home, Users, Heart, MessageCircle, User } from 'lucide-react';
 
-const tabPaths = ['/member/home', '/member/social', '/member/matrimonial', '/member/directory', '/member/profile'];
+const tabPaths = ['/member/home', '/member/social', '/member/matrimonial', '/member/chat', '/member/profile'];
 
 // Sub-pages where bottom nav should be hidden
-const hiddenPaths = ['/member/events', '/member/groups', '/member/notifications', '/member/splash', '/member/login', '/member/setup-profile', '/member/select-community', '/member/verify-otp'];
+const hiddenPaths = ['/member/events', '/member/groups', '/member/notifications', '/member/splash', '/member/login', '/member/setup-profile', '/member/select-community', '/member/verify-otp', '/member/chat/room', '/member/chat/call'];
 
 export const BottomNav = () => {
   const location = useLocation();
@@ -22,7 +22,7 @@ export const BottomNav = () => {
     { name: 'Home', path: '/member/home', icon: Home },
     { name: 'Social', path: '/member/social', icon: Users },
     { name: 'Matrimony', path: '/member/matrimonial', icon: Heart },
-    { name: 'Directory', path: '/member/directory', icon: BookOpen },
+    { name: 'Chat', path: '/member/chat', icon: MessageCircle },
     { name: 'Profile', path: '/member/profile', icon: User },
   ];
 

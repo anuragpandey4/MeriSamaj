@@ -100,10 +100,10 @@ export const DataProvider = ({ children }) => {
   // Helpers for localStorage
   const loadState = (key, defaultState) => {
     try {
-      const serialized = localStorage.getItem(`merisamaj_v3_${key}`);
+      const serialized = localStorage.getItem(`merisamaj_v4_${key}`);
       if (serialized === null) {
         // Save initial to localStorage so it's persisted immediately
-        localStorage.setItem(`merisamaj_v3_${key}`, JSON.stringify(defaultState));
+        localStorage.setItem(`merisamaj_v4_${key}`, JSON.stringify(defaultState));
         return defaultState;
       }
       return JSON.parse(serialized);
@@ -114,9 +114,9 @@ export const DataProvider = ({ children }) => {
 
   const saveState = (key, state) => {
     try {
-      localStorage.setItem(`merisamaj_v3_${key}`, JSON.stringify(state));
+      localStorage.setItem(`merisamaj_v4_${key}`, JSON.stringify(state));
     } catch (err) {
-      console.error(`Could not save ${key} to localStorage`, err);
+      console.error('Could not save state', err);
     }
   };
 
@@ -258,6 +258,21 @@ export const DataProvider = ({ children }) => {
     }));
   };
 
+  const addObituaryComment = (obId, commentText) => {
+    setObituaries(obituaries.map(ob => {
+      if (ob.id === obId) {
+        return {
+          ...ob,
+          comments: [
+            ...(ob.comments || []),
+            { id: `c${Date.now()}`, name: currentUser.name, text: commentText, timestamp: 'Just now' }
+          ]
+        };
+      }
+      return ob;
+    }));
+  };
+
   const resetAllData = () => {
     localStorage.clear();
     setCurrentUser(initialUser);
@@ -294,6 +309,7 @@ export const DataProvider = ({ children }) => {
     obituaries,
     addObituary,
     toggleObituaryShraddhanjali,
+    addObituaryComment,
     resetAllData,
     language,
     setLanguage

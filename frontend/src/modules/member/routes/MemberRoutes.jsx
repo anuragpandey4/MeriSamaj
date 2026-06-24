@@ -43,9 +43,17 @@ import PollDetailPage from '../pages/voting/PollDetailPage';
 import ObituaryPage from '../pages/obituary/ObituaryPage';
 import CreateObituaryPage from '../pages/obituary/CreateObituaryPage';
 
+// Feature: Leadership
+import LeadershipPage from '../pages/leadership/LeadershipPage';
+
+// Feature: Chat
+import ChatListPage from '../pages/chat/ChatListPage';
+import ChatRoomPage from '../pages/chat/ChatRoomPage';
+import CallScreen from '../pages/chat/CallScreen';
+
 export const MemberRoutes = () => {
   const location = useLocation();
-  
+
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
@@ -56,7 +64,7 @@ export const MemberRoutes = () => {
         {/* Main App — with bottom nav */}
         <Route path="/" element={<MemberLayout />}>
           <Route index element={<Navigate to="home" replace />} />
-          
+
           {/* Main Tabs */}
           <Route path="home" element={<AnimatedPage><HomePage /></AnimatedPage>} />
           <Route path="social" element={<AnimatedPage><FeedPage /></AnimatedPage>} />
@@ -67,30 +75,36 @@ export const MemberRoutes = () => {
           {/* Sub Pages (bottom nav hidden via BottomNav logic) */}
           <Route path="events" element={<AnimatedPage><EventsPage /></AnimatedPage>} />
           <Route path="events/:eventId" element={<AnimatedPage><EventDetailPage /></AnimatedPage>} />
-        
+
           <Route path="groups" element={<AnimatedPage><GroupsPage /></AnimatedPage>} />
           <Route path="groups/:groupId" element={<AnimatedPage><GroupDetailPage /></AnimatedPage>} />
-          
+
           <Route path="social/create" element={<AnimatedPage><CreatePostPage /></AnimatedPage>} />
           <Route path="social/:postId" element={<AnimatedPage><PostDetailPage /></AnimatedPage>} />
-          
+
           <Route path="directory/:memberId" element={<AnimatedPage><MemberDetailPage /></AnimatedPage>} />
           <Route path="chat/:memberId" element={<AnimatedPage><ChatPage /></AnimatedPage>} />
 
           <Route path="matrimonial/setup" element={<AnimatedPage><MatrimonialSetupPage /></AnimatedPage>} />
           <Route path="matrimonial/interests" element={<AnimatedPage><InterestsPage /></AnimatedPage>} />
           <Route path="matrimonial/:profileId" element={<AnimatedPage><MatrimonialProfilePage /></AnimatedPage>} />
-          
+
           <Route path="profile/edit" element={<AnimatedPage><EditProfilePage /></AnimatedPage>} />
           <Route path="profile/family" element={<AnimatedPage><FamilyPage /></AnimatedPage>} />
-          
+
           <Route path="professional" element={<AnimatedPage><ProfessionalDirectoryPage /></AnimatedPage>} />
           <Route path="professional/apply" element={<AnimatedPage><ApplyProfessionalPage /></AnimatedPage>} />
-          
+
           <Route path="voting" element={<AnimatedPage><VotingPage /></AnimatedPage>} />
           <Route path="voting/:pollId" element={<AnimatedPage><PollDetailPage /></AnimatedPage>} />
 
           <Route path="notifications" element={<AnimatedPage><NotificationsPage /></AnimatedPage>} />
+
+          <Route path="leadership" element={<AnimatedPage><LeadershipPage /></AnimatedPage>} />
+
+          <Route path="chat" element={<AnimatedPage><ChatListPage /></AnimatedPage>} />
+          <Route path="chat/:chatId" element={<AnimatedPage><ChatRoomPage /></AnimatedPage>} />
+          <Route path="chat/call/:chatId" element={<AnimatedPage><CallScreen /></AnimatedPage>} />
 
           <Route path="obituaries" element={<AnimatedPage><ObituaryPage /></AnimatedPage>} />
           <Route path="obituaries/create" element={<AnimatedPage><CreateObituaryPage /></AnimatedPage>} />

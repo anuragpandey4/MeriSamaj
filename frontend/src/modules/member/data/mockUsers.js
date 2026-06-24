@@ -24,16 +24,16 @@ export const currentUser = {
 };
 
 export const mockMembers = [
-  { 
-    id: 'm1', 
-    name: 'Suresh Agrawal', 
-    initials: 'SA', 
-    city: 'Jaipur', 
-    profession: 'Architect', 
-    community: 'Agrawal Samaj', 
-    gender: 'Male', 
-    age: 42, 
-    isVerified: true, 
+  {
+    id: 'm1',
+    name: 'Suresh Agrawal',
+    initials: 'SA',
+    city: 'Jaipur',
+    profession: 'Architect',
+    community: 'Agrawal Samaj',
+    gender: 'Male',
+    age: 42,
+    isVerified: true,
     avatar: null,
     phone: '+91 94140 12345',
     email: 'suresh.architect@email.com',
@@ -44,16 +44,16 @@ export const mockMembers = [
       { id: 'm1-f2', name: 'Rohit Agrawal', relation: 'Son', age: 12, initials: 'RA' }
     ]
   },
-  { 
-    id: 'm2', 
-    name: 'Kavita Agrawal', 
-    initials: 'KA', 
-    city: 'Indore', 
-    profession: 'Doctor', 
-    community: 'Agrawal Samaj', 
-    gender: 'Female', 
-    age: 35, 
-    isVerified: true, 
+  {
+    id: 'm2',
+    name: 'Kavita Agrawal',
+    initials: 'KA',
+    city: 'Indore',
+    profession: 'Doctor',
+    community: 'Agrawal Samaj',
+    gender: 'Female',
+    age: 35,
+    isVerified: true,
     avatar: null,
     phone: '+91 98270 54321',
     email: 'dr.kavita.a@email.com',
@@ -64,16 +64,16 @@ export const mockMembers = [
       { id: 'm2-f2', name: 'Riya Agrawal', relation: 'Daughter', age: 6, initials: 'RA' }
     ]
   },
-  { 
-    id: 'm3', 
-    name: 'Deepak Agrawal', 
-    initials: 'DA', 
-    city: 'Bhopal', 
-    profession: 'Software Engineer', 
-    community: 'Agrawal Samaj', 
-    gender: 'Male', 
-    age: 29, 
-    isVerified: false, 
+  {
+    id: 'm3',
+    name: 'Deepak Agrawal',
+    initials: 'DA',
+    city: 'Bhopal',
+    profession: 'Software Engineer',
+    community: 'Agrawal Samaj',
+    gender: 'Male',
+    age: 29,
+    isVerified: false,
     avatar: null,
     phone: '+91 99810 98765',
     email: 'deepak.se@email.com',
@@ -84,16 +84,16 @@ export const mockMembers = [
       { id: 'm3-f2', name: 'Sunita Agrawal', relation: 'Mother', age: 54, initials: 'SA' }
     ]
   },
-  { 
-    id: 'm4', 
-    name: 'Anita Agrawal', 
-    initials: 'AA', 
-    city: 'Ujjain', 
-    profession: 'Teacher', 
-    community: 'Agrawal Samaj', 
-    gender: 'Female', 
-    age: 38, 
-    isVerified: true, 
+  {
+    id: 'm4',
+    name: 'Anita Agrawal',
+    initials: 'AA',
+    city: 'Ujjain',
+    profession: 'Teacher',
+    community: 'Agrawal Samaj',
+    gender: 'Female',
+    age: 38,
+    isVerified: true,
     avatar: null,
     phone: '+91 98930 11223',
     email: 'anita.teacher@email.com',
@@ -104,16 +104,16 @@ export const mockMembers = [
       { id: 'm4-f2', name: 'Sneha Agrawal', relation: 'Daughter', age: 10, initials: 'SA' }
     ]
   },
-  { 
-    id: 'm5', 
-    name: 'Vikas Agrawal', 
-    initials: 'VA', 
-    city: 'Indore', 
-    profession: 'CA', 
-    community: 'Agrawal Samaj', 
-    gender: 'Male', 
-    age: 45, 
-    isVerified: true, 
+  {
+    id: 'm5',
+    name: 'Vikas Agrawal',
+    initials: 'VA',
+    city: 'Indore',
+    profession: 'CA',
+    community: 'Agrawal Samaj',
+    gender: 'Male',
+    age: 45,
+    isVerified: true,
     avatar: null,
     phone: '+91 98260 44556',
     email: 'ca.vikas@email.com',
@@ -125,16 +125,16 @@ export const mockMembers = [
       { id: 'm5-f3', name: 'Ananya Agrawal', relation: 'Daughter', age: 11, initials: 'AA' }
     ]
   },
-  { 
-    id: 'm6', 
-    name: 'Pooja Agrawal', 
-    initials: 'PA', 
-    city: 'Ahmedabad', 
-    profession: 'Pharmacist', 
-    community: 'Agrawal Samaj', 
-    gender: 'Female', 
-    age: 31, 
-    isVerified: true, 
+  {
+    id: 'm6',
+    name: 'Pooja Agrawal',
+    initials: 'PA',
+    city: 'Ahmedabad',
+    profession: 'Pharmacist',
+    community: 'Agrawal Samaj',
+    gender: 'Female',
+    age: 31,
+    isVerified: true,
     avatar: null,
     phone: '+91 97129 88776',
     email: 'pooja.pharma@email.com',
@@ -145,16 +145,16 @@ export const mockMembers = [
       { id: 'm6-f2', name: 'Kunal Agrawal', relation: 'Son', age: 4, initials: 'KA' }
     ]
   },
-  { 
-    id: 'm7', 
-    name: 'Ramesh Agrawal', 
-    initials: 'RA', 
-    city: 'Lucknow', 
-    profession: 'Lawyer', 
-    community: 'Agrawal Samaj', 
-    gender: 'Male', 
-    age: 50, 
-    isVerified: true, 
+  {
+    id: 'm7',
+    name: 'Ramesh Agrawal',
+    initials: 'RA',
+    city: 'Lucknow',
+    profession: 'Lawyer',
+    community: 'Agrawal Samaj',
+    gender: 'Male',
+    age: 50,
+    isVerified: true,
     avatar: null,
     phone: '+91 94150 99887',
     email: 'advocate.ramesh@email.com',
@@ -165,16 +165,16 @@ export const mockMembers = [
       { id: 'm7-f2', name: 'Nitin Agrawal', relation: 'Son', age: 21, initials: 'NA' }
     ]
   },
-  { 
-    id: 'm8', 
-    name: 'Neha Agrawal', 
-    initials: 'NA', 
-    city: 'Indore', 
-    profession: 'Interior Designer', 
-    community: 'Agrawal Samaj', 
-    gender: 'Female', 
-    age: 27, 
-    isVerified: false, 
+  {
+    id: 'm8',
+    name: 'Neha Agrawal',
+    initials: 'NA',
+    city: 'Indore',
+    profession: 'Interior Designer',
+    community: 'Agrawal Samaj',
+    gender: 'Female',
+    age: 27,
+    isVerified: false,
     avatar: null,
     phone: '+91 90090 33445',
     email: 'neha.designs@email.com',
@@ -185,16 +185,16 @@ export const mockMembers = [
       { id: 'm8-f2', name: 'Smt. Asha Agrawal', relation: 'Mother', age: 51, initials: 'AA' }
     ]
   },
-  { 
-    id: 'm9', 
-    name: 'Amit Agrawal', 
-    initials: 'AA', 
-    city: 'Delhi', 
-    profession: 'Marketing Manager', 
-    community: 'Agrawal Samaj', 
-    gender: 'Male', 
-    age: 33, 
-    isVerified: true, 
+  {
+    id: 'm9',
+    name: 'Amit Agrawal',
+    initials: 'AA',
+    city: 'Delhi',
+    profession: 'Marketing Manager',
+    community: 'Agrawal Samaj',
+    gender: 'Male',
+    age: 33,
+    isVerified: true,
     avatar: null,
     phone: '+91 98110 55667',
     email: 'amit.marketing@email.com',
@@ -205,16 +205,16 @@ export const mockMembers = [
       { id: 'm9-f2', name: 'Drishti Agrawal', relation: 'Daughter', age: 2, initials: 'DA' }
     ]
   },
-  { 
-    id: 'm10', 
-    name: 'Suman Agrawal', 
-    initials: 'SA', 
-    city: 'Jaipur', 
-    profession: 'Homemaker', 
-    community: 'Agrawal Samaj', 
-    gender: 'Female', 
-    age: 48, 
-    isVerified: true, 
+  {
+    id: 'm10',
+    name: 'Suman Agrawal',
+    initials: 'SA',
+    city: 'Jaipur',
+    profession: 'Homemaker',
+    community: 'Agrawal Samaj',
+    gender: 'Female',
+    age: 48,
+    isVerified: true,
     avatar: null,
     phone: '+91 94140 77889',
     email: 'suman.agrawal@email.com',
@@ -228,11 +228,33 @@ export const mockMembers = [
 ];
 
 export const mockAdmins = [
-  { id: 'a1', name: 'Shri Mohan Lal Agrawal', initials: 'MA', city: 'Indore', role: 'Community Head', avatar: null },
-  { id: 'a2', name: 'Smt. Kamla Agrawal', initials: 'KA', city: 'Jaipur', role: 'Community Head', avatar: null },
-  { id: 'a3', name: 'Shri Ramchandra Agrawal', initials: 'RA', city: 'Bhopal', role: 'Area Head', avatar: null },
-  // Adding specific area subheads for Indore (matches currentUser.city)
-  { id: 'a4', name: 'Shri Vijay Agrawal', initials: 'VA', city: 'Indore', area: 'Vijay Nagar', role: 'Area Sub-Head', members: 142, avatar: null },
-  { id: 'a5', name: 'Smt. Asha Agrawal', initials: 'AA', city: 'Indore', area: 'Palasia', role: 'Area Sub-Head', members: 89, avatar: null },
-  { id: 'a6', name: 'Shri Dinesh Agrawal', initials: 'DA', city: 'Indore', area: 'Rajwada', role: 'Area Sub-Head', members: 210, avatar: null },
+  // Level 0: Patron (Sanrakshak)
+  { id: 'a0', name: 'Seth Govindram Agrawal', initials: 'GA', city: 'Indore', role: 'Patron', avatar: null, phone: '+91 98765 00000' },
+
+  // Level 1: President (Adhyaksh)
+  { id: 'a1', name: 'Shri Mohan Lal Agrawal', initials: 'MA', city: 'Indore', role: 'President', avatar: null, phone: '+91 98765 43210' },
+  { id: 'a2', name: 'Smt. Kamla Agrawal', initials: 'KA', city: 'Jaipur', role: 'President', avatar: null, phone: '+91 98765 43211' },
+  
+  // Level 2: Core Committee (Mukhya Padadhikari)
+  { id: 'a10', name: 'Shri Ramesh Chand Agrawal', initials: 'RA', city: 'Indore', role: 'Vice President', avatar: null, phone: '+91 98765 11111' },
+  { id: 'a11', name: 'Shri Suresh Kumar Agrawal', initials: 'SA', city: 'Indore', role: 'Secretary', avatar: null, phone: '+91 98765 22222' },
+  { id: 'a12b', name: 'Shri Dinesh Kumar Agrawal', initials: 'DA', city: 'Indore', role: 'Joint Secretary', avatar: null, phone: '+91 98765 33334' },
+  { id: 'a12', name: 'Shri Vinod Kumar Agrawal', initials: 'VA', city: 'Indore', role: 'Treasurer', avatar: null, phone: '+91 98765 33333' },
+
+  // Level 3: Executive Board (Mantrimandal)
+  { id: 'a13', name: 'Shri Ashok Kumar Agrawal', initials: 'AA', city: 'Indore', role: 'Minister (Education)', avatar: null, phone: '+91 98765 44444' },
+  { id: 'a14', name: 'Shri Deepak Kumar Agrawal', initials: 'DA', city: 'Indore', role: 'Minister (Youth)', avatar: null, phone: '+91 98765 55555' },
+  { id: 'a15', name: 'Smt. Seema Agrawal', initials: 'SA', city: 'Indore', role: 'Minister (Women Welfare)', avatar: null, phone: '+91 98765 66666' },
+  { id: 'a16', name: 'Shri Mahesh Chand Agrawal', initials: 'MA', city: 'Indore', role: 'Minister (Social)', avatar: null, phone: '+91 98765 77777' },
+
+  // Level 4: Zonal Heads (Kshetriya Prabhari)
+  { id: 'a20', name: 'Shri Ramakant Agrawal', initials: 'RA', city: 'Indore', role: 'Zonal Head', zone: 'East Zone', avatar: null, phone: '+91 98765 88881' },
+  { id: 'a21', name: 'Shri Kamal Agrawal', initials: 'KA', city: 'Indore', role: 'Zonal Head', zone: 'West Zone', avatar: null, phone: '+91 98765 88882' },
+
+  // Level 5: Regional Delegates (Area Sub-Heads)
+  { id: 'a4', name: 'Shri Prakashchand Agrawal', initials: 'PA', city: 'Indore', area: 'Vijay Nagar', role: 'Area Sub-Head', members: 142, avatar: null },
+  { id: 'a5', name: 'Smt. Omprakash Agrawal', initials: 'OA', city: 'Indore', area: 'Palasia', role: 'Area Sub-Head', members: 89, avatar: null },
+  { id: 'a6', name: 'Shri Shankar Lal Agrawal', initials: 'SA', city: 'Indore', area: 'Rajwada', role: 'Area Sub-Head', members: 210, avatar: null },
+  { id: 'a7', name: 'Shri Govind Agrawal', initials: 'GA', city: 'Indore', area: 'Bhawarkuan', role: 'Area Sub-Head', members: 156, avatar: null },
+  { id: 'a8', name: 'Shri Bhanwarlal Agrawal', initials: 'BA', city: 'Indore', area: 'Sudama Nagar', role: 'Area Sub-Head', members: 312, avatar: null },
 ];

@@ -10,6 +10,8 @@ import { t } from '../../utils/translations';
 import { StoryViewer } from '../../components/common/StoryViewer';
 import { CityLandscape } from '../../components/common/CityLandscape';
 
+
+
 const announcements = [
   { id: 1, title: 'Annual Samaj Mahotsav 2026', subtitle: 'Registration Open — Jul 15, Indore', gradient: 'from-blue-500 via-indigo-500 to-purple-600', icon: Sparkles },
   { id: 2, title: 'Scholarship Applications Open', subtitle: 'Apply before Aug 31 for 2026-27', gradient: 'from-rose-400 via-fuchsia-500 to-indigo-500', icon: GraduationCap },
@@ -24,19 +26,42 @@ const OmIcon = ({ size, className }) => (
 
 const quickActions = [
   { icon: Briefcase, label: 'Professional Network', path: '/member/professional', bg: 'bg-orange-50', text: 'text-orange-600', desc: 'Find jobs & hire within the community', span: 'col-span-2' },
-  { icon: BookOpen, label: 'Groups', path: '/member/groups', bg: 'bg-blue-50', text: 'text-blue-600', desc: 'Discussions', span: 'col-span-1' },
+  { icon: BookOpen, label: 'Directory', path: '/member/directory', bg: 'bg-emerald-50', text: 'text-emerald-600', desc: 'Browse Samaj Members', span: 'col-span-2' },
+  { icon: Users, label: 'Groups', path: '/member/groups', bg: 'bg-blue-50', text: 'text-blue-600', desc: 'Discussions', span: 'col-span-1' },
   { icon: Vote, label: 'Voting', path: '/member/voting', bg: 'bg-purple-50', text: 'text-purple-600', desc: 'Community Polls', span: 'col-span-1' },
   { icon: OmIcon, label: 'Shraddhanjali', path: '/member/obituaries', bg: 'bg-orange-100 bg-[linear-gradient(to_right,#fdba74_1px,transparent_1px),linear-gradient(to_bottom,#fdba74_1px,transparent_1px)] [background-size:14px_14px]', text: 'text-orange-600', desc: 'Om Shanti & Condolences', span: 'col-span-2' },
+];
+
+const mockSuccessStories = [
+  {
+    id: 1,
+    names: 'Rahul & Priya',
+    date: 'Dec 12, 2025',
+    image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=600&auto=format&fit=crop',
+    quote: 'We found our perfect match within our Samaj. Thank you MeriSamaj Matrimony!'
+  },
+  {
+    id: 2,
+    names: 'Amit & Neha',
+    date: 'Jan 05, 2026',
+    image: 'https://images.unsplash.com/photo-1621801306185-3e2840134444?q=80&w=600&auto=format&fit=crop',
+    quote: 'A wonderful platform that honors our traditions and connects families.'
+  },
+  {
+    id: 3,
+    names: 'Vikram & Anjali',
+    date: 'Feb 18, 2026',
+    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=600&auto=format&fit=crop',
+    quote: 'From matching profiles to matching hearts. A blessed journey.'
+  }
 ];
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { currentUser, members: mockMembers, admins: mockAdmins, posts: mockPosts, events: mockEvents, language, setLanguage } = useData();
   const [activeAnnouncementIndex, setActiveAnnouncementIndex] = useState(0);
-  const [activeStoryMember, setActiveStoryMember] = useState(null);
   const carouselRef = useDraggableScroll();
   const subHeadsRef = useDraggableScroll();
-  const storiesRef = useDraggableScroll();
   
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning,' : hour < 18 ? 'Good afternoon,' : 'Good evening,';
@@ -57,86 +82,96 @@ const HomePage = () => {
 
   const unreadCount = 3;
 
-  const communityPosts = mockPosts.filter(p => p.community === currentUser.community || true).slice(0, 3);
+  const communityPosts = mockPosts.filter(p => p.community === currentUser.community || true).slice(0, 10);
+
+  const getSamajImage = (community) => {
+    const c = community.toLowerCase();
+    if (c.includes('agrawal')) return '/assets/images/rajwada.png';
+    if (c.includes('mali')) return '/assets/images/mali.png';
+    if (c.includes('gupta')) return '/assets/images/gupta.png';
+    if (c.includes('sharma')) return '/assets/images/sharma.png';
+    if (c.includes('jain')) return '/assets/images/jain.png';
+    if (c.includes('patel')) return '/assets/images/patel.png';
+    if (c.includes('verma')) return '/assets/images/verma.png';
+    return '/assets/images/rajwada.png'; // fallback
+  };
 
   return (
     <div className="min-h-screen bg-surface pb-28">
 
-      {/* ─── NATIVE APP HEADER ─── */}
-      <div className="px-5 pt-6 pb-4 relative z-10 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-[44px] h-[44px] rounded-full bg-gradient-to-br from-brand-primary to-brand-secondary text-white flex items-center justify-center text-[18px] font-serif shadow-lg border border-white/20">
-            {currentUser.community.substring(0, 1)}
-          </div>
-          <div>
-            <p className="text-[12px] font-medium text-text-secondary tracking-wide">{t(greeting, language)}</p>
-            <h1 className="text-[20px] font-bold text-text-primary tracking-tight leading-tight">{currentUser.name.split(' ')[0]}</h1>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button 
-            onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-            className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-brand-primary text-[11px] font-bold uppercase press-scale"
-          >
-            {language === 'en' ? 'HI' : 'EN'}
-          </button>
-          <button className="relative w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center press-scale" onClick={() => navigate('/member/notifications')}>
-            <Bell size={20} className="text-text-primary" />
-            {unreadCount > 0 && (
-              <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />
-            )}
-          </button>
-        </div>
-      </div>
+      {/* ─── SAMAJ HERO BANNER ─── */}
+      <div className="relative w-full overflow-hidden" style={{ minHeight: '300px' }}>
+        {/* Background Image — Cultural landmark */}
+        <img 
+          src={getSamajImage(currentUser.community)} 
+          alt={currentUser.community}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Gradient overlays for readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/70 z-[1]" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/80 to-transparent z-[1]" />
 
-      {/* ─── STORY RINGS (ACTIVE MEMBERS) ─── */}
-      <div className="px-5 pt-2 pb-4">
-        <div ref={storiesRef} className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-5 px-5">
-          {/* Add Story Button (Current User) */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: 'spring' }}
-            className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer"
-            onClick={() => navigate('/member/social/create')}
-          >
-            <div className="relative w-16 h-16 rounded-full p-[2px] bg-gray-200">
-              <div className="w-full h-full rounded-full border-2 border-white bg-white overflow-hidden flex items-center justify-center shadow-inner">
-                <div className="w-full h-full bg-brand-primary/10 flex items-center justify-center text-[20px] font-serif font-bold text-brand-primary">
-                  {currentUser.community.substring(0, 1)}
-                </div>
-              </div>
-              <div className="absolute bottom-0 right-0 w-5 h-5 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
-                <Plus size={12} className="text-white" strokeWidth={3} />
-              </div>
+        {/* Floating Navbar */}
+        <div className="relative z-10 px-5 pt-6 pb-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-[44px] h-[44px] rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center text-[18px] font-serif shadow-lg border border-white/30">
+              {currentUser.community.substring(0, 1)}
             </div>
-            <span className="text-[11px] font-medium text-text-secondary truncate w-16 text-center">{t('Your Story', language)}</span>
-          </motion.div>
-
-          {mockMembers.slice(0, 8).map((m, idx) => (
-            <motion.div 
-              key={m.id} 
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: idx * 0.05, type: 'spring' }}
-              className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer"
-              onClick={() => setActiveStoryMember(m)}
+            <div>
+              <p className="text-[12px] font-medium text-white/70 tracking-wide">{t(greeting, language)}</p>
+              <h1 className="text-[20px] font-bold text-white tracking-tight leading-tight drop-shadow-md">{currentUser.name.split(' ')[0]}</h1>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+              className="w-10 h-10 rounded-full bg-white/15 backdrop-blur-md shadow-sm border border-white/20 flex items-center justify-center text-white text-[11px] font-bold uppercase press-scale"
             >
-              <div className="w-16 h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500">
-                <div className="w-full h-full rounded-full border-2 border-white bg-white overflow-hidden flex items-center justify-center shadow-inner">
-                  {m.avatar ? (
-                    <img src={m.avatar} alt={m.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-[18px] font-serif font-bold text-gray-700">
-                      {m.initials}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <span className="text-[11px] font-medium text-text-secondary truncate w-16 text-center">{m.name.split(' ')[0]}</span>
-            </motion.div>
-          ))}
+              {language === 'en' ? 'HI' : 'EN'}
+            </button>
+            <button className="relative w-10 h-10 rounded-full bg-white/15 backdrop-blur-md shadow-sm border border-white/20 flex items-center justify-center press-scale" onClick={() => navigate('/member/notifications')}>
+              <Bell size={20} className="text-white" />
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white/40" />
+              )}
+            </button>
+          </div>
         </div>
+
+        {/* Samaj Identity Content — bottom of hero */}
+        <div className="relative z-10 px-5 pt-10 pb-6 flex flex-col justify-end">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-white/20 shadow-sm">
+              {currentUser.city} {t('Chapter', language)}
+            </span>
+            <span className="bg-emerald-500/30 backdrop-blur-md text-emerald-100 text-[10px] font-bold px-3 py-1 rounded-full border border-emerald-400/30 shadow-sm">
+              ✓ {t('Verified', language)}
+            </span>
+          </div>
+          
+          <h2 className="text-[28px] font-serif font-extrabold text-white tracking-tight leading-tight drop-shadow-lg">
+            {currentUser.community}
+          </h2>
+          
+          <p className="text-white/80 text-[14px] italic font-medium mt-1 drop-shadow-sm">
+            "{t('One Family, One Community', language)}"
+          </p>
+
+          <div className="flex items-center gap-4 mt-3">
+            <div className="flex items-center gap-1.5">
+              <Users size={14} className="text-white/70" />
+              <span className="text-white/90 text-[13px] font-bold">1,247 {t('Members', language)}</span>
+            </div>
+            <div className="w-[1px] h-4 bg-white/30" />
+            <div className="flex items-center gap-1.5">
+              <Calendar size={14} className="text-white/70" />
+              <span className="text-white/90 text-[13px] font-bold">{t('Est.', language)} 1952</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom rounded edge transition */}
+        <div className="absolute -bottom-1 left-0 right-0 h-5 bg-surface rounded-t-[24px] z-[2]" />
       </div>
 
       {/* ─── PREMIUM ANNOUNCEMENT CAROUSEL ─── */}
@@ -264,48 +299,98 @@ const HomePage = () => {
       {/* ─── SECTION DIVIDER ─── */}
       <div className="mx-5 mt-8 mb-6 h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
 
-      {/* ─── COMMUNITY LEADERSHIP ─── */}
-      <div className="px-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-[17px] font-bold text-text-primary tracking-tight">Community Leadership</h3>
+      {/* ─── MATRIMONY SUCCESS STORIES ─── */}
+      <div className="px-0 relative z-10">
+        <div className="px-5 flex items-center justify-between mb-4">
+          <h3 className="text-[17px] font-bold text-text-primary tracking-tight">{t('Success Stories', language)}</h3>
+          <button onClick={() => navigate('/member/matrimonial')} className="text-[13px] text-pink-600 font-bold press-scale flex items-center gap-0.5">
+            {t('Find Your Perfect Match', language)} <ChevronRight size={16} />
+          </button>
         </div>
-
-        {/* Main Head */}
-        {mockAdmins.filter(a => a.role === 'Community Head' && a.city === currentUser.city).map(mainHead => (
-          <div key={mainHead.id} className="card-std p-4 mb-4" style={{ background: 'linear-gradient(135deg, #FFFBEB 0%, #FFF7ED 100%)' }}>
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <Avatar initials={mainHead.initials} size="lg" color="bg-amber-100 text-amber-700" />
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center shadow-sm">
-                  <Crown size={12} className="text-white" />
+        
+        <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3 pb-4 px-5">
+          {mockSuccessStories.map((story) => (
+            <div 
+              key={story.id} 
+              onClick={() => navigate('/member/matrimonial')}
+              className="snap-center shrink-0 w-[280px] h-[340px] rounded-[32px] relative overflow-hidden shadow-md active:scale-[0.98] transition-transform cursor-pointer"
+            >
+              <img src={story.image} alt={story.names} className="absolute inset-0 w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+              
+              <div className="absolute inset-0 p-5 flex flex-col justify-end">
+                <div className="bg-pink-500/90 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest inline-flex self-start mb-3 shadow-sm border border-pink-400/50">
+                  {t('Met through Samaj Matrimony', language)}
                 </div>
-              </div>
-              <div className="flex-1">
-                <h4 className="text-[15px] font-bold text-text-primary">{mainHead.name}</h4>
-                <p className="text-[13px] text-amber-700 font-semibold mt-0.5">{mainHead.role} · {mainHead.city}</p>
-                <p className="text-[13px] text-text-secondary mt-0.5">Manages all sub-heads & approvals</p>
-              </div>
-            </div>
-          </div>
-        ))}
-
-        {/* Sub Heads */}
-        <div ref={subHeadsRef} className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-5 px-5">
-          {mockAdmins.filter(a => a.role !== 'Community Head' && a.city === currentUser.city).map((head) => (
-            <div key={head.id} className="shrink-0 w-44 card-std p-4 card-press">
-              <div className="flex items-center gap-2 mb-3">
-                <Avatar initials={head.initials} size="sm" />
-                <Shield size={14} className="text-brand-primary" />
-              </div>
-              <h4 className="text-[14px] font-bold text-text-primary leading-snug line-clamp-2 min-h-[36px]">{head.name}</h4>
-              <p className="text-[13px] text-brand-primary font-semibold mt-1">{head.role}</p>
-              <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                <span className="text-[12px] text-text-secondary flex items-center gap-1 truncate">
-                  <MapPin size={11} className="shrink-0" /> {head.area || head.city}
-                </span>
+                <h4 className="text-white text-[22px] font-serif font-bold leading-tight drop-shadow-md">{story.names}</h4>
+                <p className="text-white/80 text-[12px] font-medium mt-1 drop-shadow-sm flex items-center gap-1.5">
+                  <Heart size={12} className="text-pink-400" fill="currentColor" /> {t('Married on', language)} {story.date}
+                </p>
+                <div className="mt-4 pt-3 border-t border-white/20">
+                  <p className="text-white/90 text-[13px] italic font-medium leading-snug drop-shadow-sm">
+                    "{story.quote}"
+                  </p>
+                </div>
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* ─── SECTION DIVIDER ─── */}
+      <div className="mx-5 mt-6 mb-6 h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+
+      {/* ─── YOUR LEADERS (Compact Preview) ─── */}
+      <div className="px-5" onClick={() => navigate('/member/leadership')}>
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 p-5 shadow-xl cursor-pointer active:scale-[0.98] transition-transform">
+          {/* Temple silhouette */}
+          <div className="absolute inset-0 opacity-[0.06]">
+            <svg viewBox="0 0 400 120" className="w-full h-full" preserveAspectRatio="xMidYMax slice">
+              <path d="M0,120 L0,100 L40,100 L40,80 L60,60 L80,80 L80,100 L120,100 L120,70 L140,40 L160,70 L160,100 L180,100 L180,60 L200,25 L220,60 L220,100 L260,100 L260,70 L280,40 L300,70 L300,100 L320,100 L320,80 L340,60 L360,80 L360,100 L400,100 L400,120 Z" fill="white"/>
+            </svg>
+          </div>
+
+          <div className="relative z-10">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-white text-[16px] font-bold tracking-tight">{t('Samaj Netrutva', language)}</h3>
+                <p className="text-white/50 text-[10px] font-medium mt-0.5">{currentUser.city} · {mockAdmins.filter(a => a.city === currentUser.city).length} {t('Office Bearers', language)}</p>
+              </div>
+              <div className="flex items-center gap-1 bg-white/15 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                <span className="text-white text-[11px] font-bold">{t('View All', language)}</span>
+                <ChevronRight size={14} className="text-white/70" />
+              </div>
+            </div>
+
+            {/* President highlight */}
+            {(() => {
+              const president = mockAdmins.find(a => a.role === 'President' && a.city === currentUser.city);
+              const patron = mockAdmins.find(a => a.role === 'Patron' && a.city === currentUser.city);
+              if (!president && !patron) return null;
+              const leader = president || patron;
+
+              return (
+                <div className="flex items-center gap-4">
+                  <div className="relative shrink-0">
+                    <div className="rounded-full p-0.5 bg-white/20 shadow-lg">
+                      <Avatar initials={leader.initials} size="w-16 h-16 text-[22px]" color="bg-white text-blue-800" />
+                    </div>
+                    <Crown size={16} className="absolute -top-2 left-1/2 -translate-x-1/2 text-amber-400" fill="currentColor" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="bg-amber-500 text-white text-[9px] font-bold px-3 py-0.5 rounded-full inline-block mb-1 uppercase tracking-wider">
+                      {t(leader.role, language)}
+                    </div>
+                    <h4 className="text-white text-[16px] font-bold truncate leading-tight">{leader.name}</h4>
+                    <p className="text-white/50 text-[11px] mt-0.5">
+                      {t(leader.role === 'Patron' ? 'Supreme Guide' : 'Head of Community', language)} · {leader.city}
+                    </p>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
         </div>
       </div>
 
@@ -352,9 +437,9 @@ const HomePage = () => {
             View All <ChevronRight size={16} />
           </button>
         </div>
-        <div className="space-y-3">
-          {communityPosts.slice(0, 2).map((post, i) => (
-            <div key={post.id} className="card-std p-4 card-press animate-stagger-fade-in" style={{ animationDelay: `${i * 80}ms` }} onClick={() => navigate(`/member/social/${post.id}`)}>
+        <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3 pb-2 -mx-5 px-5">
+          {communityPosts.slice(0, 5).map((post, i) => (
+            <div key={post.id} className="card-std p-4 card-press animate-stagger-fade-in shrink-0 w-[280px] snap-center" style={{ animationDelay: `${i * 80}ms` }} onClick={() => navigate(`/member/social/${post.id}`)}>
               <div className="flex items-center gap-3 mb-3">
                 <Avatar initials={post.author.initials} size="sm" />
                 <div className="flex-1">
@@ -422,12 +507,7 @@ const HomePage = () => {
       >
         <ImagePlus size={24} />
       </button>
-      
-      {/* ─── STORY VIEWER MODAL ─── */}
-      <StoryViewer 
-        member={activeStoryMember} 
-        onClose={() => setActiveStoryMember(null)} 
-      />
+
     </div>
   );
 };

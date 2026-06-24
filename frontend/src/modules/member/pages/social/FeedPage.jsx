@@ -6,6 +6,9 @@ import { Avatar } from '../../components/common/Avatar';
 import { Badge } from '../../components/common/Badge';
 import { useData } from '../../context/DataProvider';
 import { PostSkeleton } from '../../components/common/Skeleton';
+import { t } from '../../utils/translations';
+import { StoryViewer } from '../../components/common/StoryViewer';
+import { useDraggableScroll } from '../../../../hooks/useDraggableScroll';
 
 const PostCard = ({ post, index }) => {
   const navigate = useNavigate();
@@ -103,11 +106,13 @@ const PostCard = ({ post, index }) => {
 
 const FeedPage = () => {
   const navigate = useNavigate();
-  const { posts, currentUser } = useData();
+  const { posts, members: mockMembers, currentUser, language } = useData();
   const [activeTab, setActiveTab] = useState('community');
   const [showBroadcastBanner, setShowBroadcastBanner] = useState(false);
   const [feedPosts, setFeedPosts] = useState(posts);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeStoryMember, setActiveStoryMember] = useState(null);
+  const storiesRef = useDraggableScroll();
 
   // Simulate loading state
   useEffect(() => {
@@ -179,6 +184,56 @@ const FeedPage = () => {
       </div>
       
       <div className="px-5 pt-5">
+        {/* ─── STORY RINGS (ACTIVE MEMBERS) ─── */}
+        <div className="pb-4">
+          <div ref={storiesRef} className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-5 px-5">
+            {/* Add Story Button (Current User) */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: 'spring' }}
+              className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer"
+              onClick={() => navigate('/member/social/create')}
+            >
+              <div className="relative w-16 h-16 rounded-full p-[2px] bg-gray-200">
+                <div className="w-full h-full rounded-full border-2 border-white bg-white overflow-hidden flex items-center justify-center shadow-inner">
+                  <div className="w-full h-full bg-brand-primary/10 flex items-center justify-center text-[20px] font-serif font-bold text-brand-primary">
+                    {currentUser.community.substring(0, 1)}
+                  </div>
+                </div>
+                <div className="absolute bottom-0 right-0 w-5 h-5 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
+                  <PlusCircle size={12} className="text-white" strokeWidth={3} fill="currentColor" />
+                </div>
+              </div>
+              <span className="text-[11px] font-medium text-text-secondary truncate w-16 text-center">{t('Your Story', language)}</span>
+            </motion.div>
+
+            {mockMembers.slice(0, 8).map((m, idx) => (
+              <motion.div 
+                key={m.id} 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: idx * 0.05, type: 'spring' }}
+                className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer"
+                onClick={() => setActiveStoryMember(m)}
+              >
+                <div className="w-16 h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500">
+                  <div className="w-full h-full rounded-full border-2 border-white bg-white overflow-hidden flex items-center justify-center shadow-inner">
+                    {m.avatar ? (
+                      <img src={m.avatar} alt={m.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gray-100 flex items-center justify-center text-[18px] font-serif font-bold text-gray-700">
+                        {m.initials}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <span className="text-[11px] font-medium text-text-secondary truncate w-16 text-center">{m.name.split(' ')[0]}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
         {/* Tab Toggle */}
         <div className="flex bg-white rounded-2xl border border-gray-200 overflow-hidden mb-4 shadow-sm p-1 gap-1">
           <button className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#1877F2] text-white rounded-xl font-medium text-sm transition-colors">
@@ -233,6 +288,12 @@ const FeedPage = () => {
       >
         <PlusCircle size={28} />
       </button>
+
+      {/* ─── STORY VIEWER MODAL ─── */}
+      <StoryViewer 
+        member={activeStoryMember} 
+        onClose={() => setActiveStoryMember(null)} 
+      />
     </div>
   );
 };
