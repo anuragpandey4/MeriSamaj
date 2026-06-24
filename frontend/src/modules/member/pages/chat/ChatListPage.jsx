@@ -163,10 +163,12 @@ const ChatListPage = ({ isHub = false }) => {
         </div>
       )}
 
-      {/* Floating Action Button */}
-      <button className="fixed bottom-24 right-5 w-14 h-14 bg-brand-primary text-white rounded-full shadow-[0_8px_20px_rgba(var(--brand-primary-rgb),0.4)] flex items-center justify-center active:scale-95 transition-transform">
-        <Edit size={24} />
-      </button>
+      {/* Floating Action Button (Hide if in Hub, handled by Hub) */}
+      {!isHub && (
+        <button className="fixed bottom-24 right-5 w-14 h-14 bg-brand-primary text-white rounded-full shadow-[0_8px_20px_rgba(var(--brand-primary-rgb),0.4)] flex items-center justify-center active:scale-95 transition-transform">
+          <Edit size={24} />
+        </button>
+      )}
 
     </div>
   );

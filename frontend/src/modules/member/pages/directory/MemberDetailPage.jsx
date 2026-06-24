@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Briefcase, Phone, Mail, CheckCircle, Calendar, Users, Building, GraduationCap } from 'lucide-react';
+import { ArrowLeft, MapPin, Briefcase, Phone, Mail, CheckCircle, Calendar, Users, Building, GraduationCap, MessageCircle } from 'lucide-react';
 import { Avatar } from '../../components/common/Avatar';
 import { Badge } from '../../components/common/Badge';
 import { useData } from '../../context/DataProvider';
@@ -124,6 +124,13 @@ const MemberDetailPage = () => {
           <Badge variant="primary"><MapPin size={10} /> {member.city}</Badge>
           {member.isVerified && <Badge variant="success">Verified Member</Badge>}
         </div>
+        <button 
+          onClick={() => navigate(`/member/chat/${member.id}`)}
+          className="mt-5 px-8 py-2.5 bg-brand-primary text-white rounded-full font-semibold text-[14px] flex items-center gap-2 press-scale shadow-sm"
+        >
+          <MessageCircle size={18} />
+          Message {member.name.split(' ')[0]}
+        </button>
       </div>
 
       {/* Personal Info */}

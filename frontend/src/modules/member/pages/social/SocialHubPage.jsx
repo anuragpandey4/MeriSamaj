@@ -101,11 +101,7 @@ const SocialHubPage = ({ initialTab = 'feed' }) => {
       );
     }
     if (activeTab === 2) { // Chat
-      return (
-        <button onClick={() => navigate('/member/chat/new')} className="responsive-fixed-fab w-14 h-14 bg-[#1877F2] text-white rounded-full shadow-lg flex items-center justify-center press-scale hover:bg-blue-600 transition-colors absolute bottom-6 right-5 z-50">
-          <Edit2 size={24} />
-        </button>
-      );
+      return null;
     }
     return null; // Discover has no FAB
   };
