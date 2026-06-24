@@ -1,15 +1,121 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, X, Heart } from 'lucide-react';
-import { Avatar } from '../../components/common/Avatar';
+import { ArrowLeft, Check, X, Heart, Eye, Star, Users, Sparkles, MessageCircle, Phone } from 'lucide-react';
 import { useData } from '../../context/DataProvider';
 
-const InterestsPage = () => {
+// ─── STAT CARD ───
+const StatCard = ({ value, label, color }) => (
+  <div className="flex-1 bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+    <div className={`text-[28px] font-extrabold ${color} leading-none mb-1`}>{value}</div>
+    <p className="text-[12px] text-gray-500 font-medium leading-tight">{label}</p>
+  </div>
+);
+
+// ─── INTEREST CARD ───
+const InterestCard = ({ profile, type, navigate }) => {
+  const [accepted, setAccepted] = useState(false);
+  const [declined, setDeclined] = useState(false);
+
+  if (declined) return null;
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-3">
+      <div className="flex gap-3.5 p-4">
+        {/* Photo */}
+        <div 
+          className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 shrink-0 cursor-pointer border border-gray-100"
+          onClick={() => navigate(`/member/matrimonial/${profile.id}`)}
+        >
+          <img 
+            src={profile.avatar || `https://i.pravatar.cc/200?u=${profile.initials}`} 
+            alt={profile.name} 
+            className={`w-full h-full object-cover ${type !== 'Accepted' && type !== 'accepted' ? 'blur-[3px]' : ''}`}
+          />
+        </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0" onClick={() => navigate(`/member/matrimonial/${profile.id}`)}>
+          <div className="flex items-center gap-2 mb-1">
+            <h4 className="text-[15px] font-bold text-gray-900 truncate">{profile.name}</h4>
+            {profile.isNew && (
+              <span className="bg-emerald-100 text-emerald-700 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">New</span>
+            )}
+          </div>
+          <p className="text-[13px] text-gray-600 font-medium">{profile.age} yrs · {profile.height}</p>
+          <p className="text-[12px] text-gray-500 mt-0.5 truncate">{profile.profession} · {profile.city}</p>
+          <p className="text-[12px] text-gray-400 mt-0.5 truncate">{profile.education}</p>
+        </div>
+      </div>
+
+      {/* Action buttons based on type */}
+      {type === 'Received' && !accepted && (
+        <div className="flex gap-2 px-4 pb-4">
+          <button 
+            onClick={() => setDeclined(true)}
+            className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
+          >
+            <X size={16} /> Decline
+          </button>
+          <button 
+            onClick={() => setAccepted(true)}
+            className="flex-1 py-2.5 bg-emerald-500 text-white rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-100 active:scale-95 transition-transform"
+          >
+            <Check size={16} /> Accept
+          </button>
+        </div>
+      )}
+
+      {type === 'Received' && accepted && (
+        <div className="flex gap-2 px-4 pb-4">
+          <div className="flex-1 py-2.5 bg-emerald-50 text-emerald-600 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 border border-emerald-100">
+            <Check size={16} /> Accepted ✓
+          </div>
+          <button 
+            onClick={() => navigate(`/member/chat/${profile.id}`)}
+            className="py-2.5 px-5 bg-blue-500 text-white rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 shadow-md shadow-blue-100 active:scale-95 transition-transform"
+          >
+            <MessageCircle size={16} /> Chat
+          </button>
+        </div>
+      )}
+
+      {type === 'Sent' && (
+        <div className="flex items-center justify-between px-4 pb-4">
+          <span className="text-rose-500 text-[12px] font-bold bg-rose-50 px-3 py-1.5 rounded-full uppercase tracking-wider border border-rose-100">
+            Pending
+          </span>
+          <button className="text-[13px] text-gray-500 font-semibold active:scale-95 transition-transform">
+            Cancel Request
+          </button>
+        </div>
+      )}
+
+      {type === 'Accepted' && (
+        <div className="flex gap-2 px-4 pb-4">
+          <button 
+            onClick={() => navigate(`/member/chat/${profile.id}`)}
+            className="flex-1 py-2.5 bg-blue-500 text-white rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 shadow-md shadow-blue-100 active:scale-95 transition-transform"
+          >
+            <MessageCircle size={16} /> Chat Now
+          </button>
+          <a 
+            href={`tel:+91${profile.id}`}
+            className="py-2.5 px-5 bg-emerald-500 text-white rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-100 active:scale-95 transition-transform"
+          >
+            <Phone size={16} /> Call
+          </a>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const InterestsPage = ({ isHub = false }) => {
   const navigate = useNavigate();
   const { matrimonialProfiles } = useData();
   const [activeTab, setActiveTab] = useState('Received');
   
-  // Mock logic - grab a few profiles for each tab
+  // Mock data distribution
   const received = matrimonialProfiles.slice(0, 2);
   const sent = matrimonialProfiles.slice(2, 3);
   const accepted = matrimonialProfiles.slice(3, 4);
@@ -24,78 +130,81 @@ const InterestsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col pb-6">
-      <div className="bg-card border-b border-pink-100 flex items-center justify-between px-4 h-14 sticky top-0 z-30">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="p-1 -ml-1 press-scale">
-            <ArrowLeft size={22} className="text-text-primary" />
+    <div className={isHub ? 'bg-gray-50 min-h-full' : 'min-h-screen bg-gray-50 pb-24'}>
+      
+      {/* ─── HEADER (only when standalone) ─── */}
+      {!isHub && (
+        <div className="px-5 pt-5 pb-4 flex items-center gap-3">
+          <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 active:scale-95 transition-transform shrink-0">
+            <ArrowLeft size={20} />
           </button>
-          <h1 className="text-base font-semibold text-text-primary">Matrimonial Interests</h1>
+          <div className="flex items-center gap-3 flex-1">
+            <div className="w-10 h-10 rounded-full bg-gray-100 overflow-hidden border-2 border-rose-100">
+              <img src="https://i.pravatar.cc/100?u=self" alt="You" className="w-full h-full object-cover" />
+            </div>
+            <div>
+              <h1 className="text-[20px] font-extrabold text-gray-900 tracking-tight">Activity</h1>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── STATS ROW ─── */}
+      <div className="px-5 pt-5 pb-2">
+        <div className="flex gap-3">
+          <StatCard value="5" label="Profile Visits" color="text-emerald-500" />
+          <StatCard value="0" label="Shortlisted Profiles" color="text-rose-500" />
+          <StatCard value="0" label="Contact Views" color="text-blue-500" />
         </div>
       </div>
 
-      <div className="bg-card px-4 pt-3 pb-2 border-b border-gray-100 sticky top-14 z-20">
-        <div className="flex bg-gray-100 p-1 rounded-xl">
-          {['Received', 'Sent', 'Accepted'].map(tab => (
+      {/* ─── INTERESTS SECTION ─── */}
+      <div className="px-5 pt-5">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-[18px] font-extrabold text-gray-900 tracking-tight">Interests</h2>
+          <button onClick={() => navigate('/member/matrimonial')} className="text-rose-500 text-[14px] font-bold active:scale-95 transition-transform">
+            View All
+          </button>
+        </div>
+
+        {/* Tab pills */}
+        <div className="flex gap-2 mb-5">
+          {['Received', 'Accepted', 'Sent'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all press-scale ${
-                activeTab === tab ? 'bg-white text-matrimonial-module shadow-sm' : 'text-text-secondary'
+              className={`px-5 py-2 rounded-full text-[13px] font-semibold border transition-all active:scale-95 ${
+                activeTab === tab
+                  ? 'bg-gray-900 text-white border-gray-900 shadow-md'
+                  : 'bg-white text-gray-700 border-gray-200'
               }`}
             >
               {tab}
             </button>
           ))}
         </div>
-      </div>
 
-      <div className="flex-1 px-4 pt-4 space-y-4">
+        {/* Interest Cards */}
         {getActiveList().length === 0 ? (
-          <div className="flex flex-col items-center justify-center mt-20 text-center">
-            <div className="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mb-3">
-              <Heart size={24} className="text-pink-300" />
+          <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-3xl border border-gray-100 shadow-sm">
+            <div className="w-24 h-24 bg-rose-50 rounded-full flex items-center justify-center mb-4 border border-rose-100">
+              <Sparkles size={36} className="text-rose-300" />
             </div>
-            <h3 className="text-sm font-semibold text-text-primary">No profiles here</h3>
-            <p className="text-xs text-text-secondary mt-1">You don't have any {activeTab.toLowerCase()} interests right now.</p>
+            <h3 className="text-[16px] font-bold text-gray-900 mb-1">No {activeTab.toLowerCase()} interests</h3>
+            <p className="text-[13px] text-gray-500 max-w-[240px] leading-relaxed">
+              {activeTab === 'Received' 
+                ? 'Receive interest with Spotlight! Remain on top of the list and increase your chances.'
+                : activeTab === 'Sent'
+                ? 'You haven\'t sent any interests yet. Browse matches to get started!'
+                : 'No accepted interests yet. Keep expressing interest to find your match!'}
+            </p>
+            <button className="mt-4 text-rose-500 text-[14px] font-bold active:scale-95 transition-transform">
+              Tell me more
+            </button>
           </div>
         ) : (
           getActiveList().map(profile => (
-            <div key={profile.id} className="bg-card rounded-2xl p-4 border border-pink-100/50 shadow-sm card-press">
-              <div className="flex gap-3">
-                <Avatar initials={profile.initials} size="lg" className={activeTab !== 'Accepted' ? 'opacity-80 blur-[2px]' : ''} />
-                <div className="flex-1 min-w-0" onClick={() => navigate(`/member/matrimonial/${profile.id}`)}>
-                  <h4 className="text-sm font-bold text-text-primary truncate">{profile.name}</h4>
-                  <p className="text-xs text-text-secondary mt-0.5">{profile.age} yrs · {profile.height}</p>
-                  <p className="text-xs text-text-secondary mt-0.5 truncate">{profile.profession}</p>
-                </div>
-              </div>
-              
-              {activeTab === 'Received' && (
-                <div className="flex gap-2 mt-4 pt-4 border-t border-gray-50">
-                  <button className="flex-1 py-2 bg-gray-100 text-text-primary rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 press-scale">
-                    <X size={14} /> Decline
-                  </button>
-                  <button className="flex-1 py-2 bg-emerald-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 press-scale shadow-sm">
-                    <Check size={14} /> Accept
-                  </button>
-                </div>
-              )}
-              
-              {activeTab === 'Sent' && (
-                <div className="mt-3 pt-3 border-t border-gray-50 flex justify-between items-center">
-                  <span className="text-xs text-matrimonial-module font-semibold uppercase tracking-wider bg-pink-50 px-2 py-1 rounded-md">Pending</span>
-                  <button className="text-xs text-text-secondary font-medium press-scale">Cancel Request</button>
-                </div>
-              )}
-
-              {activeTab === 'Accepted' && (
-                <div className="mt-3 pt-3 border-t border-gray-50 flex justify-between items-center">
-                  <span className="text-xs text-emerald-600 font-semibold uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded-md">Connected</span>
-                  <button className="text-xs text-brand-primary font-medium press-scale">View Details</button>
-                </div>
-              )}
-            </div>
+            <InterestCard key={profile.id} profile={profile} type={activeTab} navigate={navigate} />
           ))
         )}
       </div>

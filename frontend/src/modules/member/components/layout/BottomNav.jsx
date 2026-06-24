@@ -53,9 +53,9 @@ export const BottomNav = () => {
               <span className={`text-[10px] mt-1 transition-all duration-200 ${isActive ? 'font-bold' : 'font-medium'}`}>
                 {item.name}
               </span>
-              {/* Active indicator dot */}
+              {/* Active indicator line */}
               {isActive && (
-                <div className={`absolute -bottom-0.5 w-5 h-[3px] rounded-full animate-scale-pop ${item.name === 'Social' ? 'bg-[#1877F2]' : item.name === 'Matrimony' ? 'bg-matrimonial-module' : 'bg-brand-primary'}`} />
+                <div className={`absolute top-0 w-8 h-[3px] rounded-b-full ${item.name === 'Social' ? 'bg-[#1877F2]' : item.name === 'Matrimony' ? 'bg-matrimonial-module' : 'bg-brand-primary'}`} />
               )}
             </NavLink>
           );

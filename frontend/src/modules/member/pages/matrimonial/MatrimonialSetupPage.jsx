@@ -4,7 +4,7 @@ import { ArrowLeft, Camera, CheckCircle, Lock } from 'lucide-react';
 import { PageHeader } from '../../components/layout/PageHeader';
 import { useData } from '../../context/DataProvider';
 
-const MatrimonialSetupPage = () => {
+const MatrimonialSetupPage = ({ isHub = false }) => {
   const navigate = useNavigate();
   const { addMatrimonialProfile } = useData();
   const [step, setStep] = useState(1); // 1: Basic, 2: Education, 3: Family, 4: Preferences
@@ -137,7 +137,8 @@ const MatrimonialSetupPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col pb-20">
+    <div className={isHub ? 'bg-surface flex flex-col min-h-full' : 'min-h-screen bg-surface flex flex-col pb-20'}>
+      {!isHub && (
       <div className="bg-card border-b border-pink-100 flex items-center gap-3 px-4 h-14 sticky top-0 z-30">
         <button onClick={() => { step > 1 ? setStep(step - 1) : navigate(-1) }} className="p-1 press-scale">
           <ArrowLeft size={22} className="text-text-primary" />
@@ -147,13 +148,22 @@ const MatrimonialSetupPage = () => {
         </div>
         <span className="text-xs font-semibold text-matrimonial-module bg-pink-50 px-2 py-1 rounded-md">Step {step}/4</span>
       </div>
+      )}
 
       {/* Progress Bar */}
-      <div className="h-1 bg-gray-100 w-full">
-        <div 
-          className="h-full bg-matrimonial-module transition-all duration-300 ease-out"
-          style={{ width: `${(step / 4) * 100}%` }}
-        />
+      <div className={`w-full ${isHub ? 'px-5 pt-5 pb-2' : ''}`}>
+        <div className={`bg-gray-100 w-full ${isHub ? 'h-1.5 rounded-full overflow-hidden' : 'h-1'}`}>
+          <div 
+            className="h-full bg-matrimonial-module transition-all duration-300 ease-out"
+            style={{ width: `${(step / 4) * 100}%` }}
+          />
+        </div>
+        {isHub && (
+          <div className="flex justify-between items-center mt-2">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Profile Setup</span>
+            <span className="text-[10px] font-bold text-matrimonial-module uppercase tracking-wider">Step {step} of 4</span>
+          </div>
+        )}
       </div>
 
       <div className="flex-1 px-5 pt-6 pb-24 overflow-y-auto">
