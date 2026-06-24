@@ -293,9 +293,9 @@ const HomePage = () => {
           const coreCommittee = mockAdmins.filter(a => ['Vice President', 'Secretary', 'Joint Secretary', 'Treasurer'].includes(a.role) && a.city === currentUser.city);
           
           return (
-            <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
+            <div className="flex flex-col gap-6">
               {/* President Section */}
-              <div className="relative w-full h-[360px] overflow-hidden group">
+              <div className="relative w-full h-[360px] overflow-hidden group rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100">
                 <img src={`https://i.pravatar.cc/300?u=${president.initials}`} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt={president.name} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
                 
@@ -332,8 +332,8 @@ const HomePage = () => {
               </div>
 
               {/* Core Committee Section */}
-              <div className="p-5 bg-white border-t border-gray-100 mt-2">
-                <div className="flex items-center justify-between mb-5">
+              <div>
+                <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-[18px] font-extrabold text-gray-900 tracking-tight">मुख्य पदाधिकारी</h3>
                     <p className="text-[13px] text-gray-500 font-medium">Core Committee</p>
