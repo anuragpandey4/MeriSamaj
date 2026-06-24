@@ -295,40 +295,36 @@ const HomePage = () => {
           return (
             <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
               {/* President Section */}
-              <div className="flex relative items-stretch">
-                {/* Left side: Photo */}
-                <div className="w-[45%] bg-gray-100 shrink-0 relative">
-                  <img src={`https://i.pravatar.cc/300?u=${president.initials}`} className="absolute inset-0 w-full h-full object-cover" alt={president.name} />
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/30" />
-                </div>
+              <div className="relative w-full h-[360px] overflow-hidden group">
+                <img src={`https://i.pravatar.cc/300?u=${president.initials}`} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt={president.name} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
                 
-                {/* Right side: Info */}
-                <div className="w-[55%] p-4 py-5 flex flex-col justify-center items-center relative bg-gradient-to-l from-white via-white to-white/90">
-                  <div className="mb-1 flex items-center justify-center">
-                    <Crown size={36} className="text-amber-500 fill-amber-500 drop-shadow-sm" />
+                <div className="absolute inset-0 p-5 flex flex-col justify-end items-center text-center">
+                  <div className="mb-2">
+                    <Crown size={36} className="text-amber-400 fill-amber-400 drop-shadow-md" />
                   </div>
-                  <div className="bg-[#f08c35] text-white text-[11px] font-bold px-4 py-1 rounded-full mb-3 shadow-sm">
+                  <div className="bg-[#f08c35] text-white text-[11px] font-bold px-4 py-1 rounded-full mb-2 shadow-sm uppercase tracking-widest">
                     {t(president.role, language) === 'President' ? 'अध्यक्ष' : t(president.role, language)}
                   </div>
-                  <h4 className="text-gray-900 text-[18px] font-extrabold leading-tight text-center tracking-tight mb-1">{president.name}</h4>
-                  <p className="text-[#1e58b8] text-[13px] font-bold text-center mt-0 mb-3">समाज अध्यक्ष</p>
+                  <h4 className="text-white text-[22px] font-extrabold leading-tight tracking-tight mb-1 drop-shadow-sm">{president.name}</h4>
+                  <p className="text-amber-300 text-[13px] font-bold mt-0 mb-3 drop-shadow-sm">समाज अध्यक्ष</p>
                   
-                  <div className="flex flex-col gap-2.5 mt-1 w-full pl-2">
-                    <div className="flex items-center gap-2 text-gray-800 text-[12px] font-medium">
-                      <Phone size={14} className="text-gray-500 shrink-0" />
+                  <div className="flex gap-4 mb-4">
+                    <div className="flex items-center gap-1.5 text-white/90 text-[12px] font-medium">
+                      <Phone size={14} className="text-white/70" />
                       {president.phone}
                     </div>
-                    <div className="flex items-center gap-2 text-gray-800 text-[12px] font-medium">
-                      <MapPin size={14} className="text-gray-500 shrink-0" />
+                    <div className="flex items-center gap-1.5 text-white/90 text-[12px] font-medium">
+                      <MapPin size={14} className="text-white/70" />
                       {president.city}
                     </div>
                   </div>
                   
-                  <div className="flex gap-2 mt-5 w-full">
-                    <button className="flex-1 py-2.5 rounded-full border-[1.5px] border-[#1e58b8] text-[#1e58b8] text-[13px] font-bold flex items-center justify-center gap-1.5 active:bg-blue-50 transition-colors">
+                  <div className="flex gap-3 w-full max-w-[280px]">
+                    <button className="flex-1 py-2.5 rounded-full bg-white text-[#1e58b8] text-[13px] font-bold flex items-center justify-center gap-1.5 shadow-lg active:scale-95 transition-transform">
                       <Phone size={14} /> कॉल करें
                     </button>
-                    <button onClick={() => navigate(`/member/chat/${president.id}`)} className="flex-1 py-2.5 rounded-full bg-[#4ab04e] text-white text-[13px] font-bold flex items-center justify-center gap-1.5 active:bg-green-600 shadow-sm shadow-green-200 transition-colors">
+                    <button onClick={() => navigate(`/member/chat/${president.id}`)} className="flex-1 py-2.5 rounded-full bg-[#4ab04e] text-white text-[13px] font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-green-900/20 active:scale-95 transition-transform">
                       <MessageCircle size={14} /> चैट करें
                     </button>
                   </div>
