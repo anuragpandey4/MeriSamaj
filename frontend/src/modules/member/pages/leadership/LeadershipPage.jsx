@@ -21,71 +21,54 @@ const HeroBanner = ({ president, patron, language }) => {
   if (!leader) return null;
 
   return (
-    <div className="relative bg-gradient-to-b from-blue-900 via-blue-800 to-blue-700 overflow-hidden">
-      {/* Temple silhouette background */}
-      <div className="absolute inset-0 opacity-[0.08]">
-        <svg viewBox="0 0 400 200" className="w-full h-full" preserveAspectRatio="xMidYMax slice">
-          <path d="M0,200 L0,160 L30,160 L30,140 L20,140 L20,100 L40,80 L60,100 L60,140 L50,140 L50,160 L80,160 L80,140 L70,140 L70,100 L90,80 L110,100 L110,140 L100,140 L100,160 L130,160 L130,120 L120,120 L120,70 L140,40 L160,70 L160,120 L150,120 L150,160 L180,160 L180,120 L170,120 L170,60 L195,20 L200,15 L205,20 L230,60 L230,120 L220,120 L220,160 L250,160 L250,120 L240,120 L240,70 L260,40 L280,70 L280,120 L270,120 L270,160 L300,160 L300,140 L290,140 L290,100 L310,80 L330,100 L330,140 L320,140 L320,160 L350,160 L350,140 L340,140 L340,100 L360,80 L380,100 L380,140 L370,140 L370,160 L400,160 L400,200 Z" fill="white"/>
-          <circle cx="200" cy="10" r="20" fill="white" opacity="0.5"/>
-        </svg>
+    <div className="bg-gray-50 pt-12 pb-6 px-5 relative">
+      <div className="flex items-center gap-4 mb-6 relative z-20">
+        <button onClick={() => window.history.back()} className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-700 active:scale-95 transition-transform shrink-0">
+          <ArrowLeft size={20} />
+        </button>
+        <div>
+          <h1 className="text-gray-900 text-[24px] font-extrabold tracking-tight">{t('Samaj Netrutva', language)}</h1>
+          <p className="text-gray-500 text-[13px] font-medium">{t('Our Leadership, Our Pride', language)}</p>
+        </div>
       </div>
-
-      <div className="relative z-10 px-5 pt-14 pb-6">
-        {/* Back + Title */}
-        <div className="flex items-center gap-3 mb-1">
-          <button onClick={() => window.history.back()} className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white active:scale-95 transition-transform">
-            <ArrowLeft size={18} />
-          </button>
+      
+      <div className="flex relative items-stretch bg-white rounded-3xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-gray-100">
+        {/* Left side: Photo */}
+        <div className="w-[45%] bg-gray-100 shrink-0 relative">
+          <img src={`https://i.pravatar.cc/300?u=${leader.initials}`} className="absolute inset-0 w-full h-full object-cover" alt={leader.name} />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/30" />
         </div>
-
-        <div className="mb-1 mt-2">
-          <h1 className="text-white text-[22px] font-bold">{t('Samaj Netrutva', language)}</h1>
-          <p className="text-white/60 text-[12px] font-medium">{t('Our Leadership, Our Pride', language)}</p>
-        </div>
-
-        {/* Karyakaal badge */}
-        <div className="inline-flex items-center bg-white/10 border border-white/10 rounded-full px-3 py-1 mt-2 mb-5">
-          <span className="text-white/80 text-[10px] font-bold tracking-wide">{t('Term', language)} 2026 - 2029</span>
-        </div>
-
-        {/* President Card */}
-        <div className="flex flex-col items-center">
-          <motion.div
-            animate={{ y: [0, -5, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <Crown size={32} className="text-amber-400 mb-1" fill="currentColor" />
-          </motion.div>
-          
-          <div className="rounded-full p-1 bg-white/20 shadow-xl mb-3">
-            <Avatar initials={leader.initials} size="w-24 h-24 text-[32px]" color="bg-white text-blue-800" />
+        
+        {/* Right side: Info */}
+        <div className="w-[55%] p-4 py-5 flex flex-col justify-center items-center relative bg-gradient-to-l from-white via-white to-white/90">
+          <div className="mb-1 flex items-center justify-center">
+            <Crown size={36} className="text-amber-500 fill-amber-500 drop-shadow-sm" />
           </div>
-
-          <div className="bg-amber-500 text-white text-[11px] font-bold px-5 py-1.5 rounded-full uppercase tracking-widest shadow-md mb-2">
-            {t(leader.role, language)}
+          <div className="bg-[#f08c35] text-white text-[11px] font-bold px-4 py-1 rounded-full mb-3 shadow-sm">
+            {t(leader.role, language) === 'President' ? 'अध्यक्ष' : t(leader.role, language)}
           </div>
-
-          <h2 className="text-white text-[20px] font-bold text-center tracking-tight">{leader.name}</h2>
-          <p className="text-amber-300/80 text-[12px] font-semibold mt-0.5">
-            {t(leader.role === 'Patron' ? 'Supreme Guide' : 'Head of Community', language)}
-          </p>
+          <h4 className="text-gray-900 text-[18px] font-extrabold leading-tight text-center tracking-tight mb-1">{leader.name}</h4>
+          <p className="text-[#1e58b8] text-[13px] font-bold text-center mt-0 mb-3">समाज अध्यक्ष</p>
           
-          {leader.phone && (
-            <p className="text-white/50 text-[11px] mt-1.5 flex items-center gap-1">
-              <Phone size={10} /> {leader.phone}
-            </p>
-          )}
-          <p className="text-white/40 text-[11px] flex items-center gap-1 mt-0.5">
-            <MapPin size={10} /> {leader.city}
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex gap-3 mt-4 mb-2">
-            <a href={`tel:${leader.phone}`} className="flex items-center gap-2 bg-white text-blue-800 px-6 py-2.5 rounded-full text-[12px] font-bold shadow-lg active:scale-95 transition-transform">
-              <Phone size={14} /> {t('Call', language)}
+          <div className="flex flex-col gap-2.5 mt-1 w-full pl-2">
+            {leader.phone && (
+              <div className="flex items-center gap-2 text-gray-800 text-[12px] font-medium">
+                <Phone size={14} className="text-gray-500 shrink-0" />
+                {leader.phone}
+              </div>
+            )}
+            <div className="flex items-center gap-2 text-gray-800 text-[12px] font-medium">
+              <MapPin size={14} className="text-gray-500 shrink-0" />
+              {leader.city}
+            </div>
+          </div>
+          
+          <div className="flex gap-2 mt-5 w-full">
+            <a href={`tel:${leader.phone}`} className="flex-1 py-2.5 rounded-full border-[1.5px] border-[#1e58b8] text-[#1e58b8] text-[13px] font-bold flex items-center justify-center gap-1.5 active:bg-blue-50 transition-colors">
+              <Phone size={14} /> कॉल करें
             </a>
-            <a href={`https://wa.me/${leader.phone?.replace(/[\s+]/g, '')}`} className="flex items-center gap-2 bg-[#25D366] text-white px-6 py-2.5 rounded-full text-[12px] font-bold shadow-lg active:scale-95 transition-transform">
-              <MessageCircle size={14} /> WhatsApp
+            <a href={`https://wa.me/${leader.phone?.replace(/[\s+]/g, '')}`} className="flex-1 py-2.5 rounded-full bg-[#4ab04e] text-white text-[13px] font-bold flex items-center justify-center gap-1.5 active:bg-green-600 shadow-sm shadow-green-200 transition-colors">
+              <MessageCircle size={14} /> चैट करें
             </a>
           </div>
         </div>
@@ -96,28 +79,28 @@ const HeroBanner = ({ president, patron, language }) => {
 
 // ─── CORE COMMITTEE: Horizontal Scroll Cards ───
 const CoreCommitteeCard = ({ member, language }) => {
-  const badgeColor = ROLE_BADGE_COLOR[member.role] || 'bg-gray-500';
+  const badgeColor = member.role.includes('Vice') ? 'bg-[#1e58b8]' : member.role.includes('Secretary') ? 'bg-[#ff3b68]' : 'bg-[#00a651]';
+  const hindiRole = member.role.includes('Vice') ? 'उपाध्यक्ष' : member.role.includes('Secretary') ? 'सचिव' : 'कोषाध्यक्ष';
   return (
-    <div className="shrink-0 w-[140px] bg-white rounded-2xl border border-gray-100 shadow-sm p-3 flex flex-col items-center text-center">
-      <Avatar initials={member.initials} size="w-14 h-14 text-[18px]" color="bg-blue-50 text-blue-700" />
-      
-      <div className={`${badgeColor} text-white text-[9px] font-bold px-3 py-0.5 rounded-full mt-2 mb-1.5`}>
-        {t(member.role, language)}
+    <div className="shrink-0 w-[150px] bg-white rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 flex flex-col mx-1.5 my-2">
+      <div className="h-[150px] bg-gray-100 relative">
+        <img src={`https://i.pravatar.cc/150?u=${member.initials}`} className="absolute inset-0 w-full h-full object-cover" alt={member.name} />
       </div>
-      
-      <h4 className="text-[12px] font-bold text-gray-900 leading-tight line-clamp-2 min-h-[32px]">{member.name}</h4>
-      
-      {member.phone && (
-        <p className="text-[9px] text-gray-400 mt-1 truncate w-full">{member.phone}</p>
-      )}
-      
-      <div className="flex gap-2 mt-2">
-        <a href={`tel:${member.phone}`} className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 active:scale-90 transition-transform">
-          <Phone size={14} />
-        </a>
-        <a href={`https://wa.me/${member.phone?.replace(/[\s+]/g, '')}`} className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-[#25D366] active:scale-90 transition-transform">
-          <MessageCircle size={14} />
-        </a>
+      <div className="p-3.5 pt-4 flex flex-col flex-1 items-center bg-white relative">
+        <div className={`text-white text-[10px] font-bold px-4 py-1 rounded-full absolute -top-3 shadow-sm ${badgeColor}`}>
+          {hindiRole}
+        </div>
+        <h4 className="text-gray-900 text-[13px] font-extrabold text-center leading-[1.2] mt-1 mb-4 flex-1">{member.name}</h4>
+        <div className="flex gap-2 w-full mt-auto">
+          <a href={`tel:${member.phone}`} className="flex-1 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm text-[#1e58b8] flex items-center justify-center flex-col gap-1 active:bg-gray-50 transition-colors">
+            <Phone size={14} />
+            <span className="text-[9px] font-bold text-gray-500">कॉल करें</span>
+          </a>
+          <a href={`https://wa.me/${member.phone?.replace(/[\s+]/g, '')}`} className="flex-1 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm text-[#00a651] flex items-center justify-center flex-col gap-1 active:bg-gray-50 transition-colors">
+            <MessageCircle size={14} />
+            <span className="text-[9px] font-bold text-gray-500">चैट करें</span>
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -126,23 +109,27 @@ const CoreCommitteeCard = ({ member, language }) => {
 // ─── MINISTER GRID CARD ───
 const MinisterCard = ({ member, language }) => (
   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3">
-    <div className="flex items-start gap-2.5">
-      <Avatar initials={member.initials} size="w-10 h-10 text-[13px]" color="bg-rose-50 text-rose-700" />
+    <div className="flex items-center gap-3">
+      <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 shrink-0 border border-gray-100 shadow-sm relative">
+        <img src={`https://i.pravatar.cc/150?u=${member.initials}`} className="w-full h-full object-cover" alt={member.name} />
+      </div>
       <div className="flex-1 min-w-0">
-        <span className="text-[9px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full">
-          {t(member.role, language)}
-        </span>
-        <h4 className="text-[13px] font-bold text-gray-900 mt-1 truncate">{member.name}</h4>
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="text-[9px] font-bold text-white bg-[#ff3b68] px-2 py-0.5 rounded-full shadow-sm">
+            {t(member.role, language)}
+          </span>
+        </div>
+        <h4 className="text-[14px] font-extrabold text-gray-900 truncate leading-tight">{member.name}</h4>
         {member.phone && (
-          <p className="text-[10px] text-gray-400 mt-0.5">{member.phone}</p>
+          <p className="text-[11px] text-gray-500 mt-0.5 font-medium">{member.phone}</p>
         )}
       </div>
-      <div className="flex flex-col gap-1">
-        <a href={`tel:${member.phone}`} className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 active:scale-90 transition-transform">
-          <Phone size={13} />
+      <div className="flex gap-1.5 shrink-0">
+        <a href={`tel:${member.phone}`} className="w-9 h-9 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-[#1e58b8] active:scale-90 transition-transform">
+          <Phone size={14} />
         </a>
-        <a href={`https://wa.me/${member.phone?.replace(/[\s+]/g, '')}`} className="w-7 h-7 rounded-full bg-green-50 flex items-center justify-center text-[#25D366] active:scale-90 transition-transform">
-          <MessageCircle size={13} />
+        <a href={`https://wa.me/${member.phone?.replace(/[\s+]/g, '')}`} className="w-9 h-9 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-[#00a651] active:scale-90 transition-transform">
+          <MessageCircle size={14} />
         </a>
       </div>
     </div>
@@ -151,39 +138,38 @@ const MinisterCard = ({ member, language }) => (
 
 // ─── AREA DELEGATE ROW ───
 const DelegateRow = ({ member, language }) => (
-  <div className="flex items-center gap-3 py-3 border-b border-gray-50 last:border-b-0">
-    <Avatar initials={member.initials} size="w-10 h-10 text-[13px]" color="bg-gray-100 text-gray-600" />
+  <div className="flex items-center gap-3 py-3.5 border-b border-gray-100 last:border-b-0">
+    <div className="w-11 h-11 rounded-full overflow-hidden bg-gray-100 shrink-0 border border-gray-100 shadow-sm relative">
+      <img src={`https://i.pravatar.cc/150?u=${member.initials}`} className="w-full h-full object-cover" alt={member.name} />
+    </div>
     <div className="flex-1 min-w-0">
-      <h4 className="text-[13px] font-bold text-gray-900 truncate">{member.name}</h4>
-      <p className="text-[11px] text-gray-400 flex items-center gap-1 mt-0.5">
-        <MapPin size={9} /> {member.area}
+      <h4 className="text-[14px] font-extrabold text-gray-900 truncate">{member.name}</h4>
+      <p className="text-[11px] font-medium text-gray-500 flex items-center gap-1 mt-0.5">
+        <MapPin size={10} /> {member.area}
         {member.members && <span className="ml-1">· {member.members} {t('members', language)}</span>}
       </p>
     </div>
     <div className="flex gap-1.5 shrink-0">
-      <a href={`tel:${member.phone}`} className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 active:scale-90 transition-transform">
+      <a href={`tel:${member.phone}`} className="w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-[#1e58b8] active:scale-90 transition-transform">
         <Phone size={14} />
       </a>
-      <a href={`https://wa.me/${member.phone?.replace(/[\s+]/g, '')}`} className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-[#25D366] active:scale-90 transition-transform">
+      <a href={`https://wa.me/${member.phone?.replace(/[\s+]/g, '')}`} className="w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-[#00a651] active:scale-90 transition-transform">
         <MessageCircle size={14} />
       </a>
-      <button className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
-        <ChevronRight size={14} />
-      </button>
     </div>
   </div>
 );
 
 // ─── SECTION HEADER ───
 const SectionHeader = ({ titleHi, titleEn, onViewAll, language }) => (
-  <div className="flex items-center justify-between mb-3">
+  <div className="flex items-center justify-between mb-4">
     <div>
-      <h3 className="text-[16px] font-bold text-gray-900">{titleHi}</h3>
-      {titleEn && <p className="text-[10px] text-gray-400 font-medium">{titleEn}</p>}
+      <h3 className="text-[18px] font-extrabold text-gray-900 tracking-tight">{titleHi}</h3>
+      {titleEn && <p className="text-[13px] text-gray-500 font-medium">{titleEn}</p>}
     </div>
     {onViewAll && (
-      <button onClick={onViewAll} className="text-[11px] text-blue-600 font-bold flex items-center gap-0.5">
-        {t('View All', language)} <ChevronRight size={14} />
+      <button onClick={onViewAll} className="text-[14px] text-[#1e58b8] font-bold flex items-center gap-1">
+        {t('View All', language)} <ChevronRight size={16} />
       </button>
     )}
   </div>
@@ -219,23 +205,30 @@ const LeadershipPage = () => {
 
       {/* ─── PATRON (if different from president) ─── */}
       {patron && president && (
-        <div className="px-5 -mt-1 mb-4">
-          <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl p-3.5 shadow-sm">
-            <div className="flex items-center gap-3">
+        <div className="px-5 mb-6">
+          <div className="bg-white border border-[#f08c35]/30 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-amber-50 to-transparent rounded-bl-[100px]" />
+            <div className="flex items-center gap-3.5 relative z-10">
               <div className="relative shrink-0">
-                <Avatar initials={patron.initials} size="w-12 h-12 text-[16px]" color="bg-amber-100 text-amber-700" />
-                <Crown size={12} className="absolute -top-1.5 -right-1 text-amber-500" fill="currentColor" />
+                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white shadow-sm bg-amber-50">
+                  <img src={`https://i.pravatar.cc/150?u=${patron.initials}`} className="w-full h-full object-cover" alt={patron.name} />
+                </div>
+                <div className="absolute -top-2 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100">
+                  <Crown size={12} className="text-amber-500 fill-amber-500" />
+                </div>
               </div>
               <div className="flex-1 min-w-0">
-                <span className="text-[9px] font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full uppercase">{t('Patron', language)}</span>
-                <h4 className="text-[14px] font-bold text-gray-900 mt-0.5 truncate">{patron.name}</h4>
-                {patron.phone && <p className="text-[10px] text-gray-400">{patron.phone}</p>}
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="text-[9px] font-bold text-[#f08c35] bg-amber-50 px-2.5 py-0.5 rounded-full uppercase tracking-widest border border-amber-100/50">{t('Patron', language)}</span>
+                </div>
+                <h4 className="text-[15px] font-extrabold text-gray-900 leading-tight truncate mb-0.5">{patron.name}</h4>
+                {patron.phone && <p className="text-[11px] font-medium text-gray-500">{patron.phone}</p>}
               </div>
               <div className="flex gap-1.5 shrink-0">
-                <a href={`tel:${patron.phone}`} className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-blue-600 shadow-sm active:scale-90 transition-transform">
+                <a href={`tel:${patron.phone}`} className="w-9 h-9 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-[#1e58b8] active:scale-90 transition-transform">
                   <Phone size={14} />
                 </a>
-                <a href={`https://wa.me/${patron.phone?.replace(/[\s+]/g, '')}`} className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-[#25D366] shadow-sm active:scale-90 transition-transform">
+                <a href={`https://wa.me/${patron.phone?.replace(/[\s+]/g, '')}`} className="w-9 h-9 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-[#00a651] active:scale-90 transition-transform">
                   <MessageCircle size={14} />
                 </a>
               </div>
