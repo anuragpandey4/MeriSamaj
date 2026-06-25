@@ -41,6 +41,8 @@ export const translations = {
     'Discussions': 'Discussions',
     'Voting': 'Voting',
     'Community Polls': 'Community Polls',
+    'Donation': 'Donation',
+    'Contribute to Samaj': 'Contribute to Samaj',
     'Exclusive Features': 'Exclusive Features',
     
     // Leadership & Org Chart
@@ -144,6 +146,8 @@ export const translations = {
     'Discussions': 'विचार-विमर्श',
     'Voting': 'मतदान',
     'Community Polls': 'सामुदायिक चुनाव',
+    'Donation': 'योगदान',
+    'Contribute to Samaj': 'समाज में योगदान',
     'Exclusive Features': 'विशेष सुविधाएँ',
     
     // Leadership & Org Chart

@@ -42,6 +42,12 @@ import VotingPage from '../pages/voting/VotingPage';
 import PollDetailPage from '../pages/voting/PollDetailPage';
 import ElectionsListPage from '../pages/voting/ElectionsListPage';
 import { VotingProvider } from '../pages/voting/VotingContext';
+import DonationPage from '../pages/donation/DonationPage';
+import DonateSetupPage from '../pages/donation/DonateSetupPage';
+import DonatePaymentPage from '../pages/donation/DonatePaymentPage';
+import DonateSuccessPage from '../pages/donation/DonateSuccessPage';
+import MyDonationsPage from '../pages/donation/MyDonationsPage';
+import { DonationProvider } from '../pages/donation/DonationContext';
 
 // Feature: Om Shanti
 import ObituaryPage from '../pages/obituary/ObituaryPage';
@@ -105,6 +111,14 @@ export const MemberRoutes = () => {
             <Route index element={<AnimatedPage><VotingPage /></AnimatedPage>} />
             <Route path="list" element={<AnimatedPage><ElectionsListPage /></AnimatedPage>} />
             <Route path=":pollId" element={<AnimatedPage><PollDetailPage /></AnimatedPage>} />
+          </Route>
+
+          <Route path="donation" element={<DonationProvider />}>
+            <Route index element={<AnimatedPage><DonationPage /></AnimatedPage>} />
+            <Route path="setup" element={<AnimatedPage><DonateSetupPage /></AnimatedPage>} />
+            <Route path="payment" element={<AnimatedPage><DonatePaymentPage /></AnimatedPage>} />
+            <Route path="success" element={<AnimatedPage><DonateSuccessPage /></AnimatedPage>} />
+            <Route path="my" element={<AnimatedPage><MyDonationsPage /></AnimatedPage>} />
           </Route>
 
           <Route path="notifications" element={<AnimatedPage><NotificationsPage /></AnimatedPage>} />
