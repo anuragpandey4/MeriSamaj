@@ -1,13 +1,20 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Briefcase, FileText, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Briefcase, FileText, CheckCircle, ChevronDown, Check } from 'lucide-react';
 
 const ApplyProfessionalPage = () => {
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const categories = ['Finance', 'Healthcare', 'IT/Tech', 'Legal', 'Real Estate', 'Business / Trade'];
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!selectedCategory) {
+      alert('Please select a category');
+      return;
+    }
     setSubmitted(true);
   };
 
@@ -55,17 +62,38 @@ const ApplyProfessionalPage = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+          <div className="relative">
             <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Category</label>
-            <select required className="w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-brand-primary transition-all">
-              <option value="">Select Category</option>
-              <option>Finance</option>
-              <option>Healthcare</option>
-              <option>IT/Tech</option>
-              <option>Legal</option>
-              <option>Real Estate</option>
-              <option>Business / Trade</option>
-            </select>
+            <button
+              type="button"
+              onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+              className="w-full mt-1.5 flex items-center justify-between bg-card border border-gray-200 rounded-xl px-4 py-3 text-xs font-semibold text-text-primary outline-none focus:border-brand-primary transition-all text-left"
+            >
+              <span className={selectedCategory ? "text-text-primary" : "text-text-secondary"}>
+                {selectedCategory || 'Select Category'}
+              </span>
+              <ChevronDown size={16} className={`text-text-secondary transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {showCategoryDropdown && (
+              <div className="absolute top-[68px] left-0 right-0 bg-card border border-gray-200 rounded-xl shadow-xl z-20 max-h-48 overflow-y-auto py-1">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setShowCategoryDropdown(false);
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-50 text-xs font-semibold text-text-primary flex items-center justify-between"
+                  >
+                    <span className={selectedCategory === cat ? 'text-indigo-600' : ''}>{cat}</span>
+                    {selectedCategory === cat && <Check size={14} className="text-indigo-600" />}
+                  </button>
+                ))}
+              </div>
+            )}
+            <input type="hidden" required value={selectedCategory} />
           </div>
 
           <div>
