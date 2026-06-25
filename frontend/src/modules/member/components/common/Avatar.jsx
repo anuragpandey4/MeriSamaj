@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Avatar = ({ initials, size = 'md', color, className = '' }) => {
+export const Avatar = ({ initials, src, size = 'md', color, className = '' }) => {
   const sizes = {
     sm: 'w-8 h-8 text-[11px]',
     md: 'w-10 h-10 text-sm',
@@ -21,6 +21,16 @@ export const Avatar = ({ initials, size = 'md', color, className = '' }) => {
   // Deterministic color from initials
   const colorIndex = initials ? initials.charCodeAt(0) % gradients.length : 0;
   const bgColor = color || gradients[colorIndex];
+
+  if (src) {
+    return (
+      <img 
+        src={src} 
+        alt={initials || 'Avatar'} 
+        className={`${sizes[size]} rounded-full object-cover shrink-0 ${className}`} 
+      />
+    );
+  }
 
   return (
     <div className={`${sizes[size]} ${bgColor} rounded-full flex items-center justify-center font-bold tracking-tight shrink-0 ${className}`}>

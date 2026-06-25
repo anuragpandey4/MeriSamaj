@@ -35,6 +35,7 @@ import MatrimonialSetupPage from '../pages/matrimonial/MatrimonialSetupPage';
 import InterestsPage from '../pages/matrimonial/InterestsPage';
 import EditProfilePage from '../pages/profile/EditProfilePage';
 import FamilyPage from '../pages/profile/FamilyPage';
+import VerifyMembershipPage from '../pages/profile/VerifyMembershipPage';
 import ProfessionalDirectoryPage from '../pages/directory/ProfessionalDirectoryPage';
 import ApplyProfessionalPage from '../pages/directory/ApplyProfessionalPage';
 import VotingPage from '../pages/voting/VotingPage';
@@ -93,6 +94,7 @@ export const MemberRoutes = () => {
 
           <Route path="profile/edit" element={<AnimatedPage><EditProfilePage /></AnimatedPage>} />
           <Route path="profile/family" element={<AnimatedPage><FamilyPage /></AnimatedPage>} />
+          <Route path="profile/verify" element={<AnimatedPage><VerifyMembershipPage /></AnimatedPage>} />
 
           <Route path="professional" element={<AnimatedPage><ProfessionalDirectoryPage /></AnimatedPage>} />
           <Route path="professional/apply" element={<AnimatedPage><ApplyProfessionalPage /></AnimatedPage>} />

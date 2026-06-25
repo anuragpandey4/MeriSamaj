@@ -74,7 +74,7 @@ const PostCard = ({ post, index }) => {
       <div className="px-4 pb-2">
         <div className="flex items-center justify-between text-[13px] text-text-secondary">
           <span>{post.likes} likes</span>
-          <span>{post.comments?.length || 0} comments</span>
+          <span>{post.commentsList?.length || post.comments || 0} comments</span>
         </div>
       </div>
 

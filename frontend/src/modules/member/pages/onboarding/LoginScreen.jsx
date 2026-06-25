@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Phone, ArrowRight, ArrowLeft, MapPin, Users, ChevronDown, CheckCircle, User, Camera, LogIn, UserPlus } from 'lucide-react';
+import { Phone, ArrowRight, ArrowLeft, MapPin, Users, ChevronDown, CheckCircle, User, Camera, LogIn, UserPlus, Bell, Mail } from 'lucide-react';
 import { useData } from '../../context/DataProvider';
 
 const LoginScreen = () => {
   const navigate = useNavigate();
   const { loginUser } = useData();
   const [step, setStep] = useState('landing'); // landing | phone | otp | community | profile
+  const [loginMethod, setLoginMethod] = useState('phone'); // phone | email
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [generatedOtp, setGeneratedOtp] = useState('');
+  const [showOtpNotification, setShowOtpNotification] = useState(false);
+  const [otpError, setOtpError] = useState('');
+  const [avatar, setAvatar] = useState(null);
   const [selectedCommunity, setSelectedCommunity] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [name, setName] = useState('');
@@ -115,8 +121,8 @@ const LoginScreen = () => {
     const newUser = {
       id: `u-${Date.now()}`,
       name,
-      phone: phone || '+91 98765 00000',
-      email: `${name.toLowerCase().replace(/\s+/g, '.')}@email.com`,
+      phone: loginMethod === 'phone' ? (phone || '+91 98765 00000') : '',
+      email: loginMethod === 'email' ? email : `${name.toLowerCase().replace(/\s+/g, '.')}@email.com`,
       initials: name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
       community: selectedCommunity,
       city: selectedCity,
@@ -124,10 +130,39 @@ const LoginScreen = () => {
       company: `${name.split(' ')[1] || 'Samaj'} Enterprises`,
       age: 28,
       gender,
+      avatar: avatar || null,
       familyMembers: []
     };
     loginUser(newUser);
     navigate('/member/home');
+  };
+
+  const handleGetOtp = () => {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    setGeneratedOtp(code);
+    setOtp(['', '', '', '', '', '']);
+    setOtpError('');
+    setShowOtpNotification(true);
+    setStep('otp');
+  };
+
+  const handleVerifyOtp = () => {
+    const entered = otp.join('');
+    if (entered === generatedOtp) {
+      setStep('community');
+      setShowOtpNotification(false);
+      setOtpError('');
+    } else {
+      setOtpError('Invalid OTP. Please enter the correct code shown in the notification banner.');
+    }
+  };
+
+  const handleResendOtp = () => {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    setGeneratedOtp(code);
+    setOtp(['', '', '', '', '', '']);
+    setOtpError('');
+    setShowOtpNotification(true);
   };
 
   const handleOtpChange = (index, value) => {
@@ -218,8 +253,32 @@ const LoginScreen = () => {
   }
 
   if (step === 'phone') {
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const canGetOtp = loginMethod === 'phone' ? phone.length === 10 : isEmailValid;
+
     return (
-      <div className="min-h-screen bg-surface flex flex-col">
+      <div className="min-h-screen bg-surface flex flex-col relative">
+        {showOtpNotification && (
+          <div className="fixed top-4 left-4 right-4 z-50 bg-slate-900 text-white rounded-2xl p-4 shadow-2xl border border-slate-800 animate-slide-in flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-brand-primary/20 flex items-center justify-center text-brand-primary shrink-0 mt-0.5">
+              <Bell size={16} className="animate-bounce" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-bold text-slate-300">MeriSamaj Security</p>
+              <p className="text-sm font-medium mt-1 text-slate-100">
+                Your verification code is <strong className="text-brand-primary text-base font-extrabold tracking-widest bg-slate-800 px-2 py-0.5 rounded ml-1">{generatedOtp}</strong>
+              </p>
+              <p className="text-[10px] text-slate-400 mt-1">Do not share this code with anyone.</p>
+            </div>
+            <button 
+              onClick={() => setShowOtpNotification(false)} 
+              className="text-xs font-bold text-slate-400 hover:text-white px-2 py-1 bg-slate-800 rounded-lg press-scale"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         <div className="p-4">
           <button onClick={() => setStep('landing')} className="p-1 press-scale">
             <ArrowLeft size={22} className="text-text-primary" />
@@ -228,34 +287,75 @@ const LoginScreen = () => {
 
         <div className="flex-1 px-6 pt-4">
           <div className="w-14 h-14 bg-brand-primary/10 rounded-2xl flex items-center justify-center mb-5">
-            <Phone size={28} className="text-brand-primary" />
+            {loginMethod === 'phone' ? <Phone size={28} className="text-brand-primary" /> : <Mail size={28} className="text-brand-primary" />}
           </div>
           <h1 className="text-2xl font-bold text-text-primary">Login to MeriSamaj</h1>
-          <p className="text-sm text-text-secondary mt-1.5">Enter your mobile number to receive OTP</p>
+          <p className="text-sm text-text-secondary mt-1.5">Enter your details to receive verification OTP</p>
 
-          <div className="mt-8">
-            <label className="text-xs font-medium text-text-secondary uppercase tracking-wider">Mobile Number</label>
-            <div className="flex items-center gap-3 mt-2 bg-card border border-gray-200 rounded-xl px-4 py-3 focus-within:border-brand-primary focus-within:ring-2 focus-within:ring-brand-primary/10 transition-all">
-              <span className="text-sm text-text-secondary font-medium">+91</span>
-              <div className="w-px h-5 bg-gray-200" />
-              <input
-                type="tel"
-                placeholder="Enter 10-digit number"
-                className="flex-1 text-sm text-text-primary outline-none bg-transparent placeholder-gray-400"
-                maxLength={10}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-              />
-            </div>
+          {/* Login Method Tab Selector */}
+          <div className="flex bg-gray-100 p-1 rounded-xl mt-6">
+            <button
+              onClick={() => {
+                setLoginMethod('phone');
+                setOtpError('');
+              }}
+              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                loginMethod === 'phone' ? 'bg-white text-brand-primary shadow-sm' : 'text-text-secondary'
+              }`}
+            >
+              Mobile Number
+            </button>
+            <button
+              onClick={() => {
+                setLoginMethod('email');
+                setOtpError('');
+              }}
+              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                loginMethod === 'email' ? 'bg-white text-brand-primary shadow-sm' : 'text-text-secondary'
+              }`}
+            >
+              Email Address
+            </button>
           </div>
+
+          {loginMethod === 'phone' ? (
+            <div className="mt-6">
+              <label className="text-xs font-medium text-text-secondary uppercase tracking-wider">Mobile Number</label>
+              <div className="flex items-center gap-3 mt-2 bg-card border border-gray-200 rounded-xl px-4 py-3 focus-within:border-brand-primary focus-within:ring-2 focus-within:ring-brand-primary/10 transition-all">
+                <span className="text-sm text-text-secondary font-medium">+91</span>
+                <div className="w-px h-5 bg-gray-200" />
+                <input
+                  type="tel"
+                  placeholder="Enter 10-digit number"
+                  className="flex-1 text-sm text-text-primary outline-none bg-transparent placeholder-gray-400"
+                  maxLength={10}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="mt-6">
+              <label className="text-xs font-medium text-text-secondary uppercase tracking-wider">Email Address</label>
+              <div className="flex items-center gap-3 mt-2 bg-card border border-gray-200 rounded-xl px-4 py-3 focus-within:border-brand-primary focus-within:ring-2 focus-within:ring-brand-primary/10 transition-all">
+                <input
+                  type="email"
+                  placeholder="Enter your email address"
+                  className="flex-1 text-sm text-text-primary outline-none bg-transparent placeholder-gray-400"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="px-6 pb-8">
           <button
-            onClick={() => setStep('otp')}
-            disabled={phone.length !== 10}
+            onClick={handleGetOtp}
+            disabled={!canGetOtp}
             className={`w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 press-scale shadow-md transition-all ${
-              phone.length === 10
+              canGetOtp
                 ? 'bg-brand-primary text-white'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
@@ -272,7 +372,28 @@ const LoginScreen = () => {
 
   if (step === 'otp') {
     return (
-      <div className="min-h-screen bg-surface flex flex-col">
+      <div className="min-h-screen bg-surface flex flex-col relative">
+        {showOtpNotification && (
+          <div className="fixed top-4 left-4 right-4 z-50 bg-slate-900 text-white rounded-2xl p-4 shadow-2xl border border-slate-800 animate-slide-in flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-brand-primary/20 flex items-center justify-center text-brand-primary shrink-0 mt-0.5">
+              <Bell size={16} className="animate-bounce" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-bold text-slate-300">MeriSamaj Security</p>
+              <p className="text-sm font-medium mt-1 text-slate-100">
+                Your verification code is <strong className="text-brand-primary text-base font-extrabold tracking-widest bg-slate-800 px-2 py-0.5 rounded ml-1">{generatedOtp}</strong>
+              </p>
+              <p className="text-[10px] text-slate-400 mt-1">Do not share this code with anyone.</p>
+            </div>
+            <button 
+              onClick={() => setShowOtpNotification(false)} 
+              className="text-xs font-bold text-slate-400 hover:text-white px-2 py-1 bg-slate-800 rounded-lg press-scale"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         <div className="p-4">
           <button onClick={() => setStep('phone')} className="p-1 press-scale">
             <ArrowLeft size={22} className="text-text-primary" />
@@ -282,7 +403,7 @@ const LoginScreen = () => {
         <div className="flex-1 px-6 pt-4">
           <h1 className="text-2xl font-bold text-text-primary">Verify OTP</h1>
           <p className="text-sm text-text-secondary mt-1.5">
-            Enter the 6-digit code sent to <span className="font-medium text-text-primary">+91 {phone}</span>
+            Enter the 6-digit code sent to <span className="font-medium text-text-primary">{loginMethod === 'phone' ? `+91 ${phone}` : email}</span>
           </p>
 
           <div className="flex gap-2.5 mt-8 justify-center">
@@ -299,15 +420,21 @@ const LoginScreen = () => {
             ))}
           </div>
 
+          {otpError && (
+            <p className="text-xs text-red-500 font-semibold mt-4 text-center animate-pulse">
+              {otpError}
+            </p>
+          )}
+
           <div className="flex items-center justify-center gap-1 mt-5">
             <p className="text-xs text-text-secondary">Didn't receive code?</p>
-            <button className="text-xs text-brand-primary font-semibold press-scale">Resend in 28s</button>
+            <button onClick={handleResendOtp} className="text-xs text-brand-primary font-semibold press-scale">Resend OTP</button>
           </div>
         </div>
 
         <div className="px-6 pb-8">
           <button
-            onClick={() => setStep('community')}
+            onClick={handleVerifyOtp}
             disabled={otp.some(d => !d)}
             className={`w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 press-scale shadow-md transition-all ${
               otp.every(d => d)
@@ -412,12 +539,31 @@ const LoginScreen = () => {
         {/* Avatar Upload */}
         <div className="flex justify-center mt-6">
           <div className="relative">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center border-2 border-dashed border-gray-300">
-              <User size={36} className="text-gray-300" />
-            </div>
-            <button className="absolute bottom-0 right-0 w-8 h-8 bg-brand-primary rounded-full flex items-center justify-center shadow-md press-scale">
+            {avatar ? (
+              <img src={avatar} alt="Avatar Preview" className="w-24 h-24 rounded-full object-cover border-2 border-brand-primary" />
+            ) : (
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center border-2 border-dashed border-gray-300">
+                <User size={36} className="text-gray-300" />
+              </div>
+            )}
+            <label className="absolute bottom-0 right-0 w-8 h-8 bg-brand-primary rounded-full flex items-center justify-center shadow-md press-scale cursor-pointer border-2 border-white">
               <Camera size={14} className="text-white" />
-            </button>
+              <input 
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      setAvatar(event.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+            </label>
           </div>
         </div>
 

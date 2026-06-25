@@ -95,6 +95,12 @@ export const translations = {
     'Members': 'Members',
     'One Family, One Community': 'One Family, One Community',
     'Est.': 'Est.',
+    'Manage Members': 'Manage Members',
+    'View Tree': 'View Tree',
+    'Edit': 'Edit',
+    'Delete': 'Delete',
+    'Are you sure you want to delete this family member?': 'Are you sure you want to delete this family member?',
+
   },
   hi: {
     // Relations (Hindi)
@@ -192,6 +198,12 @@ export const translations = {
     'Members': 'सदस्य',
     'One Family, One Community': 'एक परिवार, एक समाज',
     'Est.': 'स्था.',
+    'Manage Members': 'सदस्य सूची',
+    'View Tree': 'फ़ैमिली ट्री',
+    'Edit': 'सुधारें',
+    'Delete': 'हटाएं',
+    'Are you sure you want to delete this family member?': 'क्या आप वाकई परिवार के इस सदस्य को हटाना चाहते हैं?',
+
   }
 };
 

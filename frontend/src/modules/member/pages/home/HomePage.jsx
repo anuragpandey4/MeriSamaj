@@ -58,7 +58,7 @@ const mockSuccessStories = [
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { currentUser, members: mockMembers, admins: mockAdmins, posts: mockPosts, events: mockEvents, language, setLanguage } = useData();
+  const { currentUser, members: mockMembers, admins: mockAdmins, posts: mockPosts, events: mockEvents, language, setLanguage, followedAnnouncements } = useData();
   const [activeAnnouncementIndex, setActiveAnnouncementIndex] = useState(0);
   const carouselRef = useDraggableScroll();
   const subHeadsRef = useDraggableScroll();
@@ -66,10 +66,13 @@ const HomePage = () => {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning,' : hour < 18 ? 'Good afternoon,' : 'Good evening,';
 
+  const displayAnnouncements = followedAnnouncements?.announcements ? announcements : [];
+
   useEffect(() => {
+    if (displayAnnouncements.length === 0) return;
     const interval = setInterval(() => {
       setActiveAnnouncementIndex((prev) => {
-        const next = (prev + 1) % announcements.length;
+        const next = (prev + 1) % displayAnnouncements.length;
         if (carouselRef.current) {
           const itemWidth = carouselRef.current.clientWidth;
           carouselRef.current.scrollTo({ left: itemWidth * next, behavior: 'smooth' });
@@ -78,7 +81,7 @@ const HomePage = () => {
       });
     }, 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [displayAnnouncements]);
 
   const unreadCount = 3;
 
@@ -164,13 +167,22 @@ const HomePage = () => {
             </div>
             <div className="w-[1px] h-4 bg-white/30" />
             <div className="flex items-center gap-1.5">
-              <Calendar size={14} className="text-white/70" />
-              <span className="text-white/90 text-[13px] font-bold">{t('Est.', language)} 1952</span>
+              <Shield size={14} className="text-white/70" />
+              <span className="text-white/90 text-[13px] font-bold">{t('Verified', language)}</span>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Bottom edge transition removed for flush slider */}
+      {/* User Welcome */}
+      <div className="px-5 pt-5 relative z-10">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-text-secondary font-medium">{t('Welcome back,', language)}</p>
+            <h1 className="text-[22px] font-extrabold text-text-primary tracking-tight mt-0.5">{currentUser.name}</h1>
+          </div>
+          <Avatar initials={currentUser.initials} src={currentUser.avatar} size="lg" color="bg-brand-primary/10 text-brand-primary border-2 border-brand-primary/20 text-md" />
+        </div>
       </div>
 
       {/* ─── PREMIUM ANNOUNCEMENT CAROUSEL ─── */}
@@ -180,26 +192,42 @@ const HomePage = () => {
         transition={{ delay: 0.2 }}
         className="mt-3 pb-2 relative z-10"
       >
-        <div
-          ref={carouselRef}
-          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-0"
-          onScroll={(e) => {
-            const idx = Math.round(e.target.scrollLeft / e.target.clientWidth);
-            if (idx !== activeAnnouncementIndex) setActiveAnnouncementIndex(idx);
-          }}
-        >
-          {announcements.map((a) => (
-            <div key={a.id} onClick={() => navigate(a.link)} className="snap-center shrink-0 w-full h-[220px] rounded-none relative overflow-hidden shadow-sm press-scale group cursor-pointer bg-gray-100">
-              <img src={a.image} alt="Announcement" className="absolute inset-0 w-full h-full object-cover" />
+        {displayAnnouncements.length === 0 ? (
+          <div className="mx-5 p-6 bg-white border border-gray-100 rounded-3xl text-center py-8 shadow-sm">
+            <Shield className="mx-auto text-brand-primary opacity-60 mb-2" size={28} />
+            <h4 className="text-sm font-bold text-text-primary">Announcements Muted</h4>
+            <p className="text-xs text-text-secondary mt-1 max-w-[240px] mx-auto leading-relaxed">You have disabled community announcements. Enable them in your Notification Preferences to see updates.</p>
+            <button 
+              onClick={() => navigate('/member/notifications')} 
+              className="mt-3 px-4 py-2 bg-brand-primary text-white text-xs font-bold rounded-xl press-scale shadow-sm"
+            >
+              Configure Preferences
+            </button>
+          </div>
+        ) : (
+          <>
+            <div
+              ref={carouselRef}
+              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-0"
+              onScroll={(e) => {
+                const idx = Math.round(e.target.scrollLeft / e.target.clientWidth);
+                if (idx !== activeAnnouncementIndex) setActiveAnnouncementIndex(idx);
+              }}
+            >
+              {displayAnnouncements.map((a) => (
+                <div key={a.id} onClick={() => navigate(a.link)} className="snap-center shrink-0 w-full h-[220px] rounded-none relative overflow-hidden shadow-sm press-scale group cursor-pointer bg-gray-100">
+                  <img src={a.image} alt="Announcement" className="absolute inset-0 w-full h-full object-cover" />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        {/* Dots */}
-        <div className="flex justify-center gap-1.5 mt-4">
-          {announcements.map((_, i) => (
-            <div key={i} className={`rounded-full transition-all duration-300 ${i === activeAnnouncementIndex ? 'w-6 h-[4px] bg-brand-primary' : 'w-[4px] h-[4px] bg-gray-300'}`} />
-          ))}
-        </div>
+            {/* Dots */}
+            <div className="flex justify-center gap-1.5 mt-4">
+              {displayAnnouncements.map((_, i) => (
+                <div key={i} className={`rounded-full transition-all duration-300 ${i === activeAnnouncementIndex ? 'w-6 h-[4px] bg-brand-primary' : 'w-[4px] h-[4px] bg-gray-300'}`} />
+              ))}
+            </div>
+          </>
+        )}
       </motion.div>
 
       {/* ─── 3D BENTO GRID (QUICK ACTIONS) ─── */}
