@@ -1,45 +1,66 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Settings, Edit3, ChevronRight, Users, Heart, Calendar, Bell, LogOut, Camera, CheckCircle, Star, Shield, AlertCircle } from 'lucide-react';
-import { Avatar } from '../../components/common/Avatar';
-import { Badge } from '../../components/common/Badge';
+import { CheckCircle, ChevronRight, Camera, LogOut, Globe, Lock, Check, ArrowLeft } from 'lucide-react';
 import { useData } from '../../context/DataProvider';
-import { useDraggableScroll } from '../../../../hooks/useDraggableScroll';
-
-const ProfileMenuItem = ({ icon: Icon, label, value, color = 'text-text-secondary', showChevron = true, onClick }) => (
-  <button onClick={onClick} className="w-full flex items-center gap-4 px-5 py-4 bg-white border-b border-gray-50 card-press">
-    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color} bg-gray-50`}>
-      <Icon size={18} />
-    </div>
-    <div className="flex-1 text-left">
-      <p className="text-[15px] font-semibold text-text-primary">{label}</p>
-      {value && <p className="text-[13px] text-text-secondary mt-0.5">{value}</p>}
-    </div>
-    {showChevron && <ChevronRight size={20} className="text-gray-300" />}
-  </button>
-);
+import { Avatar } from '../../components/common/Avatar';
 
 const MyProfilePage = () => {
   const navigate = useNavigate();
   const { currentUser, logoutUser, updateProfile } = useData();
-  const scrollRef = useDraggableScroll();
+
+  // Social Links Modal State
+  const [showSocialModal, setShowSocialModal] = useState(false);
+  const [facebook, setFacebook] = useState(currentUser.facebook || 'https://facebook.com/user');
+  const [twitter, setTwitter] = useState(currentUser.twitter || 'https://twitter.com/user');
+  const [linkedin, setLinkedin] = useState(currentUser.linkedin || 'https://linkedin.com/in/user');
+
+  // Privacy Settings Modal State
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showPhone, setShowPhone] = useState(currentUser.showPhone !== false);
+  const [showEmail, setShowEmail] = useState(currentUser.showEmail !== false);
+  const [showFamily, setShowFamily] = useState(currentUser.showFamily !== false);
+
+  const handleSaveSocials = () => {
+    updateProfile({ facebook, twitter, linkedin });
+    setShowSocialModal(false);
+  };
+
+  const handleSavePrivacy = () => {
+    updateProfile({ showPhone, showEmail, showFamily });
+    setShowPrivacyModal(false);
+  };
 
   return (
-    <div className="min-h-screen bg-surface pb-28">
-      {/* Profile Header */}
-      <div className="bg-white px-5 pt-6 pb-6 relative border-b border-gray-100">
-        <div className="flex items-center justify-between mb-6 relative z-10">
-          <h1 className="text-[20px] font-bold text-text-primary tracking-tight">My Profile</h1>
-          <button className="p-2.5 bg-gray-50 rounded-full press-scale text-text-primary border border-gray-100">
-            <Settings size={20} />
+    <div className="min-h-screen bg-surface pb-24 relative">
+      {/* Header Bar */}
+      <div className="bg-card border-b border-gray-100 flex items-center justify-between px-4 h-14 sticky top-0 z-30">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate(-1)} className="p-1 -ml-1 press-scale">
+            <ArrowLeft size={22} className="text-text-primary" />
           </button>
+          <h1 className="text-base font-bold text-text-primary">मेरा प्रोफ़ाइल</h1>
         </div>
+      </div>
 
-        <div className="flex flex-col items-center relative z-10">
-          <div className="relative">
-            <Avatar initials={currentUser.initials} src={currentUser.avatar} size="xl" color="bg-brand-primary/10 text-brand-primary border-2 border-brand-primary/20" />
-            <label className="absolute bottom-0 right-0 w-9 h-9 bg-white rounded-full shadow-md flex items-center justify-center press-scale border border-gray-100 cursor-pointer">
-              <Camera size={16} className="text-brand-primary" />
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Cover Photo & Profile Avatar Block */}
+        <div className="relative bg-card pb-4 border-b border-gray-100 shadow-sm">
+          {/* Cover Photo Wrapper */}
+          <div className="h-40 bg-gradient-to-r from-sky-400 to-indigo-500 relative overflow-hidden flex items-center justify-center">
+            {currentUser.cover ? (
+              <img src={currentUser.cover} alt="Cover" className="w-full h-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 opacity-20">
+                {/* Simulated clouds pattern vector */}
+                <svg viewBox="0 0 100 100" className="w-full h-full text-white" fill="currentColor">
+                  <path d="M10 80 Q25 50 40 80 T70 80 T100 80 L100 100 L0 100 Z" />
+                </svg>
+              </div>
+            )}
+            
+            {/* Camera trigger for Cover Photo */}
+            <label className="absolute bottom-3 right-3 w-8 h-8 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full flex items-center justify-center press-scale shadow cursor-pointer border border-white/20">
+              <Camera size={14} className="text-text-primary" />
               <input 
                 type="file" 
                 accept="image/*" 
@@ -49,7 +70,7 @@ const MyProfilePage = () => {
                   if (file) {
                     const reader = new FileReader();
                     reader.onload = (event) => {
-                      updateProfile({ avatar: event.target.result });
+                      updateProfile({ cover: event.target.result });
                     };
                     reader.readAsDataURL(file);
                   }
@@ -57,129 +78,268 @@ const MyProfilePage = () => {
               />
             </label>
           </div>
-          <h2 className="text-text-primary font-bold text-[20px] mt-4 tracking-tight">{currentUser.name}</h2>
-          {currentUser.isVerified ? (
-            <div className="flex items-center gap-1.5 mt-1 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full border border-emerald-100">
-              <CheckCircle size={14} />
-              <span className="text-[12px] font-bold">Verified Member</span>
+
+          {/* Profile Avatar (Overlapping cover) */}
+          <div className="flex flex-col items-center -mt-12 relative z-10 px-4">
+            <div className="relative">
+              <div className="w-24 h-24 rounded-full border-4 border-card overflow-hidden shadow-md">
+                <Avatar initials={currentUser.initials} src={currentUser.avatar} size="xl" />
+              </div>
+              <label className="absolute bottom-0 right-0 w-8 h-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center press-scale border-2 border-white cursor-pointer">
+                <Camera size={14} />
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        updateProfile({ avatar: event.target.result });
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+              </label>
             </div>
-          ) : currentUser.isVerificationSubmitted ? (
+
+            <div className="flex items-center gap-1.5 mt-3">
+              <h2 className="text-base font-bold text-text-primary">{currentUser.name}</h2>
+              {currentUser.isVerified && <CheckCircle size={16} className="text-emerald-500 fill-emerald-50 shrink-0" />}
+            </div>
+            <p className="text-[10px] font-semibold text-text-secondary mt-0.5">{currentUser.profession || 'सदस्य'}</p>
+          </div>
+        </div>
+
+        {/* Profile Menu Actions List (Hindi) */}
+        <div className="px-4">
+          <div className="bg-card rounded-3xl border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-50">
+            {/* Action 1: व्यक्तिगत जानकारी */}
             <button 
-              onClick={() => navigate('/member/profile/verify')}
-              className="flex items-center gap-1.5 mt-1 bg-amber-50 text-amber-600 px-3 py-1 rounded-full border border-amber-100 press-scale cursor-pointer"
+              onClick={() => navigate('/member/profile/edit')}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
             >
-              <AlertCircle size={14} />
-              <span className="text-[12px] font-bold">Verification Pending</span>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <CheckCircle size={18} />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-text-primary block">व्यक्तिगत जानकारी</span>
+                  <span className="text-[9px] font-semibold text-text-secondary mt-0.5 block">अपनी जानकारी जोड़ें और अपडेट करें</span>
+                </div>
+              </div>
+              <ChevronRight size={16} className="text-gray-300" />
             </button>
-          ) : (
+
+            {/* Action 2: व्यवसाय जानकारी */}
             <button 
-              onClick={() => navigate('/member/profile/verify')}
-              className="flex items-center gap-1.5 mt-1 bg-red-50 text-red-500 px-3 py-1 rounded-full border border-red-100 press-scale cursor-pointer"
+              onClick={() => navigate('/member/professional/apply')}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
             >
-              <AlertCircle size={14} />
-              <span className="text-[12px] font-bold">Unverified - Tap to Verify</span>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                  <Camera size={18} />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-text-primary block">व्यवसाय जानकारी</span>
+                  <span className="text-[9px] font-semibold text-text-secondary mt-0.5 block">व्यवसाय और सेवाएँ जोड़ें</span>
+                </div>
+              </div>
+              <ChevronRight size={16} className="text-gray-300" />
             </button>
-          )}
-          <div className="flex items-center gap-2 mt-4">
-            <span className="bg-gray-50 text-text-secondary text-[13px] font-bold px-4 py-2 rounded-full flex items-center gap-1.5 border border-gray-200">
-              <MapPin size={14} className="text-brand-primary" /> {currentUser.city}
-            </span>
-            <span className="bg-gray-50 text-text-secondary text-[13px] font-bold px-4 py-2 rounded-full border border-gray-200">
-              {currentUser.community}
-            </span>
+
+            {/* Action 3: सेवाएँ / उत्पाद */}
+            <button 
+              onClick={() => navigate('/member/professional')}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <Camera size={18} />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-text-primary block">सेवाएँ / उत्पाद</span>
+                  <span className="text-[9px] font-semibold text-text-secondary mt-0.5 block">आपके उत्पाद और व्यावसायिक सेवाएँ</span>
+                </div>
+              </div>
+              <ChevronRight size={16} className="text-gray-300" />
+            </button>
+
+            {/* Action 4: सोशल मीडिया लिंक */}
+            <button 
+              onClick={() => setShowSocialModal(true)}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                  <Globe size={18} />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-text-primary block">सोशल मीडिया लिंक</span>
+                  <span className="text-[9px] font-semibold text-text-secondary mt-0.5 block">सोशल मीडिया प्रोफाइल लिंक जोड़ें</span>
+                </div>
+              </div>
+              <ChevronRight size={16} className="text-gray-300" />
+            </button>
+
+            {/* Action 5: गोपनीयता सेटिंग्स */}
+            <button 
+              onClick={() => setShowPrivacyModal(true)}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <Lock size={18} />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-text-primary block">गोपनीयता सेटिंग्स</span>
+                  <span className="text-[9px] font-semibold text-text-secondary mt-0.5 block">प्रोफ़ाइल गोपनीयता प्रबंधित करें</span>
+                </div>
+              </div>
+              <ChevronRight size={16} className="text-gray-300" />
+            </button>
+
+            {/* Action 6: लॉगआउट */}
+            <button 
+              onClick={() => {
+                logoutUser();
+                navigate('/member/login');
+              }}
+              className="w-full flex items-center justify-between p-4 hover:bg-red-50/50 transition-colors text-left group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-red-50 group-hover:bg-red-100 text-red-500 flex items-center justify-center">
+                  <LogOut size={18} />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-red-500 block">लॉगआउट</span>
+                  <span className="text-[9px] font-semibold text-text-secondary mt-0.5 block">एप्लीकेशन से लॉगआउट करें</span>
+                </div>
+              </div>
+              <ChevronRight size={16} className="text-gray-300 group-hover:text-red-300" />
+            </button>
+
           </div>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="px-5 pt-5 pb-2 relative z-10">
-        <div className="card-elevated p-5 grid grid-cols-3 divide-x divide-gray-100">
-          <div className="flex flex-col items-center">
-            <span className="text-xl font-bold text-brand-primary">12</span>
-            <span className="text-[13px] text-text-secondary mt-1">Posts</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-xl font-bold text-social-module">3</span>
-            <span className="text-[13px] text-text-secondary mt-1">Groups</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-xl font-bold text-matrimonial-module">2</span>
-            <span className="text-[13px] text-text-secondary mt-1">Events</span>
-          </div>
-        </div>
-      </div>
+      {/* Social Links Modal */}
+      {showSocialModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-card w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-4 animate-scale-up">
+            <h3 className="text-sm font-bold text-text-primary">सोशल मीडिया लिंक जोड़ें</h3>
+            
+            <div className="space-y-3">
+              <div>
+                <label className="text-[10px] font-bold text-text-secondary uppercase">फेसबुक (Facebook)</label>
+                <input 
+                  type="text" 
+                  value={facebook}
+                  onChange={(e) => setFacebook(e.target.value)}
+                  className="w-full mt-1 bg-surface border border-gray-150 rounded-xl px-4 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
+                />
+              </div>
 
-      {/* Edit Profile Button */}
-      <div className="px-5 mt-5">
-        <button onClick={() => navigate('/member/profile/edit')} className="w-full py-3.5 bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-2xl text-[15px] font-bold flex items-center justify-center gap-2 press-scale" style={{ boxShadow: '0 4px 14px rgba(232, 101, 43, 0.25)' }}>
-          <Edit3 size={18} /> Edit Profile
-        </button>
-      </div>
+              <div>
+                <label className="text-[10px] font-bold text-text-secondary uppercase">ट्विटर (Twitter)</label>
+                <input 
+                  type="text" 
+                  value={twitter}
+                  onChange={(e) => setTwitter(e.target.value)}
+                  className="w-full mt-1 bg-surface border border-gray-150 rounded-xl px-4 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
+                />
+              </div>
 
-      {/* Personal Info */}
-      <div className="mt-7">
-        <p className="px-5 text-[13px] font-bold text-text-secondary uppercase tracking-wider mb-3">Personal Information</p>
-        <div className="card-std overflow-hidden mx-5">
-          {[
-            { label: 'Phone', value: currentUser.phone },
-            { label: 'Email', value: currentUser.email },
-            { label: 'Profession', value: currentUser.profession },
-            { label: 'Member Since', value: 'Jan 2024' },
-          ].map((item, i, arr) => (
-            <div key={item.label} className={`px-4 py-3.5 flex justify-between ${i < arr.length - 1 ? 'border-b border-gray-50' : ''}`}>
-              <span className="text-[14px] text-text-secondary">{item.label}</span>
-              <span className="text-[14px] font-semibold text-text-primary">{item.value}</span>
+              <div>
+                <label className="text-[10px] font-bold text-text-secondary uppercase">लिंक्डइन (LinkedIn)</label>
+                <input 
+                  type="text" 
+                  value={linkedin}
+                  onChange={(e) => setLinkedin(e.target.value)}
+                  className="w-full mt-1 bg-surface border border-gray-150 rounded-xl px-4 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
+                />
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Family */}
-      <div className="mt-7">
-        <div className="px-5 flex items-center justify-between mb-3">
-          <p className="text-[13px] font-bold text-text-secondary uppercase tracking-wider">Family Members</p>
-          <Badge variant="default">{currentUser.familyMembers.length}</Badge>
-        </div>
-        <div className="px-5 flex gap-3 overflow-x-auto scrollbar-hide pb-2" ref={scrollRef}>
-          {currentUser.familyMembers.map((fm) => (
-            <div key={fm.id} className="shrink-0 card-std p-4 flex flex-col items-center w-28 card-press">
-              <Avatar initials={fm.initials} src={fm.avatar} size="md" />
-              <p className="text-[13px] font-semibold text-text-primary mt-2 truncate w-full text-center">{fm.name.split(' ')[0]}</p>
-              <p className="text-[12px] text-text-secondary mt-0.5">{fm.relation}</p>
+            <div className="flex gap-3 pt-2">
+              <button 
+                onClick={() => setShowSocialModal(false)}
+                className="flex-1 py-3 border border-gray-200 text-text-primary rounded-2xl font-bold text-xs press-scale text-center hover:bg-gray-50"
+              >
+                रद्द करें
+              </button>
+              <button 
+                onClick={handleSaveSocials}
+                className="flex-1 py-3 bg-indigo-600 text-white rounded-2xl font-bold text-xs press-scale text-center hover:bg-indigo-700 shadow-md flex items-center justify-center gap-1.5"
+              >
+                <Check size={14} /> सहेजें
+              </button>
             </div>
-          ))}
-          <button onClick={() => navigate('/member/profile/family')} className="shrink-0 w-28 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center gap-1.5 press-scale">
-            <span className="text-2xl text-gray-300">+</span>
-            <span className="text-[13px] text-text-secondary font-medium">Add</span>
-          </button>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Menu */}
-      <div className="mt-7">
-        <p className="px-5 text-[13px] font-bold text-text-secondary uppercase tracking-wider mb-3">Quick Links</p>
-        <div className="mx-5 card-std overflow-hidden">
-          <ProfileMenuItem icon={Users} label="Family Profiles" value="Manage family" color="text-social-module" onClick={() => navigate('/member/profile/family')} />
-          <ProfileMenuItem icon={Heart} label="Matrimonial Profile" value="Create or edit" color="text-matrimonial-module" onClick={() => navigate('/member/matrimonial/setup')} />
-          <ProfileMenuItem icon={Star} label="Professional Listing" value="Apply for directory" color="text-amber-500" onClick={() => navigate('/member/professional/apply')} />
-          <ProfileMenuItem icon={Calendar} label="My Events" value="2 upcoming" color="text-brand-primary" onClick={() => navigate('/member/events')} />
-          <ProfileMenuItem icon={Bell} label="Notifications" value="3 unread" color="text-purple-500" onClick={() => navigate('/member/notifications')} />
-          <ProfileMenuItem icon={Shield} label="Privacy Settings" color="text-emerald-600" onClick={() => {}} />
+      {/* Privacy Settings Modal */}
+      {showPrivacyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-card w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-4 animate-scale-up">
+            <h3 className="text-sm font-bold text-text-primary">गोपनीयता सेटिंग्स प्रबंधित करें</h3>
+            
+            <div className="space-y-3.5 pt-2">
+              {/* Option 1: Phone */}
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-xs font-bold text-text-primary">मेरा मोबाइल नंबर दिखाएं</span>
+                <input 
+                  type="checkbox" 
+                  checked={showPhone}
+                  onChange={(e) => setShowPhone(e.target.checked)}
+                  className="w-4.5 h-4.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+              </label>
+
+              {/* Option 2: Email */}
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-xs font-bold text-text-primary">मेरा ईमेल एड्रेस दिखाएं</span>
+                <input 
+                  type="checkbox" 
+                  checked={showEmail}
+                  onChange={(e) => setShowEmail(e.target.checked)}
+                  className="w-4.5 h-4.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+              </label>
+
+              {/* Option 3: Family */}
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-xs font-bold text-text-primary">मेरा पारिवारिक वृक्ष दिखाएं</span>
+                <input 
+                  type="checkbox" 
+                  checked={showFamily}
+                  onChange={(e) => setShowFamily(e.target.checked)}
+                  className="w-4.5 h-4.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+              </label>
+            </div>
+
+            <div className="flex gap-3 pt-4 border-t border-gray-100">
+              <button 
+                onClick={() => setShowPrivacyModal(false)}
+                className="flex-1 py-3 border border-gray-200 text-text-primary rounded-2xl font-bold text-xs press-scale text-center hover:bg-gray-50"
+              >
+                रद्द करें
+              </button>
+              <button 
+                onClick={handleSavePrivacy}
+                className="flex-1 py-3 bg-indigo-600 text-white rounded-2xl font-bold text-xs press-scale text-center hover:bg-indigo-700 shadow-md flex items-center justify-center gap-1.5"
+              >
+                <Check size={14} /> सहेजें
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Logout */}
-      <div className="px-5 mt-7 mb-6">
-        <button 
-          onClick={() => {
-            logoutUser();
-            navigate('/member/login');
-          }} 
-          className="w-full py-3.5 border border-red-200 bg-red-50 text-red-500 rounded-2xl text-[15px] font-semibold flex items-center justify-center gap-2 press-scale hover:bg-red-100 transition-colors"
-        >
-          <LogOut size={18} /> Logout
-        </button>
-      </div>
     </div>
   );
 };

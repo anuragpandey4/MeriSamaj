@@ -1,198 +1,213 @@
-import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Briefcase, Phone, Mail, CheckCircle, Calendar, Users, Building, GraduationCap, MessageCircle } from 'lucide-react';
-import { Avatar } from '../../components/common/Avatar';
-import { Badge } from '../../components/common/Badge';
+import { ArrowLeft, CheckCircle, MessageCircle, Phone, Mail, MapPin } from 'lucide-react';
 import { useData } from '../../context/DataProvider';
-import { useDraggableScroll } from '../../../../hooks/useDraggableScroll';
 import BranchingFamilyTree from '../../components/family/BranchingFamilyTree';
-import { t } from '../../utils/translations';
+
+// Hindi mappings
+const cityMap = {
+  'Indore': 'इंदौर, मध्य प्रदेश',
+  'Jaipur': 'जयपुर, राजस्थान',
+  'Bhopal': 'भोपाल, मध्य प्रदेश',
+  'Ujjain': 'उज्जैन, मध्य प्रदेश',
+  'Ahmedabad': 'अहमदाबाद, गुजरात',
+  'Lucknow': 'लखनऊ, उत्तर प्रदेश',
+  'Delhi': 'दिल्ली',
+  'Kota': 'कोटा, राजस्थान',
+  'Alwar': 'अलवर, राजस्थान',
+  'Bikaner': 'बीकानेर, राजस्थान',
+  'Udaipur': 'उदयपुर, राजस्थान',
+  'Pune': 'पुणे, महाराष्ट्र',
+};
+
+const professionMap = {
+  'Architect': 'आर्किटेक्ट',
+  'Doctor': 'चिकित्सक / डॉक्टर',
+  'Software Engineer': 'इंजीनियर',
+  'Teacher': 'शिक्षक',
+  'CA': 'चार्टर्ड अकाउंटेंट / सीए',
+  'Pharmacist': 'फार्मासिस्ट',
+  'Lawyer': 'वकील',
+  'Interior Designer': 'इंटीरियर डिजाइनर',
+  'Marketing Manager': 'मार्केटिंग मैनेजर',
+  'Homemaker': 'गृहणी',
+  'Business Owner': 'व्यवसायी / उद्योगपति',
+};
+
+const businessTypeMap = {
+  'Architect': 'कंस्ट्रक्शन और डिजाइनिंग',
+  'Doctor': 'चिकित्सा / स्वास्थ्य सेवा',
+  'Software Engineer': 'आईटी / सॉफ्टवेयर सेवा',
+  'Teacher': 'शिक्षा सेवा',
+  'CA': 'वित्तीय ऑडिट और कर परामर्श',
+  'Pharmacist': 'औषधि निर्माण व विक्रय',
+  'Lawyer': 'कानूनी सेवा और परामर्श',
+  'Interior Designer': 'गृह सज्जा और डिजाइन',
+  'Marketing Manager': 'विपणन और विज्ञापन',
+  'Homemaker': 'पारिवारिक देखभाल',
+  'Business Owner': 'विनिर्माण और व्यापार',
+};
 
 const MemberDetailPage = () => {
   const { memberId } = useParams();
   const navigate = useNavigate();
-  const { members, language } = useData();
-  const scrollRef = useDraggableScroll();
+  const { members, admins } = useData();
 
-  const member = members.find(m => m.id === memberId) || members[0];
+  // Find member in either members or admins list
+  const member = members.find(m => m.id === memberId) || 
+                 admins.find(a => a.id === memberId) || 
+                 members[0];
 
-  // Helper functions for dynamic realistic details if not present in the object (e.g. from localStorage)
-  const getMockPhone = (m) => {
-    if (m.phone) return m.phone;
-    const hash = m.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return `+91 98${hash % 90}5 ${1000 + (hash % 8999)}`;
+  // Helper hash function to generate realistic deterministic values for fields
+  const getHashValue = (str, offset = 0) => {
+    if (!str) return 0;
+    return str.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + offset;
   };
 
-  const getMockEmail = (m) => {
-    if (m.email) return m.email;
-    const namePart = m.name.toLowerCase().replace(/\s+/g, '.');
-    return `${namePart}@email.com`;
-  };
+  const hash = getHashValue(member.id);
 
-  const getMockCompany = (m) => {
-    if (m.company) return m.company;
-    const lastName = m.name.split(' ')[1] || 'Agrawal';
-    const prof = m.profession || 'Enterprises';
-    if (prof === 'Doctor') return `${lastName} Clinic & Nursing Home`;
-    if (prof === 'CA') return `${lastName} & Co. Chartered Accountants`;
-    if (prof === 'Architect') return `${lastName} Designs & Associates`;
-    if (prof === 'Teacher') return `Modern Public School`;
-    if (prof === 'Software Engineer') return `Tech Solutions Ltd.`;
-    if (prof === 'Interior Designer') return `${lastName} Decor & Interiors`;
-    if (prof === 'Pharmacist') return `${lastName} Pharmacy`;
-    if (prof === 'Lawyer') return `${lastName} Legal Associates`;
-    return `${lastName} Enterprises`;
-  };
+  // Dynamic deterministic properties matching Screen 3 layout
+  const memberIdCode = `SM${7000 + (hash % 999)}`;
+  
+  // Calculate a deterministic date of birth based on age
+  const birthYear = 2026 - (member.age || 40);
+  const birthDay = 1 + (hash % 28);
+  const birthMonth = 1 + (hash % 12);
+  const dobStr = `${birthDay.toString().padStart(2, '0')}/${birthMonth.toString().padStart(2, '0')}/${birthYear}`;
 
-  const getMockEducation = (m) => {
-    if (m.education) return m.education;
-    const prof = m.profession;
-    if (prof === 'Doctor') return 'MBBS, MD';
-    if (prof === 'CA') return 'FCA (Chartered Accountant)';
-    if (prof === 'Architect') return 'B.Arch, M.Arch';
-    if (prof === 'Teacher') return 'B.Ed, M.A. in Education';
-    if (prof === 'Software Engineer') return 'B.Tech in Computer Science';
-    if (prof === 'Interior Designer') return 'Diploma in Interior Designing';
-    if (prof === 'Pharmacist') return 'B.Pharm';
-    if (prof === 'Lawyer') return 'BA LLB, LLM';
-    return 'Graduate';
-  };
+  const phoneNum = member.phone || `98765${(10000 + (hash % 89999))}`;
+  const emailAddr = member.email || `${member.name.toLowerCase().replace(/\s+/g, '')}@email.com`;
+  const hindiCity = cityMap[member.city] || `${member.city}, राजस्थान`;
 
+  // Professional details
+  const hindiProfession = professionMap[member.profession] || member.role || 'व्यवसायी';
+  const companyName = member.company || `${member.name.split(' ')[1] || 'शर्मा'} इंडस्ट्रीज`;
+  const businessSector = businessTypeMap[member.profession] || 'विनिर्माण';
+  const estYear = 2000 + (hash % 24);
+
+  // Full Address
+  const fullAddress = member.address || `${10 + (hash % 200)}, वैशाली नगर, ${hindiCity} - ${302000 + (hash % 999)}`;
+
+  // Set up mock family list if not present
   const getMockFamilyMembers = (m) => {
     if (m.familyMembers && m.familyMembers.length > 0) {
       return m.familyMembers;
     }
-    const lastName = m.name.split(' ')[1] || 'Agrawal';
-    const hash = m.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const spouseInitials = m.gender === 'Male' ? 'SA' : 'VA';
-    const spouseRelation = m.gender === 'Male' ? 'Wife' : 'Husband';
-    
-    if (m.age < 30) {
-      return [
-        { id: `${m.id}-f1`, name: `Shri Suresh ${lastName}`, relation: 'Father', age: m.age + 26, initials: 'SA' },
-        { id: `${m.id}-f2`, name: `Smt. Kavita ${lastName}`, relation: 'Mother', age: m.age + 23, initials: 'KA' }
-      ];
-    }
-    
-    const families = [
-      [
-        { id: `${m.id}-f1`, name: `Sunita ${lastName}`, relation: 'Wife', age: m.age - 3, initials: 'SA' },
-        { id: `${m.id}-f2`, name: `Aarav ${lastName}`, relation: 'Son', age: Math.max(5, m.age - 25), initials: 'AA' }
-      ],
-      [
-        { id: `${m.id}-f1`, name: `Amit ${lastName}`, relation: 'Husband', age: m.age + 2, initials: 'AA' },
-        { id: `${m.id}-f2`, name: `Riya ${lastName}`, relation: 'Daughter', age: Math.max(4, m.age - 25), initials: 'RA' }
-      ],
-      [
-        { id: `${m.id}-f1`, name: `Ramesh ${lastName}`, relation: 'Father', age: m.age + 28, initials: 'RA' },
-        { id: `${m.id}-f2`, name: `Suman ${lastName}`, relation: 'Mother', age: m.age + 25, initials: 'SA' }
-      ],
-      [
-        { id: `${m.id}-f1`, name: `Pooja ${lastName}`, relation: 'Wife', age: m.age - 2, initials: 'PA' },
-        { id: `${m.id}-f2`, name: `Neha ${lastName}`, relation: 'Daughter', age: Math.max(3, m.age - 26), initials: 'NA' },
-        { id: `${m.id}-f3`, name: `Kunal ${lastName}`, relation: 'Son', age: Math.max(1, m.age - 28), initials: 'KA' }
-      ]
+    const lastName = m.name.split(' ')[1] || 'शर्मा';
+    return [
+      { id: `${m.id}-f1`, name: `सुनीता ${lastName}`, relation: 'Wife', age: m.age - 3, initials: 'SA' },
+      { id: `${m.id}-f2`, name: `आरव ${lastName}`, relation: 'Son', age: Math.max(5, m.age - 25), initials: 'AA' }
     ];
-    return families[hash % families.length];
   };
 
-  const memberPhone = getMockPhone(member);
-  const memberEmail = getMockEmail(member);
-  const memberCompany = getMockCompany(member);
-  const memberEducation = getMockEducation(member);
-  const memberFamily = getMockFamilyMembers(member);
+  const familyMembers = getMockFamilyMembers(member);
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-screen bg-surface pb-12">
       {/* Header */}
       <div className="bg-card border-b border-gray-100 flex items-center gap-3 px-4 h-14 sticky top-0 z-30">
-        <button onClick={() => navigate(-1)} className="p-1 press-scale">
+        <button onClick={() => navigate(-1)} className="p-1 -ml-1 press-scale">
           <ArrowLeft size={22} className="text-text-primary" />
         </button>
-        <h1 className="text-base font-semibold text-text-primary">Member Profile</h1>
+        <h1 className="text-base font-bold text-text-primary">सदस्य प्रोफ़ाइल</h1>
       </div>
 
-      {/* Profile Card */}
-      <div className="bg-card px-4 py-6 flex flex-col items-center border-b border-gray-100">
-        <Avatar initials={member.initials} size="xl" />
-        <div className="flex items-center gap-1.5 mt-3">
-          <h2 className="text-lg font-bold text-text-primary">{member.name}</h2>
-          {member.isVerified && <CheckCircle size={16} className="text-emerald-500" />}
-        </div>
-        <p className="text-xs text-text-secondary mt-0.5">{member.community}</p>
-        <div className="flex items-center gap-2 mt-2">
-          <Badge variant="primary"><MapPin size={10} /> {member.city}</Badge>
-          {member.isVerified && <Badge variant="success">Verified Member</Badge>}
-        </div>
-        <button 
-          onClick={() => navigate(`/member/chat/${member.id}`)}
-          className="mt-5 px-8 py-2.5 bg-brand-primary text-white rounded-full font-semibold text-[14px] flex items-center gap-2 press-scale shadow-sm"
-        >
-          <MessageCircle size={18} />
-          Message {member.name.split(' ')[0]}
-        </button>
-      </div>
+      <div className="max-w-4xl mx-auto space-y-4 pt-4 px-4">
+        {/* Top Profile Card */}
+        <div className="bg-card rounded-3xl p-5 border border-gray-100 shadow-sm flex flex-col items-center">
+          <div className="w-24 h-24 rounded-2xl overflow-hidden bg-indigo-50 border border-indigo-100/50 flex items-center justify-center font-bold text-3xl text-indigo-700 shadow-inner">
+            {member.initials}
+          </div>
+          
+          <div className="flex items-center gap-1.5 mt-4">
+            <h2 className="text-lg font-bold text-text-primary">{member.name}</h2>
+            {member.isVerified && <CheckCircle size={18} className="text-emerald-500 fill-emerald-50 shrink-0" />}
+          </div>
+          
+          <p className="text-xs font-semibold text-text-secondary mt-1">{hindiProfession}</p>
+          <p className="text-[10px] font-medium text-text-secondary mt-0.5">{hindiCity}</p>
 
-      {/* Personal Info */}
-      <div className="mt-3">
-        <p className="px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Personal Information</p>
-        <div className="bg-card mx-4 rounded-2xl overflow-hidden border border-gray-100">
-          <InfoRow icon={Briefcase} label="Profession" value={member.profession} />
-          <InfoRow icon={MapPin} label="City" value={member.city} />
-          <InfoRow icon={Calendar} label="Age" value={`${member.age} years`} />
-          <InfoRow icon={Users} label="Gender" value={member.gender} />
-          <InfoRow icon={Phone} label="Phone" value={memberPhone} />
-          <InfoRow icon={Mail} label="Email" value={memberEmail} last />
+          {/* Action Buttons */}
+          <div className="w-full grid grid-cols-3 gap-2.5 mt-6 pt-5 border-t border-gray-50">
+            <button 
+              onClick={() => navigate(`/member/chat/${member.id}`)}
+              className="py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale shadow-sm shadow-indigo-100"
+            >
+              <MessageCircle size={14} /> संपर्क करें
+            </button>
+            <button 
+              onClick={() => navigate(`/member/chat/${member.id}`)}
+              className="py-3 bg-card border border-gray-200 text-text-primary rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale hover:bg-gray-50"
+            >
+              <Mail size={14} /> मैसेज करें
+            </button>
+            <a 
+              href={`tel:${phoneNum}`}
+              className="py-3 bg-card border border-gray-200 text-text-primary rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale hover:bg-gray-50 text-center"
+            >
+              <Phone size={14} /> कॉल करें
+            </a>
+          </div>
         </div>
-      </div>
 
-      {/* Professional Info */}
-      <div className="mt-4">
-        <p className="px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Professional Details</p>
-        <div className="bg-card mx-4 rounded-2xl overflow-hidden border border-gray-100">
-          <InfoRow icon={Briefcase} label="Designation" value={member.profession} />
-          <InfoRow icon={Building} label="Company" value={memberCompany} />
-          <InfoRow icon={GraduationCap} label="Education" value={memberEducation} last />
+        {/* Section 1: व्यक्तिगत जानकारी */}
+        <div className="space-y-2">
+          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">व्यक्तिगत जानकारी</h3>
+          <div className="bg-card rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50 overflow-hidden">
+            <InfoField label="सदस्य ID" value={memberIdCode} />
+            <InfoField label="जन्म तिथि" value={dobStr} />
+            <InfoField label="मोबाइल नंबर" value={phoneNum} />
+            <InfoField label="ईमेल" value={emailAddr} />
+            <InfoField label="शहर" value={hindiCity} />
+          </div>
         </div>
-      </div>
 
-      {/* Family Members */}
-      <div className="mt-5 pb-6">
-        <p className="px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider mb-3">{t('Family Tree', language)}</p>
-        <div className="w-full bg-white border-y border-gray-100 overflow-hidden relative">
-          <BranchingFamilyTree 
-            primaryMember={member} 
-            familyMembers={memberFamily} 
-          />
+        {/* Section 2: व्यवसाय जानकारी */}
+        <div className="space-y-2">
+          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">व्यवसाय जानकारी</h3>
+          <div className="bg-card rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50 overflow-hidden">
+            <InfoField label="पेशा" value={hindiProfession} />
+            <InfoField label="कंपनी" value={companyName} />
+            <InfoField label="व्यवसाय" value={businessSector} />
+            <InfoField label="स्थापना वर्ष" value={estYear.toString()} />
+          </div>
         </div>
-      </div>
 
-      {/* Contact Actions */}
-      <div className="px-4 mt-4 pb-8 flex gap-2.5">
-        <a 
-          href={`tel:${memberPhone}`} 
-          className="flex-1 py-3 bg-social-module text-white rounded-2xl text-xs font-semibold flex items-center justify-center gap-1.5 press-scale text-center"
-        >
-          <Phone size={14} /> Call
-        </a>
-        <button 
-          onClick={() => navigate(`/member/chat/${member.id}`)} 
-          className="flex-1 py-3 bg-gray-100 text-text-primary rounded-2xl text-xs font-semibold flex items-center justify-center gap-1.5 press-scale text-center"
-        >
-          <Mail size={14} /> Message
-        </button>
+        {/* Section 3: पता */}
+        <div className="space-y-2">
+          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">पता</h3>
+          <div className="bg-card rounded-2xl p-4 border border-gray-100 shadow-sm">
+            <div className="flex gap-2.5 items-start">
+              <MapPin size={16} className="text-text-secondary mt-0.5 shrink-0" />
+              <div>
+                <p className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">पूर्ण पता</p>
+                <p className="text-xs font-semibold text-text-primary mt-1 leading-relaxed">{fullAddress}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 4: पारिवारिक वृक्ष (Family Tree) */}
+        <div className="space-y-2">
+          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">पारिवारिक विवरण (फ़ैमिली ट्री)</h3>
+          <div className="bg-card rounded-2xl border border-gray-100 shadow-sm overflow-hidden p-2">
+            <div className="w-full overflow-hidden relative rounded-xl border border-gray-50">
+              <BranchingFamilyTree 
+                primaryMember={member} 
+                familyMembers={familyMembers} 
+              />
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
 };
 
-const InfoRow = ({ icon: Icon, label, value, last = false }) => (
-  <div className={`flex items-center gap-3 px-4 py-3 ${!last ? 'border-b border-gray-50' : ''}`}>
-    <Icon size={16} className="text-text-secondary shrink-0" />
-    <div className="flex-1">
-      <p className="text-xs text-text-secondary">{label}</p>
-      <p className="text-xs font-medium text-text-primary">{value}</p>
-    </div>
+const InfoField = ({ label, value }) => (
+  <div className="px-4 py-3.5 flex justify-between items-center text-xs font-semibold">
+    <span className="text-text-secondary">{label}</span>
+    <span className="text-text-primary text-right">{value}</span>
   </div>
 );
 

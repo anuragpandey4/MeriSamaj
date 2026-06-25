@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, UserPlus, Camera, Trash2, Edit3 } from 'lucide-react';
 import { Avatar } from '../../components/common/Avatar';
