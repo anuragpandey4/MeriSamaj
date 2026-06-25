@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { MemberLayout } from '../components/layout/MemberLayout';
@@ -10,14 +10,14 @@ import LoginScreen from '../pages/onboarding/LoginScreen';
 
 // Main Tab Pages
 import HomePage from '../pages/home/HomePage';
-import FeedPage from '../pages/social/FeedPage';
+// import FeedPage from '../pages/social/FeedPage';
 import MatrimonialHomePage from '../pages/matrimonial/MatrimonialHomePage';
 import DirectoryPage from '../pages/directory/DirectoryPage';
 import MyProfilePage from '../pages/profile/MyProfilePage';
 
 // Sub Pages
 import EventsPage from '../pages/events/EventsPage';
-import GroupsPage from '../pages/groups/GroupsPage';
+// import GroupsPage from '../pages/groups/GroupsPage';
 import NotificationsPage from '../pages/notifications/NotificationsPage';
 
 // Detail Pages (Built in Phase A)
@@ -40,6 +40,8 @@ import ProfessionalDirectoryPage from '../pages/directory/ProfessionalDirectoryP
 import ApplyProfessionalPage from '../pages/directory/ApplyProfessionalPage';
 import VotingPage from '../pages/voting/VotingPage';
 import PollDetailPage from '../pages/voting/PollDetailPage';
+import ElectionsListPage from '../pages/voting/ElectionsListPage';
+import { VotingProvider } from '../pages/voting/VotingContext';
 
 // Feature: Om Shanti
 import ObituaryPage from '../pages/obituary/ObituaryPage';
@@ -49,7 +51,7 @@ import CreateObituaryPage from '../pages/obituary/CreateObituaryPage';
 import LeadershipPage from '../pages/leadership/LeadershipPage';
 
 // Feature: Chat
-import ChatListPage from '../pages/chat/ChatListPage';
+// import ChatListPage from '../pages/chat/ChatListPage';
 import ChatRoomPage from '../pages/chat/ChatRoomPage';
 import CallScreen from '../pages/chat/CallScreen';
 
@@ -99,8 +101,11 @@ export const MemberRoutes = () => {
           <Route path="professional" element={<AnimatedPage><ProfessionalDirectoryPage /></AnimatedPage>} />
           <Route path="professional/apply" element={<AnimatedPage><ApplyProfessionalPage /></AnimatedPage>} />
 
-          <Route path="voting" element={<AnimatedPage><VotingPage /></AnimatedPage>} />
-          <Route path="voting/:pollId" element={<AnimatedPage><PollDetailPage /></AnimatedPage>} />
+          <Route path="voting" element={<VotingProvider />}>
+            <Route index element={<AnimatedPage><VotingPage /></AnimatedPage>} />
+            <Route path="list" element={<AnimatedPage><ElectionsListPage /></AnimatedPage>} />
+            <Route path=":pollId" element={<AnimatedPage><PollDetailPage /></AnimatedPage>} />
+          </Route>
 
           <Route path="notifications" element={<AnimatedPage><NotificationsPage /></AnimatedPage>} />
 
