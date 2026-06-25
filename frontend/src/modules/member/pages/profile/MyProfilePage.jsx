@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Settings, Edit3, ChevronRight, Users, Heart, Calendar, Bell, LogOut, Camera, CheckCircle, Star, Shield } from 'lucide-react';
+import { MapPin, Settings, Edit3, ChevronRight, Users, Heart, Calendar, Bell, LogOut, Camera, CheckCircle, Star, Shield, AlertCircle } from 'lucide-react';
 import { Avatar } from '../../components/common/Avatar';
 import { Badge } from '../../components/common/Badge';
 import { useData } from '../../context/DataProvider';
@@ -21,7 +21,7 @@ const ProfileMenuItem = ({ icon: Icon, label, value, color = 'text-text-secondar
 
 const MyProfilePage = () => {
   const navigate = useNavigate();
-  const { currentUser, logoutUser } = useData();
+  const { currentUser, logoutUser, updateProfile } = useData();
   const scrollRef = useDraggableScroll();
 
   return (
@@ -37,16 +37,49 @@ const MyProfilePage = () => {
 
         <div className="flex flex-col items-center relative z-10">
           <div className="relative">
-            <Avatar initials={currentUser.initials} size="xl" color="bg-brand-primary/10 text-brand-primary border-2 border-brand-primary/20" />
-            <button className="absolute bottom-0 right-0 w-9 h-9 bg-white rounded-full shadow-md flex items-center justify-center press-scale border border-gray-100">
+            <Avatar initials={currentUser.initials} src={currentUser.avatar} size="xl" color="bg-brand-primary/10 text-brand-primary border-2 border-brand-primary/20" />
+            <label className="absolute bottom-0 right-0 w-9 h-9 bg-white rounded-full shadow-md flex items-center justify-center press-scale border border-gray-100 cursor-pointer">
               <Camera size={16} className="text-brand-primary" />
-            </button>
+              <input 
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      updateProfile({ avatar: event.target.result });
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+            </label>
           </div>
           <h2 className="text-text-primary font-bold text-[20px] mt-4 tracking-tight">{currentUser.name}</h2>
-          <div className="flex items-center gap-1.5 mt-1 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full border border-emerald-100">
-            <CheckCircle size={14} />
-            <span className="text-[12px] font-bold">Verified Member</span>
-          </div>
+          {currentUser.isVerified ? (
+            <div className="flex items-center gap-1.5 mt-1 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full border border-emerald-100">
+              <CheckCircle size={14} />
+              <span className="text-[12px] font-bold">Verified Member</span>
+            </div>
+          ) : currentUser.isVerificationSubmitted ? (
+            <button 
+              onClick={() => navigate('/member/profile/verify')}
+              className="flex items-center gap-1.5 mt-1 bg-amber-50 text-amber-600 px-3 py-1 rounded-full border border-amber-100 press-scale cursor-pointer"
+            >
+              <AlertCircle size={14} />
+              <span className="text-[12px] font-bold">Verification Pending</span>
+            </button>
+          ) : (
+            <button 
+              onClick={() => navigate('/member/profile/verify')}
+              className="flex items-center gap-1.5 mt-1 bg-red-50 text-red-500 px-3 py-1 rounded-full border border-red-100 press-scale cursor-pointer"
+            >
+              <AlertCircle size={14} />
+              <span className="text-[12px] font-bold">Unverified - Tap to Verify</span>
+            </button>
+          )}
           <div className="flex items-center gap-2 mt-4">
             <span className="bg-gray-50 text-text-secondary text-[13px] font-bold px-4 py-2 rounded-full flex items-center gap-1.5 border border-gray-200">
               <MapPin size={14} className="text-brand-primary" /> {currentUser.city}
@@ -110,7 +143,7 @@ const MyProfilePage = () => {
         <div className="px-5 flex gap-3 overflow-x-auto scrollbar-hide pb-2" ref={scrollRef}>
           {currentUser.familyMembers.map((fm) => (
             <div key={fm.id} className="shrink-0 card-std p-4 flex flex-col items-center w-28 card-press">
-              <Avatar initials={fm.initials} size="md" />
+              <Avatar initials={fm.initials} src={fm.avatar} size="md" />
               <p className="text-[13px] font-semibold text-text-primary mt-2 truncate w-full text-center">{fm.name.split(' ')[0]}</p>
               <p className="text-[12px] text-text-secondary mt-0.5">{fm.relation}</p>
             </div>

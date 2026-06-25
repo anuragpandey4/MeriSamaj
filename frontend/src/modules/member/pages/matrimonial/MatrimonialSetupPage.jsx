@@ -4,7 +4,7 @@ import { ArrowLeft, Camera, CheckCircle, Lock } from 'lucide-react';
 import { PageHeader } from '../../components/layout/PageHeader';
 import { useData } from '../../context/DataProvider';
 
-const MatrimonialSetupPage = ({ isHub = false }) => {
+const MatrimonialSetupPage = ({ isHub = false, onPublish }) => {
   const navigate = useNavigate();
   const { addMatrimonialProfile } = useData();
   const [step, setStep] = useState(1); // 1: Basic, 2: Education, 3: Family, 4: Preferences
@@ -33,13 +33,21 @@ const MatrimonialSetupPage = ({ isHub = false }) => {
     if (step < 4) {
       setStep(step + 1);
     } else {
-      addMatrimonialProfile({
-        age: form.partnerAge ? 26 : 26, // dummy age logic
+      const profileData = {
+        age: 26,
         height: form.height || "5'6\"",
         profession: form.occupation || "Software Engineer",
         education: form.education || "B.Tech",
-      });
-      navigate('/member/matrimonial');
+        gotra: form.gotra || 'N/A',
+        manglik: form.manglik || 'No',
+        diet: form.diet || 'Vegetarian',
+      };
+      if (onPublish) {
+        onPublish(profileData);
+      } else {
+        addMatrimonialProfile(profileData);
+        navigate('/member/matrimonial');
+      }
     }
   };
 
@@ -76,19 +84,35 @@ const MatrimonialSetupPage = ({ isHub = false }) => {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Manglik</label>
-                <select className="w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-matrimonial-module transition-all">
-                  <option>No</option>
-                  <option>Yes</option>
-                  <option>Don't Know</option>
-                </select>
+                <div className="relative mt-1.5">
+                  <select 
+                    name="manglik" 
+                    value={form.manglik} 
+                    onChange={handleChange}
+                    className="w-full bg-card border border-gray-200 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-text-primary outline-none focus:border-matrimonial-module transition-all appearance-none pr-8"
+                  >
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                    <option value="Don't Know">Don't Know</option>
+                  </select>
+                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary text-[10px]">▼</div>
+                </div>
               </div>
               <div>
                 <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Diet</label>
-                <select className="w-full mt-1.5 bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-matrimonial-module transition-all">
-                  <option>Vegetarian</option>
-                  <option>Non-Vegetarian</option>
-                  <option>Eggetarian</option>
-                </select>
+                <div className="relative mt-1.5">
+                  <select 
+                    name="diet" 
+                    value={form.diet} 
+                    onChange={handleChange}
+                    className="w-full bg-card border border-gray-200 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-text-primary outline-none focus:border-matrimonial-module transition-all appearance-none pr-8"
+                  >
+                    <option value="Vegetarian">Vegetarian</option>
+                    <option value="Non-Vegetarian">Non-Vegetarian</option>
+                    <option value="Eggetarian">Eggetarian</option>
+                  </select>
+                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary text-[10px]">▼</div>
+                </div>
               </div>
             </div>
           </div>
@@ -168,17 +192,29 @@ const MatrimonialSetupPage = ({ isHub = false }) => {
 
       <div className="flex-1 px-5 pt-6 pb-24 overflow-y-auto">
         {renderStep()}
+        {isHub && (
+          <div className="mt-8 mb-6">
+            <button
+              onClick={handleNext}
+              className="w-full py-3.5 bg-matrimonial-module text-white rounded-2xl text-sm font-semibold press-scale shadow-md shadow-pink-200"
+            >
+              {step === 4 ? 'Publish Profile' : 'Continue'}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Bottom Actions */}
-      <div className="responsive-fixed-bottom p-4 bg-card border-t border-gray-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-40">
-        <button
-          onClick={handleNext}
-          className="w-full py-3.5 bg-matrimonial-module text-white rounded-2xl text-sm font-semibold press-scale shadow-md shadow-pink-200"
-        >
-          {step === 4 ? 'Publish Profile' : 'Continue'}
-        </button>
-      </div>
+      {!isHub && (
+        <div className="responsive-fixed-bottom p-4 bg-card border-t border-gray-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-40">
+          <button
+            onClick={handleNext}
+            className="w-full py-3.5 bg-matrimonial-module text-white rounded-2xl text-sm font-semibold press-scale shadow-md shadow-pink-200"
+          >
+            {step === 4 ? 'Publish Profile' : 'Continue'}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

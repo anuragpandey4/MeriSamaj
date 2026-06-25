@@ -7,15 +7,16 @@ import { useData } from '../../context/DataProvider';
 const PostDetailPage = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
-  const { posts, togglePostLike, addPostComment, currentUser } = useData();
+  const { posts, togglePostLike, addPostComment, toggleCommentLike, currentUser } = useData();
   const [commentText, setCommentText] = useState('');
-  const [comments, setComments] = useState([]);
 
   const post = posts.find((p) => p.id === postId);
 
   if (!post) {
     return <div className="p-4">Post not found</div>;
   }
+
+  const comments = post.commentsList || [];
 
   const handleLike = () => {
     togglePostLike(post.id);
@@ -98,7 +99,12 @@ const PostDetailPage = () => {
                 </div>
                 <div className="flex items-center gap-3 mt-1 px-1">
                   <span className="text-xs text-text-secondary">{comment.time}</span>
-                  <button className="text-xs text-text-secondary font-medium press-scale">Like ({comment.likes})</button>
+                  <button 
+                    onClick={() => toggleCommentLike(post.id, comment.id)}
+                    className={`text-xs font-semibold press-scale transition-colors ${comment.isLiked ? 'text-red-500 font-bold' : 'text-text-secondary'}`}
+                  >
+                    Like ({comment.likes})
+                  </button>
                   <button className="text-xs text-text-secondary font-medium press-scale">Reply</button>
                 </div>
               </div>

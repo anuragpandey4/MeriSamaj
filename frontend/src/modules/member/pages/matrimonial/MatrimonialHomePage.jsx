@@ -134,7 +134,7 @@ const ProfileCard = ({ profile, onSkip }) => {
 };
 
 // ─── MATCHES FEED (Tab 1 content) ───
-const MatchesFeed = () => {
+const MatchesFeed = ({ tempProfile }) => {
   const navigate = useNavigate();
   const { matrimonialProfiles } = useData();
   const [activeFilter, setActiveFilter] = useState(null);
@@ -145,6 +145,7 @@ const MatchesFeed = () => {
   }, []);
 
   const visibleProfiles = matrimonialProfiles.filter(p => !skippedIds.includes(p.id));
+  const finalProfiles = tempProfile ? [tempProfile, ...visibleProfiles] : visibleProfiles;
 
   return (
     <div className="bg-gray-50 min-h-full">
@@ -168,11 +169,11 @@ const MatchesFeed = () => {
 
       {/* ─── PROFILE FEED ─── */}
       <div className="pt-4">
-        {visibleProfiles.map(profile => (
+        {finalProfiles.map(profile => (
           <ProfileCard key={profile.id} profile={profile} onSkip={handleSkip} />
         ))}
 
-        {visibleProfiles.length === 0 && (
+        {finalProfiles.length === 0 && (
           <div className="flex flex-col items-center justify-center mt-20 px-8 text-center">
             <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mb-4 border border-rose-100">
               <Sparkles size={32} className="text-rose-400" />
@@ -190,7 +191,9 @@ const MatchesFeed = () => {
 const MatrimonialHomePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { currentUser } = useData();
   const [activeTab, setActiveTab] = useState(0);
+  const [tempProfile, setTempProfile] = useState(null);
   const scrollContainerRef = useRef(null);
 
   const tabs = [
@@ -232,6 +235,24 @@ const MatrimonialHomePage = () => {
       });
       setActiveTab(index);
     }
+  };
+
+  const handlePublish = (profileData) => {
+    const newProfile = {
+      id: `mp-temp-${Date.now()}`,
+      name: currentUser?.name || 'Rajesh Agrawal',
+      initials: currentUser?.initials || 'RA',
+      avatar: currentUser?.avatar || `https://i.pravatar.cc/100?u=${currentUser?.name || 'self'}`,
+      city: currentUser?.city || 'Indore',
+      community: currentUser?.community || 'Agrawal',
+      age: 26,
+      photos: 1,
+      isNew: true,
+      interests: { sent: false, received: false },
+      ...profileData
+    };
+    setTempProfile(newProfile);
+    scrollToTab(0);
   };
 
   return (
@@ -297,7 +318,7 @@ const MatrimonialHomePage = () => {
       >
         {/* Tab 1: Matches */}
         <div className="w-full h-full flex-shrink-0 snap-start overflow-y-auto pb-28">
-          <MatchesFeed />
+          <MatchesFeed tempProfile={tempProfile} />
         </div>
 
         {/* Tab 2: Activity/Interests */}
@@ -307,7 +328,7 @@ const MatrimonialHomePage = () => {
 
         {/* Tab 3: Setup/Profile */}
         <div className="w-full h-full flex-shrink-0 snap-start overflow-y-auto pb-28">
-          <MatrimonialSetupContent isHub={true} />
+          <MatrimonialSetupContent isHub={true} onPublish={handlePublish} />
         </div>
       </div>
     </div>
