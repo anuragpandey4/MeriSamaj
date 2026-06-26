@@ -19,26 +19,37 @@ const getCommunitySurname = (community) => {
 };
 
 const initialGroups = [
-  { id: 'g1', name: 'Agrawal Youth Indore', initials: 'AY', members: 342, posts: 28, category: 'Youth', lastActivity: '5 min ago', isJoined: true, description: 'For young Agrawal community members in Indore city.', isMuted: false },
-  { id: 'g2', name: 'Mali Samaj Women Wing', initials: 'MW', members: 189, posts: 15, category: 'Women', lastActivity: '1 hour ago', isJoined: true, description: 'Empowering women of Mali Samaj through education and networking.', isMuted: false },
-  { id: 'g3', name: 'Business Network MP', initials: 'BN', members: 567, posts: 45, category: 'Business', lastActivity: '2 hours ago', isJoined: false, description: 'Connect with business owners and professionals across Madhya Pradesh.', isMuted: false },
-  { id: 'g4', name: 'Samaj Sewa Volunteers', initials: 'SS', members: 124, posts: 8, category: 'Service', lastActivity: '3 hours ago', isJoined: false, description: 'Volunteer group for community service activities and charity work.', isMuted: false },
-  { id: 'g5', name: 'Education Support Circle', initials: 'ES', members: 256, posts: 22, category: 'Education', lastActivity: '1 day ago', isJoined: true, description: 'Scholarship info, career guidance, and mentoring for students.', isMuted: false },
+  { id: 'g1', name: 'Community General Group', initials: 'CG', members: 125, online: 8, posts: 28, category: 'General', lastActivity: '10:30 AM', isJoined: true, description: 'General discussion and announcement group for all community members.', isMuted: false, unread: 5 },
+  { id: 'g2', name: 'Youth Group', initials: 'YG', members: 85, online: 4, posts: 15, category: 'Youth', lastActivity: '09:15 AM', isJoined: true, description: 'For networking, career, and creative activities among community youth.', isMuted: false, unread: 2 },
+  { id: 'g3', name: 'Women Group', initials: 'WG', members: 60, online: 2, posts: 45, category: 'Women', lastActivity: 'Yesterday', isJoined: true, description: 'Dialogue on women welfare, empowerment, and cottage industry.', isMuted: false, unread: 0 },
+  { id: 'g4', name: 'Business Group', initials: 'BG', members: 45, online: 5, posts: 8, category: 'Business', lastActivity: 'Yesterday', isJoined: false, description: 'Business platform for community traders, entrepreneurs, and professionals.', isMuted: false, unread: 0 },
+  { id: 'g5', name: 'Education Group', initials: 'EG', members: 55, online: 3, posts: 22, category: 'Education', lastActivity: '18/05/24', isJoined: false, description: 'Information on scholarship, school/college admission, and career guidance.', isMuted: false, unread: 0 },
+  { id: 'g6', name: 'Religious & Spiritual Group', initials: 'RG', members: 75, online: 6, posts: 19, category: 'Religious', lastActivity: '17/05/24', isJoined: false, description: 'Group for Satsang, religious festivals, and spiritual discussion.', isMuted: false, unread: 0 }
 ];
 
 const initialGroupMessages = {
   g1: [
-    { id: 1, senderId: 's1', senderName: 'Vikas Jain', initials: 'VJ', text: 'Has anyone got the details for the upcoming samaj meet?', time: '10:00 AM', isMe: false },
-    { id: 2, senderId: 'me', senderName: 'Rajesh Agrawal', initials: 'RA', text: 'Yes, it is on the 15th at Samaj Bhawan. Registration link is on the homepage banner.', time: '10:05 AM', isMe: true },
-    { id: 3, senderId: 's2', senderName: 'Kavita Agrawal', initials: 'KA', text: 'Thank you Rajesh! I just registered my family.', time: '10:15 AM', isMe: false },
+    { id: 1, senderId: 's1', senderName: 'Rajesh Sharma', initials: 'RS', role: 'Admin', text: 'Hello to all members! A meeting has been scheduled at Samaj Bhawan at 7 PM today! Everyone\'s presence is mandatory.', time: '10:30 AM', isMe: false, reactions: ['🔥', '👍'] },
+    { id: 2, senderId: 'me', senderName: 'Rajesh Agrawal', initials: 'RA', role: 'Member', text: 'Yes, I will be present.', time: '10:32 AM', isMe: true },
+    { id: 3, senderId: 's2', senderName: 'Sushma Devi', initials: 'SD', role: 'Member', text: 'What will be the agenda of the program?', time: '10:35 AM', isMe: false },
+    { id: 4, senderId: 's1', senderName: 'Rajesh Sharma', initials: 'RS', role: 'Admin', text: 'Agenda document has been shared in the group.', time: '10:40 AM', isMe: false },
+    { id: 5, senderId: 's1', senderName: 'Rajesh Sharma', initials: 'RS', role: 'Admin', time: '10:40 AM', isMe: false, attachment: { type: 'file', name: 'Agenda.pdf', size: '1.2 MB' } },
+    { id: 6, senderId: 's3', senderName: 'Veena Patel', initials: 'VP', role: 'Member', text: 'Thank you Admin', time: '10:45 AM', isMe: false }
   ],
   g2: [
-    { id: 1, senderId: 's3', senderName: 'Sunita Agrawal', initials: 'SA', text: 'Welcome to the Samaj Women Wing discussion board! Please share your ideas here.', time: 'Yesterday', isMe: false },
+    { id: 1, senderId: 's4', senderName: 'Amit', initials: 'AM', role: 'Member', text: 'There is a meeting tomorrow, everyone please come on time.', time: '09:15 AM', isMe: false }
   ],
-  g3: [],
-  g4: [],
+  g3: [
+    { id: 1, senderId: 's5', senderName: 'Reema', initials: 'RM', role: 'Member', text: 'Today\'s program was successful, thank you everyone.', time: 'Yesterday', isMe: false }
+  ],
+  g4: [
+    { id: 1, senderId: 's6', senderName: 'Sunil', initials: 'SL', role: 'Member', text: 'Let\'s talk about the new order tomorrow.', time: 'Yesterday', isMe: false }
+  ],
   g5: [
-    { id: 1, senderId: 's4', senderName: 'Rahul Agrawal', initials: 'RA', text: 'Applications for the Samaj Scholarship close next Friday. Don\'t forget to submit.', time: '2 days ago', isMe: false },
+    { id: 1, senderId: 's2', senderName: 'Sudha', initials: 'SH', role: 'Member', text: 'Notes have been shared, please check.', time: '18/05/24', isMe: false }
+  ],
+  g6: [
+    { id: 1, senderId: 's7', senderName: 'Pooja', initials: 'PJ', role: 'Member', text: 'The time for Satsang has been set for 7 PM.', time: '17/05/24', isMe: false }
   ]
 };
 
@@ -71,13 +82,13 @@ const adaptGroupMessages = (messagesMap, community) => {
   const result = {};
   Object.keys(messagesMap).forEach(key => {
     result[key] = messagesMap[key].map(m => {
-      const newName = m.senderName.replaceAll('Agrawal', surname).replaceAll('Jain', surname).replaceAll('Mali', surname).replaceAll('Gupta', surname).replaceAll('Sharma', surname).replaceAll('Patel', surname).replaceAll('Verma', surname);
-      const newInitials = newName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      const newName = m.senderName ? m.senderName.replaceAll('Agrawal', surname).replaceAll('Jain', surname).replaceAll('Mali', surname).replaceAll('Gupta', surname).replaceAll('Sharma', surname).replaceAll('Patel', surname).replaceAll('Verma', surname) : '';
+      const newInitials = newName ? newName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '';
       return {
         ...m,
         senderName: newName,
         initials: newInitials,
-        text: m.text.replaceAll('Agrawal', surname).replaceAll('Jain', surname).replaceAll('Mali', surname).replaceAll('Gupta', surname).replaceAll('Sharma', surname).replaceAll('Patel', surname).replaceAll('Verma', surname)
+        text: m.text ? m.text.replaceAll('Agrawal', surname).replaceAll('Jain', surname).replaceAll('Mali', surname).replaceAll('Gupta', surname).replaceAll('Sharma', surname).replaceAll('Patel', surname).replaceAll('Verma', surname) : m.text
       };
     });
   });
@@ -181,10 +192,10 @@ export const DataProvider = ({ children }) => {
   // Helpers for localStorage
   const loadState = (key, defaultState) => {
     try {
-      const serialized = localStorage.getItem(`merisamaj_v4_${key}`);
+      const serialized = localStorage.getItem(`merisamaj_v6_${key}`);
       if (serialized === null) {
         // Save initial to localStorage so it's persisted immediately
-        localStorage.setItem(`merisamaj_v4_${key}`, JSON.stringify(defaultState));
+        localStorage.setItem(`merisamaj_v6_${key}`, JSON.stringify(defaultState));
         return defaultState;
       }
       return JSON.parse(serialized);
@@ -195,7 +206,7 @@ export const DataProvider = ({ children }) => {
 
   const saveState = (key, state) => {
     try {
-      localStorage.setItem(`merisamaj_v4_${key}`, JSON.stringify(state));
+      localStorage.setItem(`merisamaj_v6_${key}`, JSON.stringify(state));
     } catch (err) {
       console.error('Could not save state', err);
     }
@@ -239,12 +250,50 @@ export const DataProvider = ({ children }) => {
     events: true,
     groups: true
   }));
-  const [events, setEvents] = useState(() => loadState('events', initialEvents));
+  const [events, setEvents] = useState(() => {
+    const saved = loadState('events', initialEvents);
+    return saved.map(savedEv => {
+      const initEv = initialEvents.find(e => e.id === savedEv.id);
+      if (initEv) {
+        const merged = { ...initEv };
+        Object.keys(savedEv).forEach(key => {
+          if (savedEv[key] !== null && savedEv[key] !== undefined) {
+            merged[key] = savedEv[key];
+          }
+        });
+        return merged;
+      }
+      return savedEv;
+    });
+  });
   const [obituaries, setObituaries] = useState(() => loadState('obituaries', initialObituaries));
   const [matrimonialProfiles, setMatrimonialProfiles] = useState(() => loadState('matrimonialProfiles', initialMatrimonial));
   const [language, setLanguage] = useState(() => loadState('language', 'en'));
-  const [groups, setGroups] = useState(() => loadState('groups', initialGroups));
-  const [groupMessages, setGroupMessages] = useState(() => loadState('groupMessages', initialGroupMessages));
+  const [groups, setGroups] = useState(() => {
+    const saved = loadState('groups', initialGroups);
+    return initialGroups.map(initG => {
+      const savedG = saved.find(g => g.id === initG.id);
+      if (savedG) {
+        return {
+          ...initG,
+          isJoined: savedG.isJoined !== undefined ? savedG.isJoined : initG.isJoined,
+          isMuted: savedG.isMuted !== undefined ? savedG.isMuted : initG.isMuted,
+          unread: savedG.unread !== undefined ? savedG.unread : initG.unread,
+        };
+      }
+      return initG;
+    });
+  });
+  const [groupMessages, setGroupMessages] = useState(() => {
+    const saved = loadState('groupMessages', initialGroupMessages);
+    const merged = { ...initialGroupMessages };
+    Object.keys(saved).forEach(key => {
+      if (saved[key] && saved[key].length > 0) {
+        merged[key] = saved[key];
+      }
+    });
+    return merged;
+  });
   const [notifications, setNotifications] = useState(() => loadState('notifications', initialNotifications));
 
   // Sync to localStorage when state changes
@@ -456,6 +505,42 @@ export const DataProvider = ({ children }) => {
     setNotifications(initialNotifications);
   };
 
+  const createGroup = (groupData) => {
+    const newGroup = {
+      id: `g${Date.now()}`,
+      name: groupData.name,
+      initials: groupData.name.substring(0, 2),
+      avatarUrl: groupData.avatarUrl || null,
+      members: groupData.members || 1,
+      online: 1,
+      posts: 0,
+      category: groupData.category || 'General',
+      lastActivity: 'Just now',
+      isJoined: true,
+      description: groupData.description || '',
+      isMuted: false,
+      unread: 0,
+      privacy: groupData.privacy,
+      chatSettings: groupData.chatSettings
+    };
+    setGroups(prev => [newGroup, ...prev]);
+    setGroupMessages(prev => ({
+      ...prev,
+      [newGroup.id]: groupData.initialMessage ? [
+        {
+          id: Date.now(),
+          senderId: 'me',
+          senderName: currentUser.name,
+          initials: currentUser.initials,
+          role: 'Admin',
+          text: groupData.initialMessage,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isMe: true
+        }
+      ] : []
+    }));
+  };
+
   const joinGroup = (groupId) => {
     setGroups(groups.map(g => g.id === groupId ? { ...g, isJoined: true, members: g.members + 1 } : g));
   };
@@ -466,6 +551,53 @@ export const DataProvider = ({ children }) => {
 
   const toggleGroupMute = (groupId) => {
     setGroups(groups.map(g => g.id === groupId ? { ...g, isMuted: !g.isMuted } : g));
+  };
+
+  const updateGroupDetails = (groupId, updatedFields) => {
+    setGroups(prevGroups => prevGroups.map(g => {
+      if (g.id === groupId) {
+        let initials = g.initials;
+        if (updatedFields.name) {
+          initials = updatedFields.name.split(' ')
+            .map(n => n[0])
+            .join('')
+            .substring(0, 2)
+            .toUpperCase();
+        }
+        return {
+          ...g,
+          ...updatedFields,
+          initials
+        };
+      }
+      return g;
+    }));
+  };
+
+  const reactToGroupMessage = (groupId, messageId, emoji) => {
+    setGroupMessages(prev => {
+      const messages = prev[groupId] || [];
+      const updatedMessages = messages.map(m => {
+        if (m.id === messageId) {
+          const currentReactions = m.reactions || [];
+          let nextReactions;
+          if (currentReactions.includes(emoji)) {
+            nextReactions = currentReactions.filter(r => r !== emoji);
+          } else {
+            nextReactions = [...currentReactions, emoji];
+          }
+          return {
+            ...m,
+            reactions: nextReactions
+          };
+        }
+        return m;
+      });
+      return {
+        ...prev,
+        [groupId]: updatedMessages
+      };
+    });
   };
 
   const sendGroupMessage = (groupId, text, attachment = null) => {
@@ -528,6 +660,13 @@ export const DataProvider = ({ children }) => {
     setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
   };
 
+  const clearChatMessages = (groupId) => {
+    setGroupMessages(prev => ({
+      ...prev,
+      [groupId]: []
+    }));
+  };
+
   const activeCommunity = currentUser ? currentUser.community : 'Agrawal Samaj';
 
   const adaptedMembersList = adaptMembers(members, activeCommunity);
@@ -573,7 +712,11 @@ export const DataProvider = ({ children }) => {
     leaveGroup,
     toggleGroupMute,
     sendGroupMessage,
-    markAllNotificationsRead
+    createGroup,
+    markAllNotificationsRead,
+    updateGroupDetails,
+    reactToGroupMessage,
+    clearChatMessages
   };
 
   return (

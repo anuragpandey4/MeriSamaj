@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useDraggableScroll } from '../../../../hooks/useDraggableScroll';
-import { Bell, Search, Calendar, Heart, Users, BookOpen, Briefcase, Vote, ChevronRight, MapPin, Shield, Crown, ImagePlus, ArrowRight, Plus, Sparkles, GraduationCap, HeartHandshake, Flame, User, Smile, Phone, MessageCircle } from 'lucide-react';
+import { Bell, Search, Calendar, Heart, Users, BookOpen, Briefcase, Vote, ChevronRight, MapPin, Shield, Crown, ImagePlus, ArrowRight, Plus, Sparkles, GraduationCap, HeartHandshake, Flame, User, Smile, Phone, MessageCircle, Clock, CalendarDays } from 'lucide-react';
 import { Avatar } from '../../components/common/Avatar';
 import { Badge } from '../../components/common/Badge';
 import { useData } from '../../context/DataProvider';
@@ -410,32 +410,94 @@ const HomePage = () => {
       {/* ─── SECTION DIVIDER ─── */}
       <div className="mx-5 mt-8 mb-6 h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
 
-      {/* ─── UPCOMING EVENT ─── */}
-      <div className="px-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-[17px] font-bold text-text-primary tracking-tight">Upcoming Events</h3>
+      {/* ─── आगामी कार्यक्रम (UPCOMING EVENTS) ─── */}
+      <div className="px-0">
+        <div className="px-5 flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-[17px] font-extrabold text-text-primary tracking-tight">आगामी कार्यक्रम</h3>
+            <p className="text-[11px] text-text-secondary font-medium mt-0.5">Upcoming Events</p>
+          </div>
           <button onClick={() => navigate('/member/events')} className="text-[13px] text-brand-primary font-bold press-scale flex items-center gap-0.5">
-            View All <ChevronRight size={16} />
+            और देखें <ChevronRight size={16} />
           </button>
         </div>
-        <div className="card-std p-4 card-press" onClick={() => navigate(`/member/events/${mockEvents[0].id}`)}>
-          <div className="flex gap-4">
-            <div className="w-[56px] h-[56px] bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex flex-col items-center justify-center shrink-0 shadow-sm">
-              <span className="text-white font-extrabold text-[18px] leading-none">15</span>
-              <span className="text-white/90 text-[10px] font-bold mt-0.5">JUL</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="font-bold text-[15px] text-text-primary tracking-tight">{mockEvents[0].title}</h4>
-              <p className="text-[13px] text-text-secondary mt-1">{mockEvents[0].time}</p>
-              <p className="text-[13px] text-text-secondary flex items-center gap-1.5 mt-0.5">
-                <MapPin size={12} /> {mockEvents[0].venue}
-              </p>
-              <div className="flex items-center justify-between mt-3">
-                <span className="text-[13px] text-text-secondary font-medium">{mockEvents[0].attendees} attending</span>
-                <span className="text-[12px] font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">Registered ✓</span>
+        <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3 pb-3 px-5">
+          {mockEvents.slice(0, 4).map((event) => {
+            const gradients = {
+              Cultural: 'from-purple-500 to-violet-600',
+              Education: 'from-blue-500 to-cyan-600',
+              Matrimonial: 'from-pink-500 to-rose-600',
+              Health: 'from-emerald-500 to-teal-600',
+              Sports: 'from-orange-500 to-amber-600',
+            };
+            const catGradient = gradients[event.category] || gradients.Cultural;
+            return (
+              <div
+                key={event.id}
+                className="snap-center shrink-0 w-[260px] bg-white rounded-[20px] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 cursor-pointer active:scale-[0.97] transition-transform"
+                onClick={() => navigate(`/member/events/${event.id}`)}
+              >
+                {/* Image / Gradient Header */}
+                <div className="h-[100px] relative flex items-center justify-center overflow-hidden bg-gray-900">
+                  {event.image ? (
+                    <img 
+                      src={event.image} 
+                      alt={event.title} 
+                      className="absolute inset-0 w-full h-full object-cover opacity-90 transition-transform duration-300 hover:scale-105"
+                    />
+                  ) : (
+                    <div className={`absolute inset-0 bg-gradient-to-br ${catGradient}`} />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10" />
+                  
+                  {!event.image && (
+                    <CalendarDays size={48} className="text-white/10 absolute right-2 top-2" />
+                  )}
+                  
+                  <div className="absolute bottom-[-12px] left-3 z-10">
+                    <div className="w-[44px] h-[50px] bg-white rounded-xl shadow-md flex flex-col items-center justify-center border border-gray-100">
+                      <span className="text-[18px] font-black text-gray-900 leading-none">{event.day}</span>
+                      <span className="text-[8px] font-bold text-brand-primary mt-0.5 uppercase">{event.monthShort}</span>
+                    </div>
+                  </div>
+                  {event.isFeatured && (
+                    <span className="absolute top-2 left-2 bg-amber-400 text-amber-900 text-[8px] font-extrabold px-2 py-0.5 rounded-full shadow-sm">
+                      ★ विशेष
+                    </span>
+                  )}
+                  <span className="absolute top-2 right-2 bg-black/35 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5 rounded-full border border-white/10">
+                    {event.categoryHi || event.category}
+                  </span>
+                </div>
+                {/* Card Body */}
+                <div className="p-3 pt-5">
+                  <h4 className="font-bold text-[13px] text-gray-900 leading-snug line-clamp-2">{event.title}</h4>
+                  <div className="flex flex-col gap-1 mt-2">
+                    <p className="text-[11px] text-gray-500 flex items-center gap-1 line-clamp-1">
+                      <Clock size={10} className="text-gray-400 shrink-0" /> {event.time}
+                    </p>
+                    <p className="text-[11px] text-gray-500 flex items-center gap-1 line-clamp-1">
+                      <MapPin size={10} className="text-gray-400 shrink-0" /> {event.venue.split(',')[0]}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-gray-50">
+                    <span className="text-[10px] text-gray-500 font-medium flex items-center gap-1">
+                      <Users size={10} className="text-gray-400" /> {event.interested || event.attendees}+ रुचि
+                    </span>
+                    {event.isRegistered ? (
+                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-0.5">
+                        ✓ पंजीकृत
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-brand-primary bg-brand-primary/5 px-2 py-0.5 rounded-full border border-brand-primary/10">
+                        शामिल हों →
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
 
