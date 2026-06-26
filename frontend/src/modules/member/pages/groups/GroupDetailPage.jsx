@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MoreVertical, Send, Paperclip, Image as ImageIcon, X, FileText, Phone, Info, Users, Bell, BellOff, Settings, Search, Check, Shield, Mic, Plus, LogOut, Star, ChevronRight, Video, Trash, Camera } from 'lucide-react';
+import { ArrowLeft, MoreVertical, Send, Paperclip, Image as ImageIcon, X, FileText, Phone, Info, Users, Bell, BellOff, Settings, Search, Check, Shield, Mic, Plus, LogOut, Star, ChevronRight, Video, Trash, Camera, Edit } from 'lucide-react';
 import { Avatar } from '../../components/common/Avatar';
 import { useData } from '../../context/DataProvider';
 
@@ -26,6 +26,8 @@ const GroupDetailPage = () => {
   const [pendingAttachment, setPendingAttachment] = useState(null);
   const [memberSearch, setMemberSearch] = useState('');
   const [joinedMemberIds, setJoinedMemberIds] = useState(() => {
+    const saved = localStorage.getItem(`merisamaj_v6_group_members_${groupId}`);
+    if (saved) return JSON.parse(saved);
     if (groupId === 'g1') return ['m1', 'm2', 'm3', 'm4', 'm5'];
     if (groupId === 'g2') return ['m3', 'm4', 'm7', 'm8'];
     if (groupId === 'g3') return ['m2', 'm4', 'm6', 'm9'];
@@ -44,8 +46,45 @@ const GroupDetailPage = () => {
   const [editGroupDesc, setEditGroupDesc] = useState('');
   const [editGroupAvatar, setEditGroupAvatar] = useState('');
 
+  // Call, Media & Starred states
+  const [activeCall, setActiveCall] = useState(null); // null | 'voice' | 'video'
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [showStarredModal, setShowStarredModal] = useState(false);
+  const [activeDropdownField, setActiveDropdownField] = useState(null); // null | 'groupType' | 'addMembers' | 'seeMembers' | 'sendMessages' | 'shareMedia' | 'shareLinks'
+
+  const groupAvatarInputRef = useRef(null);
+  const [isEditingNameInline, setIsEditingNameInline] = useState(false);
+  const [inlineGroupName, setInlineGroupName] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem(`merisamaj_v6_group_members_${groupId}`, JSON.stringify(joinedMemberIds));
+  }, [joinedMemberIds, groupId]);
+
   const handleAddMember = (memberId) => {
-    setJoinedMemberIds(prev => [...prev, memberId]);
+    setJoinedMemberIds(prev => {
+      const next = [...prev, memberId];
+      updateGroupDetails(groupId, { members: next.length + 1 });
+      return next;
+    });
+  };
+
+  const handleGroupAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64Url = event.target.result;
+        updateGroupDetails(groupId, { avatarUrl: base64Url });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveGroupNameInline = () => {
+    if (inlineGroupName.trim()) {
+      updateGroupDetails(groupId, { name: inlineGroupName.trim() });
+      setIsEditingNameInline(false);
+    }
   };
 
   const displayMemberCount = joinedMemberIds.length + 1; // including current user
@@ -60,8 +99,8 @@ const GroupDetailPage = () => {
   // Group settings state (local copy for toggle interaction)
   const [privacySettings, setPrivacySettings] = useState({
     type: group?.privacy?.type || 'Public',
-    canAdd: 'all', // all | admin
-    canSee: 'all'  // all | admin
+    canAdd: group?.privacy?.canAddMembers || 'all', // all | admin
+    canSee: group?.privacy?.canSeeMembers || 'all'  // all | admin
   });
 
   const [chatPermissions, setChatPermissions] = useState({
@@ -82,9 +121,29 @@ const GroupDetailPage = () => {
 
   useEffect(() => {
     if (group && !group.isJoined) {
-      navigate('/member/groups', { state: { showJoinAlert: true } });
+      const wasVoluntary = sessionStorage.getItem(`voluntary_exit_${group.id}`);
+      if (wasVoluntary) {
+        sessionStorage.removeItem(`voluntary_exit_${group.id}`);
+      } else {
+        navigate('/member/groups', { state: { showJoinAlert: true } });
+      }
     }
   }, [group, navigate]);
+
+  useEffect(() => {
+    if (group) {
+      setPrivacySettings({
+        type: group.privacy?.type || 'Public',
+        canAdd: group.privacy?.canAddMembers || 'all',
+        canSee: group.privacy?.canSeeMembers || 'all'
+      });
+      setChatPermissions({
+        canSend: group.chatSettings?.canSendMessages || 'All Members',
+        canMedia: group.chatSettings?.canShareMedia || 'All Members',
+        canLinks: group.chatSettings?.canShareLinks || 'All Members'
+      });
+    }
+  }, [group?.id]);
 
   if (!group) return null;
 
@@ -152,13 +211,13 @@ const GroupDetailPage = () => {
             
             <div className="flex items-center gap-2.5 shrink-0 relative">
               <button 
-                onClick={() => alert("Starting voice call...")}
+                onClick={() => setActiveCall('voice')}
                 className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-gray-655 active:scale-90 transition-transform"
               >
                 <Phone size={16} />
               </button>
               <button 
-                onClick={() => alert("Starting video call...")}
+                onClick={() => setActiveCall('video')}
                 className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-gray-655 active:scale-90 transition-transform"
               >
                 <Video size={16} />
@@ -191,7 +250,7 @@ const GroupDetailPage = () => {
                     <button 
                       onClick={() => {
                         setShowChatMenu(false);
-                        alert(`Media, Links and Documents: 342 files found.`);
+                        setShowMediaModal(true);
                       }}
                       className="w-full text-left px-4 py-2.5 text-[13.5px] font-semibold text-gray-800 hover:bg-slate-50 flex items-center gap-2.5"
                     >
@@ -487,15 +546,70 @@ const GroupDetailPage = () => {
           <div className="flex-1 overflow-y-auto pb-12">
             {/* Group Details Hero Card */}
             <div className="bg-white pt-8 pb-7 px-5 flex flex-col items-center text-center border-b border-gray-150/20 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-              <div className="mb-4 relative">
+              <div className="mb-4 relative group/avatar cursor-pointer" onClick={() => groupAvatarInputRef.current?.click()}>
                 <Avatar 
                   initials={group.initials} 
+                  src={group.avatarUrl}
                   size="xl" 
                   color={groupColors[group.category] || 'bg-gray-100 text-gray-700'} 
                   className="shadow-sm ring-4 ring-indigo-50/50 border border-indigo-100/30" 
                 />
+                <div className="absolute bottom-0 right-0 w-7 h-7 bg-brand-primary text-white rounded-full flex items-center justify-center shadow-md border border-white hover:scale-110 active:scale-95 transition-transform">
+                  <Camera size={13} />
+                </div>
+                <input 
+                  type="file" 
+                  ref={groupAvatarInputRef} 
+                  accept="image/*" 
+                  onChange={handleGroupAvatarChange} 
+                  className="hidden" 
+                  onClick={(e) => e.stopPropagation()}
+                />
               </div>
-              <h2 className="text-[20px] font-black text-slate-800 leading-snug tracking-tight">{group.name}</h2>
+
+              {isEditingNameInline ? (
+                <div className="flex items-center gap-2 mt-1 max-w-sm w-full px-4 justify-center">
+                  <input
+                    type="text"
+                    value={inlineGroupName}
+                    onChange={(e) => setInlineGroupName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveGroupNameInline();
+                      if (e.key === 'Escape') setIsEditingNameInline(false);
+                    }}
+                    className="border-b-2 border-brand-primary outline-none text-[18px] font-bold text-slate-800 bg-transparent py-0.5 text-center flex-1 max-w-[240px]"
+                    autoFocus
+                  />
+                  <button 
+                    onClick={handleSaveGroupNameInline}
+                    className="p-1.5 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-sm active:scale-90 transition-transform shrink-0"
+                  >
+                    <Check size={13} />
+                  </button>
+                  <button 
+                    onClick={() => setIsEditingNameInline(false)}
+                    className="p-1.5 bg-gray-400 hover:bg-gray-500 text-white rounded-full shadow-sm active:scale-90 transition-transform shrink-0"
+                  >
+                    <X size={13} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-2 group/name mt-1">
+                  <h2 className="text-[20px] font-black text-slate-800 leading-snug tracking-tight select-none">
+                    {group.name}
+                  </h2>
+                  <button 
+                    onClick={() => {
+                      setInlineGroupName(group.name);
+                      setIsEditingNameInline(true);
+                    }}
+                    className="p-1 text-slate-400 hover:text-brand-primary active:scale-90 transition-all opacity-100 md:opacity-0 md:group-hover/name:opacity-100"
+                  >
+                    <Edit size={14} className="cursor-pointer" />
+                  </button>
+                </div>
+              )}
+
               <p className="text-[12.5px] text-slate-400 font-bold mt-1.5">Public Group · {group.members} members</p>
               <p className="text-[13px] text-slate-500 mt-4 leading-relaxed max-w-sm font-medium text-center px-4">
                 {group.description || 'This group is created for establishing key communication and mutual support among all society members.'}
@@ -508,7 +622,10 @@ const GroupDetailPage = () => {
             {/* SECTION 1: MEDIA, STARRED, SEARCH */}
             <div className="bg-white border-y border-slate-100/40 flex flex-col">
               {/* Media */}
-              <div className="flex items-center gap-4 px-5 hover:bg-slate-50/50 active:bg-slate-100 transition-colors cursor-pointer group">
+              <div 
+                onClick={() => setShowMediaModal(true)}
+                className="flex items-center gap-4 px-5 hover:bg-slate-50/50 active:bg-slate-100 transition-colors cursor-pointer group"
+              >
                 <FileText size={20} className="text-slate-400 group-hover:text-slate-500 transition-colors shrink-0" />
                 <div className="flex-1 py-4 flex items-center justify-between border-b border-slate-100">
                   <span className="text-[14.5px] font-semibold text-slate-800">Media, Links and Documents</span>
@@ -520,7 +637,10 @@ const GroupDetailPage = () => {
               </div>
 
               {/* Starred */}
-              <div className="flex items-center gap-4 px-5 hover:bg-slate-50/50 active:bg-slate-100 transition-colors cursor-pointer group">
+              <div 
+                onClick={() => setShowStarredModal(true)}
+                className="flex items-center gap-4 px-5 hover:bg-slate-50/50 active:bg-slate-100 transition-colors cursor-pointer group"
+              >
                 <Star size={20} className="text-slate-400 group-hover:text-slate-500 transition-colors shrink-0" />
                 <div className="flex-1 py-4 flex items-center justify-between border-b border-slate-100">
                   <span className="text-[14.5px] font-semibold text-slate-800">Starred Messages</span>
@@ -529,7 +649,13 @@ const GroupDetailPage = () => {
               </div>
 
               {/* Search */}
-              <div className="flex items-center gap-4 px-5 hover:bg-slate-50/50 active:bg-slate-100 transition-colors cursor-pointer group">
+              <div 
+                onClick={() => {
+                  setViewState('chat');
+                  setIsSearchingChat(true);
+                }}
+                className="flex items-center gap-4 px-5 hover:bg-slate-50/50 active:bg-slate-100 transition-colors cursor-pointer group"
+              >
                 <Search size={20} className="text-slate-400 group-hover:text-slate-500 transition-colors shrink-0" />
                 <div className="flex-1 py-4 flex items-center justify-between border-transparent">
                   <span className="text-[14.5px] font-semibold text-slate-800">Search in Chat</span>
@@ -543,12 +669,15 @@ const GroupDetailPage = () => {
             {/* SECTION 2: SETTINGS & NOTIFICATIONS */}
             <div className="bg-white border-y border-slate-100/40 flex flex-col">
               {/* Mute Notifications */}
-              <div className="flex items-center gap-4 px-5 hover:bg-slate-50/50 active:bg-slate-100 transition-colors cursor-pointer group">
+              <div 
+                onClick={() => toggleGroupMute(group.id)}
+                className="flex items-center gap-4 px-5 hover:bg-slate-50/50 active:bg-slate-100 transition-colors cursor-pointer group"
+              >
                 <Bell size={20} className="text-slate-400 group-hover:text-slate-500 transition-colors shrink-0" />
                 <div className="flex-1 py-4 flex items-center justify-between border-b border-slate-100">
                   <span className="text-[14.5px] font-semibold text-slate-800">Mute Notifications</span>
                   <button 
-                    onClick={() => toggleGroupMute(group.id)}
+                    onClick={(e) => { e.stopPropagation(); toggleGroupMute(group.id); }}
                     className={`w-11 h-6 rounded-full transition-colors duration-200 relative focus:outline-none shrink-0 ${
                       group.isMuted ? 'bg-[#4CD964]' : 'bg-[#E5E5EA]'
                     }`}
@@ -561,7 +690,10 @@ const GroupDetailPage = () => {
               </div>
 
               {/* Custom Alert */}
-              <div className="flex items-center gap-4 px-5 hover:bg-slate-50/50 active:bg-slate-100 transition-colors cursor-pointer group">
+              <div 
+                onClick={() => alert("Custom Notifications: default ringtone active.")}
+                className="flex items-center gap-4 px-5 hover:bg-slate-50/50 active:bg-slate-100 transition-colors cursor-pointer group"
+              >
                 <BellOff size={20} className="text-slate-400 group-hover:text-slate-500 transition-colors shrink-0" />
                 <div className="flex-1 py-4 flex items-center justify-between border-b border-slate-100">
                   <span className="text-[14.5px] font-semibold text-slate-800">Custom Notifications</span>
@@ -728,49 +860,127 @@ const GroupDetailPage = () => {
               <h4 className="text-[12px] font-black text-brand-primary uppercase tracking-wider mb-2.5 px-1">Privacy</h4>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] divide-y divide-gray-50 overflow-hidden">
                 {/* Group Type */}
-                <div 
-                  onClick={() => {
-                    const next = privacySettings.type === 'Public' ? 'Private' : privacySettings.type === 'Private' ? 'Admin Only' : 'Public';
-                    setPrivacySettings(prev => ({ ...prev, type: next }));
-                    if (!group.privacy) group.privacy = {};
-                    group.privacy.type = next;
-                  }}
-                  className="p-4 flex items-center justify-between cursor-pointer active:bg-gray-50 transition-colors"
-                >
-                  <span className="text-[13px] font-bold text-gray-800">Group Type</span>
-                  <span className="text-[12px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">{privacySettings.type}</span>
+                <div className="relative">
+                  <div 
+                    onClick={() => setActiveDropdownField(activeDropdownField === 'groupType' ? null : 'groupType')}
+                    className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50/80 active:bg-gray-100 transition-colors"
+                  >
+                    <span className="text-[13px] font-bold text-gray-800">Group Type</span>
+                    <span className="text-[12px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">{privacySettings.type}</span>
+                  </div>
+
+                  {activeDropdownField === 'groupType' && (
+                    <>
+                      <div className="fixed inset-0 z-30" onClick={() => setActiveDropdownField(null)} />
+                      <div className="absolute right-4 top-12 w-48 bg-white border border-slate-150 rounded-2xl shadow-xl py-1.5 z-40 animate-scale-up">
+                        {['Public', 'Private', 'Admin Only'].map(opt => (
+                          <button
+                            key={opt}
+                            onClick={() => {
+                              setPrivacySettings(prev => ({ ...prev, type: opt }));
+                              updateGroupDetails(group.id, {
+                                privacy: {
+                                  ...(group.privacy || {}),
+                                  type: opt
+                                }
+                              });
+                              setActiveDropdownField(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-[13px] font-semibold text-gray-700 hover:bg-slate-50 flex items-center justify-between"
+                          >
+                            <span>{opt}</span>
+                            {privacySettings.type === opt && <Check size={14} className="text-brand-primary" />}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* Add Members Permission */}
-                <div 
-                  onClick={() => {
-                    const next = privacySettings.canAdd === 'all' ? 'admin' : 'all';
-                    setPrivacySettings(prev => ({ ...prev, canAdd: next }));
-                    if (!group.privacy) group.privacy = {};
-                    group.privacy.canAddMembers = next;
-                  }}
-                  className="p-4 flex items-center justify-between cursor-pointer active:bg-gray-50 transition-colors"
-                >
-                  <span className="text-[13px] font-bold text-gray-800">Permission to Add Members</span>
-                  <span className="text-[12px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">
-                    {privacySettings.canAdd === 'all' ? 'All Members' : 'Only Admin'}
-                  </span>
+                <div className="relative">
+                  <div 
+                    onClick={() => setActiveDropdownField(activeDropdownField === 'addMembers' ? null : 'addMembers')}
+                    className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50/80 active:bg-gray-100 transition-colors"
+                  >
+                    <span className="text-[13px] font-bold text-gray-800">Permission to Add Members</span>
+                    <span className="text-[12px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">
+                      {privacySettings.canAdd === 'all' ? 'All Members' : 'Only Admin'}
+                    </span>
+                  </div>
+
+                  {activeDropdownField === 'addMembers' && (
+                    <>
+                      <div className="fixed inset-0 z-30" onClick={() => setActiveDropdownField(null)} />
+                      <div className="absolute right-4 top-12 w-48 bg-white border border-slate-150 rounded-2xl shadow-xl py-1.5 z-40 animate-scale-up">
+                        {[
+                          { label: 'All Members', value: 'all' },
+                          { label: 'Only Admin', value: 'admin' }
+                        ].map(opt => (
+                          <button
+                            key={opt.value}
+                            onClick={() => {
+                              setPrivacySettings(prev => ({ ...prev, canAdd: opt.value }));
+                              updateGroupDetails(group.id, {
+                                privacy: {
+                                  ...(group.privacy || {}),
+                                  canAddMembers: opt.value
+                                }
+                              });
+                              setActiveDropdownField(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-[13px] font-semibold text-gray-700 hover:bg-slate-50 flex items-center justify-between"
+                          >
+                            <span>{opt.label}</span>
+                            {privacySettings.canAdd === opt.value && <Check size={14} className="text-brand-primary" />}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* See Members Permission */}
-                <div 
-                  onClick={() => {
-                    const next = privacySettings.canSee === 'all' ? 'admin' : 'all';
-                    setPrivacySettings(prev => ({ ...prev, canSee: next }));
-                    if (!group.privacy) group.privacy = {};
-                    group.privacy.canSeeMembers = next;
-                  }}
-                  className="p-4 flex items-center justify-between cursor-pointer active:bg-gray-50 transition-colors"
-                >
-                  <span className="text-[13px] font-bold text-gray-800">Permission to See Members</span>
-                  <span className="text-[12px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">
-                    {privacySettings.canSee === 'all' ? 'All Members' : 'Only Admin'}
-                  </span>
+                <div className="relative">
+                  <div 
+                    onClick={() => setActiveDropdownField(activeDropdownField === 'seeMembers' ? null : 'seeMembers')}
+                    className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50/80 active:bg-gray-100 transition-colors"
+                  >
+                    <span className="text-[13px] font-bold text-gray-800">Permission to See Members</span>
+                    <span className="text-[12px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">
+                      {privacySettings.canSee === 'all' ? 'All Members' : 'Only Admin'}
+                    </span>
+                  </div>
+
+                  {activeDropdownField === 'seeMembers' && (
+                    <>
+                      <div className="fixed inset-0 z-30" onClick={() => setActiveDropdownField(null)} />
+                      <div className="absolute right-4 top-12 w-48 bg-white border border-slate-150 rounded-2xl shadow-xl py-1.5 z-40 animate-scale-up">
+                        {[
+                          { label: 'All Members', value: 'all' },
+                          { label: 'Only Admin', value: 'admin' }
+                        ].map(opt => (
+                          <button
+                            key={opt.value}
+                            onClick={() => {
+                              setPrivacySettings(prev => ({ ...prev, canSee: opt.value }));
+                              updateGroupDetails(group.id, {
+                                privacy: {
+                                  ...(group.privacy || {}),
+                                  canSeeMembers: opt.value
+                                }
+                              });
+                              setActiveDropdownField(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-[13px] font-semibold text-gray-700 hover:bg-slate-50 flex items-center justify-between"
+                          >
+                            <span>{opt.label}</span>
+                            {privacySettings.canSee === opt.value && <Check size={14} className="text-brand-primary" />}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -780,45 +990,117 @@ const GroupDetailPage = () => {
               <h4 className="text-[12px] font-black text-brand-primary uppercase tracking-wider mb-2.5 px-1">Chat Settings</h4>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] divide-y divide-gray-50 overflow-hidden">
                 {/* Send Messages */}
-                <div 
-                  onClick={() => {
-                    const next = chatPermissions.canSend === 'All Members' ? 'Only Admin' : 'All Members';
-                    setChatPermissions(prev => ({ ...prev, canSend: next }));
-                    if (!group.chatSettings) group.chatSettings = {};
-                    group.chatSettings.canSendMessages = next;
-                  }}
-                  className="p-4 flex items-center justify-between cursor-pointer active:bg-gray-50 transition-colors"
-                >
-                  <span className="text-[13px] font-bold text-gray-800">Permission to Send Messages</span>
-                  <span className="text-[12px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">{chatPermissions.canSend}</span>
+                <div className="relative">
+                  <div 
+                    onClick={() => setActiveDropdownField(activeDropdownField === 'sendMessages' ? null : 'sendMessages')}
+                    className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50/80 active:bg-gray-100 transition-colors"
+                  >
+                    <span className="text-[13px] font-bold text-gray-800">Permission to Send Messages</span>
+                    <span className="text-[12px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">{chatPermissions.canSend}</span>
+                  </div>
+
+                  {activeDropdownField === 'sendMessages' && (
+                    <>
+                      <div className="fixed inset-0 z-30" onClick={() => setActiveDropdownField(null)} />
+                      <div className="absolute right-4 top-12 w-48 bg-white border border-slate-150 rounded-2xl shadow-xl py-1.5 z-40 animate-scale-up">
+                        {['All Members', 'Only Admin'].map(opt => (
+                          <button
+                            key={opt}
+                            onClick={() => {
+                              setChatPermissions(prev => ({ ...prev, canSend: opt }));
+                              updateGroupDetails(group.id, {
+                                chatSettings: {
+                                  ...(group.chatSettings || {}),
+                                  canSendMessages: opt
+                                }
+                              });
+                              setActiveDropdownField(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-[13px] font-semibold text-gray-700 hover:bg-slate-50 flex items-center justify-between"
+                          >
+                            <span>{opt}</span>
+                            {chatPermissions.canSend === opt && <Check size={14} className="text-brand-primary" />}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* Share Media */}
-                <div 
-                  onClick={() => {
-                    const next = chatPermissions.canMedia === 'All Members' ? 'Only Admin' : 'All Members';
-                    setChatPermissions(prev => ({ ...prev, canMedia: next }));
-                    if (!group.chatSettings) group.chatSettings = {};
-                    group.chatSettings.canShareMedia = next;
-                  }}
-                  className="p-4 flex items-center justify-between cursor-pointer active:bg-gray-50 transition-colors"
-                >
-                  <span className="text-[13px] font-bold text-gray-800">Permission to Share Media</span>
-                  <span className="text-[12px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">{chatPermissions.canMedia}</span>
+                <div className="relative">
+                  <div 
+                    onClick={() => setActiveDropdownField(activeDropdownField === 'shareMedia' ? null : 'shareMedia')}
+                    className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50/80 active:bg-gray-100 transition-colors"
+                  >
+                    <span className="text-[13px] font-bold text-gray-800">Permission to Share Media</span>
+                    <span className="text-[12px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">{chatPermissions.canMedia}</span>
+                  </div>
+
+                  {activeDropdownField === 'shareMedia' && (
+                    <>
+                      <div className="fixed inset-0 z-30" onClick={() => setActiveDropdownField(null)} />
+                      <div className="absolute right-4 top-12 w-48 bg-white border border-slate-150 rounded-2xl shadow-xl py-1.5 z-40 animate-scale-up">
+                        {['All Members', 'Only Admin'].map(opt => (
+                          <button
+                            key={opt}
+                            onClick={() => {
+                              setChatPermissions(prev => ({ ...prev, canMedia: opt }));
+                              updateGroupDetails(group.id, {
+                                chatSettings: {
+                                  ...(group.chatSettings || {}),
+                                  canShareMedia: opt
+                                }
+                              });
+                              setActiveDropdownField(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-[13px] font-semibold text-gray-700 hover:bg-slate-50 flex items-center justify-between"
+                          >
+                            <span>{opt}</span>
+                            {chatPermissions.canMedia === opt && <Check size={14} className="text-brand-primary" />}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* Share Links */}
-                <div 
-                  onClick={() => {
-                    const next = chatPermissions.canLinks === 'All Members' ? 'Only Admin' : 'All Members';
-                    setChatPermissions(prev => ({ ...prev, canLinks: next }));
-                    if (!group.chatSettings) group.chatSettings = {};
-                    group.chatSettings.canShareLinks = next;
-                  }}
-                  className="p-4 flex items-center justify-between cursor-pointer active:bg-gray-50 transition-colors"
-                >
-                  <span className="text-[13px] font-bold text-gray-800">Permission to Share Links</span>
-                  <span className="text-[12px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">{chatPermissions.canLinks}</span>
+                <div className="relative">
+                  <div 
+                    onClick={() => setActiveDropdownField(activeDropdownField === 'shareLinks' ? null : 'shareLinks')}
+                    className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50/80 active:bg-gray-100 transition-colors"
+                  >
+                    <span className="text-[13px] font-bold text-gray-800">Permission to Share Links</span>
+                    <span className="text-[12px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">{chatPermissions.canLinks}</span>
+                  </div>
+
+                  {activeDropdownField === 'shareLinks' && (
+                    <>
+                      <div className="fixed inset-0 z-30" onClick={() => setActiveDropdownField(null)} />
+                      <div className="absolute right-4 top-12 w-48 bg-white border border-slate-150 rounded-2xl shadow-xl py-1.5 z-40 animate-scale-up">
+                        {['All Members', 'Only Admin'].map(opt => (
+                          <button
+                            key={opt}
+                            onClick={() => {
+                              setChatPermissions(prev => ({ ...prev, canLinks: opt }));
+                              updateGroupDetails(group.id, {
+                                chatSettings: {
+                                  ...(group.chatSettings || {}),
+                                  canShareLinks: opt
+                                }
+                              });
+                              setActiveDropdownField(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-[13px] font-semibold text-gray-700 hover:bg-slate-50 flex items-center justify-between"
+                          >
+                            <span>{opt}</span>
+                            {chatPermissions.canLinks === opt && <Check size={14} className="text-brand-primary" />}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -930,6 +1212,134 @@ const GroupDetailPage = () => {
             >
               Save Changes
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ─── SIMULATED CALL MODAL ─── */}
+      {activeCall && (
+        <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-between py-16 px-6 animate-fade-in text-white">
+          <div className="flex flex-col items-center mt-12 text-center">
+            <div className="w-24 h-24 rounded-full bg-white/10 flex items-center justify-center border border-white/20 mb-6 shadow-xl relative overflow-hidden">
+              <Avatar initials={group.initials} src={group.avatarUrl} size="xl" color={groupColors[group.category]} />
+            </div>
+            <h2 className="text-[20px] font-black tracking-tight">{group.name}</h2>
+            <p className="text-[12px] text-slate-400 font-extrabold mt-3 uppercase tracking-widest animate-pulse">
+              Simulated {activeCall === 'video' ? 'Video' : 'Voice'} Call...
+            </p>
+          </div>
+          
+          <div className="flex flex-col items-center gap-6 w-full max-w-xs">
+            {activeCall === 'video' && (
+              <div className="w-full aspect-[4/3] rounded-3xl bg-slate-900 border border-slate-800 overflow-hidden relative shadow-inner mb-4 flex items-center justify-center text-slate-500 text-[11px] font-bold">
+                [ Local Camera Stream ]
+                <div className="absolute bottom-3 right-3 w-16 h-20 rounded-xl bg-slate-800 border border-slate-700 shadow flex items-center justify-center text-[8px] text-slate-400 font-bold">
+                  Self
+                </div>
+              </div>
+            )}
+            
+            <button 
+              onClick={() => setActiveCall(null)}
+              className="w-14 h-14 rounded-full bg-red-600 flex items-center justify-center text-white shadow-lg shadow-red-650/30 hover:bg-red-700 active:scale-90 transition-transform cursor-pointer"
+            >
+              <Phone size={24} className="rotate-[135deg]" />
+            </button>
+            <span className="text-[11px] text-slate-450 font-bold uppercase tracking-wider">End Call</span>
+          </div>
+        </div>
+      )}
+
+      {/* ─── GROUP MEDIA VIEW MODAL ─── */}
+      {showMediaModal && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-end justify-center animate-fade-in" onClick={() => setShowMediaModal(false)}>
+          <div className="bg-white rounded-t-[28px] max-w-lg w-full h-[65vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up" onClick={e => e.stopPropagation()}>
+            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-3 shrink-0" />
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between shrink-0 bg-gray-50/50">
+              <h3 className="text-[15.5px] font-black text-gray-900">Media, Links & Docs</h3>
+              <button onClick={() => setShowMediaModal(false)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors">
+                <X size={16} />
+              </button>
+            </div>
+            
+            {/* Simple Grid */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-5">
+              <div>
+                <h4 className="text-[11.5px] font-extrabold text-gray-400 uppercase tracking-wider mb-2.5">Shared Media</h4>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=120',
+                    'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=120',
+                    'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=120',
+                    'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=120',
+                    'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=120',
+                    'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=120'
+                  ].map((url, i) => (
+                    <div key={i} className="aspect-square rounded-xl overflow-hidden border border-gray-100 bg-slate-50 shadow-sm">
+                      <img src={url} alt="Media" className="w-full h-full object-cover hover:scale-105 transition-transform duration-200" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="text-[11.5px] font-extrabold text-gray-400 uppercase tracking-wider mb-2.5">Documents & Files</h4>
+                <div className="space-y-2">
+                  {[
+                    { name: 'Samaj_Executive_List_2026.pdf', size: '1.4 MB' },
+                    { name: 'Diwali_Milan_Sammelan_Form.pdf', size: '840 KB' }
+                  ].map((doc, idx) => (
+                    <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 border border-gray-150 rounded-xl hover:bg-slate-100/50 cursor-pointer">
+                      <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                        <FileText size={16} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[12px] font-bold text-gray-800 truncate">{doc.name}</p>
+                        <p className="text-[10px] text-gray-400 font-semibold mt-0.5">{doc.size}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── STARRED MESSAGES MODAL ─── */}
+      {showStarredModal && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-end justify-center animate-fade-in" onClick={() => setShowStarredModal(false)}>
+          <div className="bg-white rounded-t-[28px] max-w-lg w-full h-[60vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up" onClick={e => e.stopPropagation()}>
+            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-3 shrink-0" />
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between shrink-0 bg-gray-50/50">
+              <h3 className="text-[15.5px] font-black text-gray-900">Starred Messages</h3>
+              <button onClick={() => setShowStarredModal(false)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors">
+                <X size={16} />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {messages.length > 0 ? (
+                messages.slice(0, 2).map((msg, idx) => (
+                  <div key={idx} className="p-4 bg-slate-50 border border-gray-150 rounded-2xl relative shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Avatar initials={msg.initials} size="xs" />
+                        <span className="text-[11px] font-extrabold text-gray-800">{msg.senderName}</span>
+                      </div>
+                      <Star size={12} className="text-amber-400" fill="currentColor" />
+                    </div>
+                    <p className="text-[12.5px] text-gray-700 leading-relaxed font-semibold">{msg.text || '[Attachment]'}</p>
+                    <span className="absolute bottom-2.5 right-3 text-[9px] text-gray-400 font-semibold">{msg.time}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-16">
+                  <Star size={36} className="text-gray-200 mx-auto mb-3" />
+                  <p className="text-[14px] font-bold text-gray-400">No starred messages yet</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

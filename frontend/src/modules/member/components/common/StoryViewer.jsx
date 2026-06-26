@@ -3,12 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Heart } from 'lucide-react';
 import { Avatar } from './Avatar';
 
-export const StoryViewer = ({ member, onClose }) => {
+export const StoryViewer = ({ story, onClose }) => {
   const [progress, setProgress] = useState(0);
 
   // Auto advance timeline (5 seconds total)
   useEffect(() => {
-    if (!member) return;
+    if (!story) return;
     
     setProgress(0); // Reset progress when story opens
 
@@ -28,14 +28,13 @@ export const StoryViewer = ({ member, onClose }) => {
     }, interval);
 
     return () => clearInterval(timer);
-  }, [member, onClose]);
+  }, [story, onClose]);
 
-  // Use a reliable placeholder image for the story background
-  const mockStoryImage = member ? `https://picsum.photos/seed/${member.id}/800/1200` : '';
+  const mockStoryImage = story ? story.image : '';
 
   return (
     <AnimatePresence>
-      {member && (
+      {story && (
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -57,10 +56,10 @@ export const StoryViewer = ({ member, onClose }) => {
         {/* Header Overlay */}
         <div className="absolute top-0 pt-8 left-0 right-0 z-20 px-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Avatar initials={member.initials} avatar={member.avatar} size="sm" />
+            <Avatar initials={story.initials} avatar={story.avatar} size="sm" color="bg-white/10 text-white" />
             <div className="text-white drop-shadow-md">
-              <h4 className="font-bold text-[14px] leading-tight">{member.name}</h4>
-              <p className="text-[11px] opacity-80">2h ago</p>
+              <h4 className="font-bold text-[14px] leading-tight">{story.name}</h4>
+              <p className="text-[11px] opacity-80">{story.timestamp || '2h ago'}</p>
             </div>
           </div>
           <button 
@@ -73,7 +72,7 @@ export const StoryViewer = ({ member, onClose }) => {
 
         {/* Story Content Area */}
         <div 
-          className="flex-1 relative w-full h-full"
+          className="flex-1 relative w-full h-full cursor-pointer"
           onClick={(e) => {
             // Tap right to advance (since we only have 1 mock story, right tap closes it)
             // Tap left to go back (restarts progress here)
@@ -93,6 +92,14 @@ export const StoryViewer = ({ member, onClose }) => {
               alt="Story" 
               className="w-full h-full object-cover rounded-b-3xl"
             />
+            {/* Text Overlay (if text is supplied) */}
+            {story.text && (
+              <div className="absolute inset-0 flex items-center justify-center p-6 text-center z-10 pointer-events-none">
+                <span className="text-white text-[19px] font-black drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] bg-black/40 px-6 py-4 rounded-3xl backdrop-blur-xs leading-relaxed max-w-[85%]">
+                  {story.text}
+                </span>
+              </div>
+            )}
             {/* Gradient overlays for legibility */}
             <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
             <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
