@@ -1,124 +1,387 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Clock, Users, CheckCircle, Bell, BellOff, Camera, Share2, CalendarDays } from 'lucide-react';
-import { Badge } from '../../components/common/Badge';
+import { ArrowLeft, MapPin, Clock, Users, CheckCircle, Share2, CalendarDays, Heart, Phone, MessageCircle, ExternalLink, ChevronRight, Star, Bookmark, BookmarkCheck } from 'lucide-react';
 import { Avatar } from '../../components/common/Avatar';
 import { useData } from '../../context/DataProvider';
 import { useDraggableScroll } from '../../../../hooks/useDraggableScroll';
 
-const mockGallery = [1, 2, 3, 4, 5, 6];
+const categoryConfig = {
+  Cultural: { hi: 'सांस्कृतिक', emoji: '🎭', gradient: 'from-purple-500 to-violet-600', lightBg: 'bg-purple-50', lightText: 'text-purple-700' },
+  Education: { hi: 'शिक्षा', emoji: '📚', gradient: 'from-blue-500 to-cyan-600', lightBg: 'bg-blue-50', lightText: 'text-blue-700' },
+  Matrimonial: { hi: 'वैवाहिक', emoji: '💍', gradient: 'from-pink-500 to-rose-600', lightBg: 'bg-pink-50', lightText: 'text-pink-700' },
+  Health: { hi: 'स्वास्थ्य', emoji: '🏥', gradient: 'from-emerald-500 to-teal-600', lightBg: 'bg-emerald-50', lightText: 'text-emerald-700' },
+  Sports: { hi: 'खेल', emoji: '🏆', gradient: 'from-orange-500 to-amber-600', lightBg: 'bg-orange-50', lightText: 'text-orange-700' },
+};
+
 const mockAttendees = [
-  { initials: 'RA', name: 'Rajesh A.' },
-  { initials: 'KA', name: 'Kavita A.' },
-  { initials: 'SM', name: 'Suresh M.' },
-  { initials: 'AG', name: 'Anita G.' },
-  { initials: 'DS', name: 'Deepak S.' },
-  { initials: 'VJ', name: 'Vikas J.' },
+  { initials: 'RA', name: 'राजेश अ.' },
+  { initials: 'KA', name: 'कविता अ.' },
+  { initials: 'SM', name: 'सुरेश म.' },
+  { initials: 'AG', name: 'अनिता ग.' },
+  { initials: 'DS', name: 'दीपक श.' },
+  { initials: 'VJ', name: 'विकास ज.' },
+  { initials: 'PK', name: 'प्रियंका क.' },
 ];
 
 const EventDetailPage = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const { events, toggleEventRSVP } = useData();
-  const scrollRef = useDraggableScroll();
+  const attendeesRef = useDraggableScroll();
 
   const event = events.find(e => e.id === eventId);
-  const [reminder, setReminder] = useState(false);
+  const [isInterested, setIsInterested] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   if (!event) return null;
 
-  const categoryGradient =
-    event.category === 'Cultural' ? 'from-purple-500 to-purple-700' :
-    event.category === 'Education' ? 'from-blue-500 to-blue-700' :
-    event.category === 'Matrimonial' ? 'from-pink-500 to-pink-700' :
-    'from-emerald-500 to-emerald-700';
+  const config = categoryConfig[event.category] || categoryConfig.Cultural;
 
   return (
-    <div className="min-h-screen bg-surface pb-24">
-      {/* Header */}
-      <div className="bg-card border-b border-gray-100 flex items-center justify-between px-4 h-14 sticky top-0 z-30">
-        <button onClick={() => navigate(-1)} className="p-1 press-scale">
-          <ArrowLeft size={22} className="text-text-primary" />
-        </button>
-        <h1 className="text-base font-semibold text-text-primary">Event Details</h1>
-        <button className="p-1 press-scale">
-          <Share2 size={20} className="text-text-secondary" />
-        </button>
-      </div>
+    <div className="min-h-screen bg-[#f5f6fa] pb-32">
+      {/* ─── Hero Banner ─── */}
+      <div className="relative bg-gray-900">
+        <div className="h-[240px] relative overflow-hidden bg-gray-900">
+          {/* Event Image / Gradient Background */}
+          {event.image ? (
+            <img 
+              src={event.image} 
+              alt={event.title} 
+              className="absolute inset-0 w-full h-full object-cover opacity-80"
+            />
+          ) : (
+            <div className={`absolute inset-0 bg-gradient-to-br ${config.gradient} opacity-90`} />
+          )}
+          
+          {/* Decorative background elements (only if no image) */}
+          {!event.image && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-6 right-6">
+                <CalendarDays size={120} className="text-white" />
+              </div>
+              <div className="absolute bottom-4 left-4">
+                <CalendarDays size={60} className="text-white rotate-12" />
+              </div>
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
-      {/* Banner */}
-      <div className={`h-44 bg-gradient-to-br ${categoryGradient} flex items-center justify-center relative`}>
-        <CalendarDays size={56} className="text-white/15" />
-        <div className="absolute top-3 left-3">
-          <Badge variant="new" className="bg-white/90 !text-text-primary">{event.category}</Badge>
+          {/* Top Nav */}
+          <div className="relative z-10 flex items-center justify-between px-4 pt-5">
+            <button
+              onClick={() => navigate(-1)}
+              className="w-10 h-10 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform border border-white/20"
+            >
+              <ArrowLeft size={20} className="text-white" />
+            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsBookmarked(!isBookmarked)}
+                className="w-10 h-10 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform border border-white/20"
+              >
+                {isBookmarked ? <BookmarkCheck size={18} className="text-amber-300" fill="currentColor" /> : <Bookmark size={18} className="text-white" />}
+              </button>
+              <button className="w-10 h-10 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform border border-white/20">
+                <Share2 size={18} className="text-white" />
+              </button>
+            </div>
+          </div>
+
+          {/* Category Badge */}
+          <div className="absolute bottom-4 right-4 z-10">
+            <span className="bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-3.5 py-1.5 rounded-full border border-white/20">
+              {config.emoji} {config.hi}
+            </span>
+          </div>
         </div>
-      </div>
 
-      {/* Event Info */}
-      <div className="px-4 -mt-4 relative z-10">
-        <div className="bg-card rounded-2xl p-4 shadow-lg border border-gray-100">
-          <h2 className="text-lg font-bold text-text-primary">{event.title}</h2>
-          <p className="text-xs text-text-secondary mt-2 leading-relaxed">{event.description}</p>
-
-          <div className="flex flex-col gap-2 mt-4">
-            <div className="flex items-center gap-2.5 text-xs text-text-secondary">
-              <CalendarDays size={14} className="text-brand-primary shrink-0" />
-              <span><strong className="text-text-primary">{event.date}</strong> · {event.time}</span>
-            </div>
-            <div className="flex items-center gap-2.5 text-xs text-text-secondary">
-              <MapPin size={14} className="text-brand-primary shrink-0" />
-              <span>{event.venue}</span>
-            </div>
-            <div className="flex items-center gap-2.5 text-xs text-text-secondary">
-              <Users size={14} className="text-brand-primary shrink-0" />
-              <span><strong className="text-text-primary">{event.attendees}</strong> members attending</span>
-            </div>
+        {/* Date Badge - Overlapping */}
+        <div className="absolute bottom-[-24px] left-5 z-20">
+          <div className="w-[64px] h-[72px] bg-white rounded-2xl shadow-lg flex flex-col items-center justify-center border border-gray-100">
+            <span className="text-[24px] font-black text-gray-900 leading-none">{event.day}</span>
+            <span className="text-[11px] font-bold text-brand-primary mt-0.5">{event.month}</span>
           </div>
         </div>
       </div>
 
-      {/* Attendees */}
-      <div className="px-4 mt-6">
-        <h3 className="text-sm font-semibold text-text-primary mb-2.5">Attendees ({event.attendees})</h3>
-        <div className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1" ref={scrollRef}>
-          {mockAttendees.map((a, i) => (
-            <div key={i} className="shrink-0 flex flex-col items-center w-16">
-              <Avatar initials={a.initials} size="md" />
-              <p className="text-xs text-text-secondary mt-1 truncate w-full text-center">{a.name}</p>
+      {/* ─── Event Title Card ─── */}
+      <div className="px-4 pt-8 pb-1">
+        <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100">
+          <h1 className="text-[20px] font-extrabold text-gray-900 leading-snug">{event.title}</h1>
+          {event.titleEn && (
+            <p className="text-[12px] text-gray-400 font-medium mt-1">{event.titleEn}</p>
+          )}
+
+          {/* Quick Info Row */}
+          <div className="flex flex-col gap-2.5 mt-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                <CalendarDays size={15} className="text-blue-600" />
+              </div>
+              <div>
+                <p className="text-[13px] font-bold text-gray-800">{event.weekday}, {event.day} {event.month}</p>
+                <p className="text-[11px] text-gray-500">{event.date}</p>
+              </div>
             </div>
-          ))}
-          <div className="shrink-0 flex flex-col items-center justify-center w-16">
-            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-xs font-semibold text-text-secondary">
-              +{event.attendees - 6}
+
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+                <Clock size={15} className="text-orange-600" />
+              </div>
+              <div>
+                <p className="text-[13px] font-bold text-gray-800">{event.time}</p>
+                <p className="text-[11px] text-gray-500">{event.timeEn}</p>
+              </div>
             </div>
+
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                <MapPin size={15} className="text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-[13px] font-bold text-gray-800">{event.venue}</p>
+                {event.venueEn && <p className="text-[11px] text-gray-500">{event.venueEn}</p>}
+              </div>
+            </div>
+
+            {event.entryFee && (
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center shrink-0">
+                  <Star size={15} className="text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-bold text-gray-800">प्रवेश: {event.entryFee}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Gallery */}
-      <div className="px-4 mt-6">
-        <h3 className="text-sm font-semibold text-text-primary mb-2.5">Event Gallery</h3>
-        <div className="grid grid-cols-3 gap-1.5">
-          {mockGallery.map((_, i) => (
-            <div key={i} className="aspect-square bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl flex items-center justify-center card-press">
-              <Camera size={20} className="text-gray-300" />
-            </div>
-          ))}
+      {/* ─── Participation Stats ─── */}
+      <div className="px-4 pt-3">
+        <div className="grid grid-cols-3 gap-2.5">
+          <div className="bg-white rounded-2xl p-3.5 text-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100">
+            <p className="text-[20px] font-black text-brand-primary leading-none">{event.interested || event.attendees}+</p>
+            <p className="text-[10px] text-gray-500 font-bold mt-1.5">रुचि रखने वाले</p>
+          </div>
+          <div className="bg-white rounded-2xl p-3.5 text-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100">
+            <p className="text-[20px] font-black text-emerald-600 leading-none">{event.attendees}+</p>
+            <p className="text-[10px] text-gray-500 font-bold mt-1.5">शामिल हो चुके</p>
+          </div>
+          <div className="bg-white rounded-2xl p-3.5 text-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100">
+            <p className="text-[20px] font-black text-orange-500 leading-none">{event.daysRemaining || '–'}</p>
+            <p className="text-[10px] text-gray-500 font-bold mt-1.5">दिन शेष</p>
+          </div>
         </div>
       </div>
 
-      {/* CTA */}
-      <div className="responsive-fixed-bottom p-4 bg-card border-t border-gray-100 pb-safe z-40">
-        <button
-          onClick={() => toggleEventRSVP(event.id)}
-          className={`w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 press-scale transition-all ${
-            event.isRegistered
-              ? 'bg-emerald-50 text-emerald-600 border-2 border-emerald-500/20'
-              : 'bg-brand-primary text-white shadow-md shadow-brand-primary/20'
-          }`}
-        >
-          {event.isRegistered ? <><CheckCircle size={18} /> RSVP Confirmed</> : 'RSVP Now — Free'}
-        </button>
+      {/* ─── About Event ─── */}
+      <div className="px-4 pt-4">
+        <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100">
+          <h3 className="text-[15px] font-extrabold text-gray-900 mb-3 flex items-center gap-2">
+            📋 इवेंट के बारे में
+          </h3>
+          <p className="text-[13px] text-gray-600 leading-relaxed">{event.description}</p>
+
+          <div className="mt-4 space-y-3.5 border-t border-gray-100 pt-4">
+            {event.objectiveHi && (
+              <div className="flex gap-3">
+                <span className="w-5 h-5 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center shrink-0 text-[10px] font-bold">✓</span>
+                <div className="flex-1">
+                  <h4 className="text-[12.5px] font-extrabold text-gray-900">इवेंट का उद्देश्य</h4>
+                  <p className="text-[12px] text-gray-600 mt-0.5 leading-relaxed">{event.objectiveHi}</p>
+                </div>
+              </div>
+            )}
+
+            {event.programsHi && event.programsHi.length > 0 && (
+              <div className="flex gap-3">
+                <span className="w-5 h-5 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center shrink-0 text-[10px] font-bold">✓</span>
+                <div className="flex-1">
+                  <h4 className="text-[12.5px] font-extrabold text-gray-900">क्या-क्या कार्यक्रम होंगे</h4>
+                  <div className="grid grid-cols-1 gap-1 mt-1.5 pl-0.5">
+                    {event.programsHi.map((prog, i) => (
+                      <div key={i} className="flex items-center gap-1.5 text-[12px] text-gray-600">
+                        <span className="w-1 h-1 bg-gray-400 rounded-full" />
+                        <span>{prog}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {event.audienceHi && (
+              <div className="flex gap-3">
+                <span className="w-5 h-5 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center shrink-0 text-[10px] font-bold">✓</span>
+                <div className="flex-1">
+                  <h4 className="text-[12.5px] font-extrabold text-gray-900">किसके लिए इवेंट है</h4>
+                  <p className="text-[12px] text-gray-600 mt-0.5 leading-relaxed">{event.audienceHi}</p>
+                </div>
+              </div>
+            )}
+
+            {event.importantInfoHi && (
+              <div className="flex gap-3">
+                <span className="w-5 h-5 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center shrink-0 text-[10px] font-bold">✓</span>
+                <div className="flex-1">
+                  <h4 className="text-[12.5px] font-extrabold text-gray-900">महत्वपूर्ण जानकारी</h4>
+                  <p className="text-[12px] text-gray-600 mt-0.5 leading-relaxed">{event.importantInfoHi}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {event.tags && event.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4 border-t border-gray-50 pt-3">
+              {event.tags.map((tag, i) => (
+                <span key={i} className="text-[10px] font-bold text-gray-500 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ─── Organizer ─── */}
+      {event.organizer && (
+        <div className="px-4 pt-3">
+          <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100">
+            <h3 className="text-[15px] font-extrabold text-gray-900 mb-3 flex items-center gap-2">
+              👤 आयोजक
+            </h3>
+            <div className="flex items-center gap-3">
+              <Avatar initials={event.organizer.initials} size="lg" color="bg-brand-primary/10 text-brand-primary border-2 border-brand-primary/20" />
+              <div className="flex-1">
+                <h4 className="text-[14px] font-bold text-gray-900">{event.organizer.name}</h4>
+                <p className="text-[12px] text-gray-500 font-medium">{event.organizer.role}</p>
+              </div>
+              <div className="flex gap-2">
+                <button className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center active:scale-90 transition-transform border border-blue-100">
+                  <Phone size={15} className="text-blue-600" />
+                </button>
+                <button className="w-9 h-9 rounded-full bg-emerald-50 flex items-center justify-center active:scale-90 transition-transform border border-emerald-100">
+                  <MessageCircle size={15} className="text-emerald-600" />
+                </button>
+              </div>
+            </div>
+            {event.contact && (
+              <div className="mt-3 pt-3 border-t border-gray-50">
+                <p className="text-[12px] text-gray-500 flex items-center gap-2">
+                  <Phone size={12} className="text-gray-400" />
+                  संपर्क: <span className="font-bold text-gray-700">{event.contact}</span>
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ─── Attendees ─── */}
+      <div className="px-4 pt-3">
+        <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-[15px] font-extrabold text-gray-900 flex items-center gap-2">
+              👥 शामिल सदस्य
+            </h3>
+            <span className="text-[12px] text-brand-primary font-bold flex items-center gap-1 active:scale-95 cursor-pointer">
+              सभी देखें <ChevronRight size={14} />
+            </span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1" ref={attendeesRef}>
+            {mockAttendees.map((a, i) => (
+              <div key={i} className="shrink-0 flex flex-col items-center w-[56px]">
+                <Avatar initials={a.initials} size="md" />
+                <p className="text-[10px] text-gray-500 font-medium mt-1.5 truncate w-full text-center">{a.name}</p>
+              </div>
+            ))}
+            <div className="shrink-0 flex flex-col items-center justify-center w-[56px]">
+              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-[11px] font-bold text-gray-500">
+                +{Math.max(0, event.attendees - 7)}
+              </div>
+              <p className="text-[10px] text-gray-400 font-medium mt-1.5">और</p>
+            </div>
+          </div>
+
+          {/* Stacked Avatars Preview */}
+          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-50">
+            <div className="flex -space-x-2">
+              {mockAttendees.slice(0, 4).map((a, i) => (
+                <div key={i} className="w-7 h-7 rounded-full bg-gradient-to-br from-brand-primary/20 to-brand-secondary/20 border-2 border-white flex items-center justify-center text-[8px] font-bold text-brand-primary">
+                  {a.initials}
+                </div>
+              ))}
+            </div>
+            <p className="text-[11px] text-gray-500">
+              <span className="font-bold text-gray-700">{mockAttendees[0].name}</span> और <span className="font-bold text-gray-700">{event.attendees - 1} अन्य</span> शामिल हो चुके हैं
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Location Map Placeholder ─── */}
+      <div className="px-4 pt-3">
+        <div className="bg-white rounded-[20px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100">
+          <div className="p-5 pb-3">
+            <h3 className="text-[15px] font-extrabold text-gray-900 flex items-center gap-2">
+              📍 स्थान
+            </h3>
+          </div>
+          <div className="h-[140px] bg-gradient-to-br from-blue-50 to-emerald-50 mx-4 mb-3 rounded-2xl flex items-center justify-center relative overflow-hidden">
+            <div className="absolute inset-0 opacity-20">
+              {/* Map grid pattern */}
+              <div className="w-full h-full" style={{
+                backgroundImage: 'linear-gradient(to right, #9ca3af 1px, transparent 1px), linear-gradient(to bottom, #9ca3af 1px, transparent 1px)',
+                backgroundSize: '24px 24px'
+              }} />
+            </div>
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center shadow-lg shadow-red-500/30 mb-2">
+                <MapPin size={20} className="text-white" fill="currentColor" />
+              </div>
+              <p className="text-[11px] text-gray-600 font-bold text-center px-4">{event.venue}</p>
+            </div>
+          </div>
+          <button className="w-full py-3 text-[12px] font-bold text-blue-600 flex items-center justify-center gap-1 border-t border-gray-50 active:bg-gray-50">
+            <ExternalLink size={13} /> Google Maps में खोलें
+          </button>
+        </div>
+      </div>
+
+      {/* ─── Bottom CTA ─── */}
+      <div className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-white border-t border-gray-100 p-4 pb-safe z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+        <div className="flex gap-3">
+          {/* Interest Button */}
+          <button
+            onClick={() => setIsInterested(!isInterested)}
+            className={`flex-1 py-3 rounded-2xl text-[13px] font-bold flex items-center justify-center gap-2 transition-all active:scale-95 border ${
+              isInterested
+                ? 'bg-pink-50 text-pink-600 border-pink-200'
+                : 'bg-gray-50 text-gray-600 border-gray-200'
+            }`}
+          >
+            <Heart size={16} fill={isInterested ? 'currentColor' : 'none'} />
+            {isInterested ? 'रुचि दिखाई' : 'रुचि दिखाएं'}
+          </button>
+
+          {/* Register/RSVP Button */}
+          <button
+            onClick={() => toggleEventRSVP(event.id)}
+            className={`flex-[1.5] py-3 rounded-2xl text-[13px] font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md ${
+              event.isRegistered
+                ? 'bg-emerald-500 text-white shadow-emerald-500/20'
+                : 'bg-brand-primary text-white shadow-brand-primary/20'
+            }`}
+          >
+            {event.isRegistered ? (
+              <><CheckCircle size={16} /> शामिल हो चुके</>
+            ) : (
+              <>शामिल हों</>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
