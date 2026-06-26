@@ -184,7 +184,7 @@ const MultiImageGrid = ({ images, onClick }) => {
 
   if (images.length === 1) {
     return (
-      <div className="w-full mb-3 h-64 overflow-hidden rounded-2xl cursor-pointer border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.02)]" onClick={onClick}>
+      <div className="w-full mb-3 h-64 overflow-hidden rounded-none cursor-pointer" onClick={onClick}>
         <img src={getUrl(images[0])} alt="Post Attachment" className="w-full h-full object-cover hover:scale-102 transition-transform duration-300" />
       </div>
     );
@@ -192,7 +192,7 @@ const MultiImageGrid = ({ images, onClick }) => {
 
   if (images.length === 2) {
     return (
-      <div className="w-full mb-3 h-48 grid grid-cols-2 gap-1.5 overflow-hidden rounded-2xl cursor-pointer" onClick={onClick}>
+      <div className="w-full mb-3 h-48 grid grid-cols-2 gap-1.5 overflow-hidden rounded-none cursor-pointer" onClick={onClick}>
         <img src={getUrl(images[0])} alt="Post Attachment 1" className="w-full h-full object-cover hover:scale-102 transition-transform duration-350" />
         <img src={getUrl(images[1])} alt="Post Attachment 2" className="w-full h-full object-cover hover:scale-102 transition-transform duration-350" />
       </div>
@@ -200,7 +200,7 @@ const MultiImageGrid = ({ images, onClick }) => {
   }
 
   return (
-    <div className="w-full mb-3 h-56 grid grid-cols-3 gap-1.5 overflow-hidden rounded-2xl cursor-pointer" onClick={onClick}>
+    <div className="w-full mb-3 h-56 grid grid-cols-3 gap-1.5 overflow-hidden rounded-none cursor-pointer" onClick={onClick}>
       <div className="col-span-2 h-full">
         <img src={getUrl(images[0])} alt="Post Attachment 1" className="w-full h-full object-cover hover:scale-102 transition-transform duration-350" />
       </div>
@@ -248,14 +248,14 @@ const PostCard = ({ post, index, lang, onShareClick }) => {
 
   return (
     <div 
-      className="bg-white rounded-[28px] border border-slate-100/70 shadow-[0_8px_30px_rgb(0,0,0,0.025)] hover:shadow-[0_16px_36px_rgba(0,0,0,0.045)] transition-all duration-300 relative overflow-hidden"
+      className="bg-white border-y border-slate-150/60 shadow-sm transition-all duration-300 relative overflow-hidden"
       style={{ animationDelay: `${index * 80}ms` }}
     >
       {/* Accent Top Border representing category color */}
       <div className={`h-[5px] w-full bg-current ${styles.text}`} />
 
       {/* Author Header */}
-      <div className="flex items-center justify-between px-5 pt-4.5 pb-3">
+      <div className="flex items-center justify-between px-3 pt-4.5 pb-3">
         <div className="flex items-center gap-3">
           <Avatar initials={post.author.initials} size="md" color="bg-indigo-50 text-indigo-700" />
           <div>
@@ -282,7 +282,7 @@ const PostCard = ({ post, index, lang, onShareClick }) => {
       </div>
 
       {/* Post Title & Content */}
-      <div className="px-5 pb-3">
+      <div className="px-3 pb-3">
         {post.title && (
           <h3 className="text-[16px] font-extrabold text-slate-900 mb-1.5 leading-snug tracking-tight">{post.title}</h3>
         )}
@@ -291,7 +291,7 @@ const PostCard = ({ post, index, lang, onShareClick }) => {
 
       {/* Event Details Grid (Conditional) */}
       {post.category === 'Event' && post.eventDetails && (
-        <div className="mx-5 mb-3.5 p-4 rounded-2xl bg-blue-50/40 border border-blue-100/30">
+        <div className="mx-3 mb-3.5 p-4 rounded-2xl bg-blue-50/40 border border-blue-100/30">
           <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-[12px]">
             <div>
               <span className="font-extrabold text-blue-600 block">{localT[lang].date}</span>
@@ -326,12 +326,12 @@ const PostCard = ({ post, index, lang, onShareClick }) => {
       {/* Post Media - Single Image / Gallery Collage */}
       <div onClick={handleDoubleTap} className="relative select-none">
         {post.images && post.images.length > 0 ? (
-          <div className="px-5">
+          <div className="px-0">
             <MultiImageGrid images={post.images} onClick={() => navigate(`/member/social/${post.id}`)} />
           </div>
         ) : (
           post.image && (
-            <div className="mx-5 mb-3.5 h-64 bg-slate-50 flex items-center justify-center cursor-pointer overflow-hidden relative rounded-2xl border border-slate-100" onClick={() => navigate(`/member/social/${post.id}`)}>
+            <div className="mb-3 h-64 bg-slate-50 flex items-center justify-center cursor-pointer overflow-hidden relative rounded-none" onClick={() => navigate(`/member/social/${post.id}`)}>
               <img src={getSingleImageUrl(post.image)} alt="Post Banner" className="w-full h-full object-cover hover:scale-103 transition-transform duration-500" />
             </div>
           )
@@ -353,7 +353,7 @@ const PostCard = ({ post, index, lang, onShareClick }) => {
       </div>
 
       {/* Stats (Likes, Comments & Views) */}
-      <div className="px-5 pb-3 flex items-center justify-between text-[11.5px] font-bold text-slate-400">
+      <div className="px-3 pb-3 flex items-center justify-between text-[11.5px] font-bold text-slate-400">
         <div className="flex items-center gap-1.5">
           <span className="flex items-center -space-x-1">
             <span className="w-5.5 h-5.5 rounded-full bg-red-50 flex items-center justify-center border-2 border-white shadow-sm">
@@ -538,88 +538,7 @@ const FeedPage = ({ isHub = false }) => {
           </div>
         </div>
 
-        {/* ─── WELCOME GREETING CARD ─── */}
-        <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.015)] mb-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-[17px] font-black text-slate-800 leading-tight">
-              {localT[lang].welcome}, {currentUser?.name.split(' ')[0]} 👋
-            </h2>
-            <p className="text-[12px] text-slate-400 font-bold mt-1">{localT[lang].subGreeting}</p>
-          </div>
-          <div className="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center text-brand-primary">
-            <Sparkles size={20} />
-          </div>
-        </div>
 
-        {/* ─── QUICK ACTIONS GRID COMPOSER TRIGGERS ─── */}
-        <div className="bg-white rounded-3xl p-4.5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.015)] mb-4.5">
-          <div 
-            onClick={() => navigate('/member/social/create')}
-            className="flex items-center gap-3 bg-slate-50 hover:bg-slate-100/60 rounded-2xl p-3 cursor-pointer transition-colors border border-transparent hover:border-slate-200/50 mb-4"
-          >
-            <Avatar initials={currentUser?.initials || 'U'} size="sm" color="bg-indigo-50 text-indigo-700" />
-            <span className="text-[13.5px] text-slate-400 font-semibold flex-1">
-              {localT[lang].shareUpdate}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-y-3.5 gap-x-2 text-[11px] font-extrabold text-slate-500">
-            <button 
-              onClick={() => navigate('/member/social/create', { state: { preselectedCategory: 'Notice' } })}
-              className="flex flex-col items-center gap-1.5 p-2 hover:bg-slate-50 rounded-2xl transition-colors active:scale-95"
-            >
-              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <Radio size={18} />
-              </div>
-              <span>{localT[lang].writeSomething}</span>
-            </button>
-            <button 
-              onClick={() => navigate('/member/social/create', { state: { preselectedCategory: 'Notice', attachPhoto: true } })}
-              className="flex flex-col items-center gap-1.5 p-2 hover:bg-slate-50 rounded-2xl transition-colors active:scale-95"
-            >
-              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                <Camera size={18} />
-              </div>
-              <span>{localT[lang].photo}</span>
-            </button>
-            <button 
-              onClick={() => navigate('/member/social/create', { state: { preselectedCategory: 'Notice', attachVideo: true } })}
-              className="flex flex-col items-center gap-1.5 p-2 hover:bg-slate-50 rounded-2xl transition-colors active:scale-95"
-            >
-              <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-                <Video size={18} />
-              </div>
-              <span>{localT[lang].video}</span>
-            </button>
-            <button 
-              onClick={() => navigate('/member/social/create', { state: { preselectedCategory: 'Event' } })}
-              className="flex flex-col items-center gap-1.5 p-2 hover:bg-slate-50 rounded-2xl transition-colors active:scale-95"
-            >
-              <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
-                <Calendar size={18} />
-              </div>
-              <span>{localT[lang].eventQuick}</span>
-            </button>
-            <button 
-              onClick={() => navigate('/member/social/create', { state: { preselectedCategory: 'Obituary' } })}
-              className="flex flex-col items-center gap-1.5 p-2 hover:bg-slate-50 rounded-2xl transition-colors active:scale-95"
-            >
-              <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
-                <Clock size={18} />
-              </div>
-              <span>{localT[lang].obituaryQuick}</span>
-            </button>
-            <button 
-              onClick={() => navigate('/member/social/create', { state: { preselectedCategory: 'Matrimony' } })}
-              className="flex flex-col items-center gap-1.5 p-2 hover:bg-slate-50 rounded-2xl transition-colors active:scale-95"
-            >
-              <div className="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center">
-                <Heart size={18} />
-              </div>
-              <span>{localT[lang].matrimonyQuick}</span>
-            </button>
-          </div>
-        </div>
 
         {/* ─── SEARCH INPUT ─── */}
         <div className="bg-white rounded-2xl flex items-center px-4 py-2.5 border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.015)] focus-within:border-brand-primary/20 transition-all mb-4.5">
@@ -663,7 +582,7 @@ const FeedPage = ({ isHub = false }) => {
         </div>
 
         {/* ─── POSTS FEED LIST ─── */}
-        <div className="space-y-4 pb-16">
+        <div className="space-y-3.5 pb-16 -mx-4.5">
           {isLoading ? (
             <>
               <PostSkeleton />
