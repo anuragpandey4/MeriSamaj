@@ -166,6 +166,19 @@ const adaptPosts = (postsList, community) => {
   });
 };
 
+const adaptStories = (storiesList, community) => {
+  const surname = getCommunitySurname(community);
+  return storiesList.map(s => {
+    const newName = s.name.replaceAll('Agrawal', surname);
+    const newInitials = newName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    return {
+      ...s,
+      name: newName,
+      initials: newInitials
+    };
+  });
+};
+
 const adaptMatrimonial = (profilesList, currentUser) => {
   if (!currentUser) return profilesList;
   const community = currentUser.community;
@@ -217,32 +230,25 @@ export const DataProvider = ({ children }) => {
   const [members, setMembers] = useState(() => loadState('members', initialMembers));
   const [admins, setAdmins] = useState(() => loadState('admins', initialAdmins));
   const [posts, setPosts] = useState(() => {
-    const saved = loadState('posts', null);
-    if (!saved || saved.length === 0) {
-      return initialPosts.map((p, idx) => ({
-        ...p,
-        commentsList: [
-          {
-            id: `c-p${idx}-1`,
-            author: { name: 'Dr. Vinay Jain', initials: 'VJ' },
-            text: 'Great initiative! Fully supporting this.',
-            time: '1 hour ago',
-            likes: 2,
-            isLiked: false
-          },
-          {
-            id: `c-p${idx}-2`,
-            author: { name: 'Sunita Agrawal', initials: 'SA' },
-            text: 'Wonderful update, thank you for sharing!',
-            time: '30 mins ago',
-            likes: 4,
-            isLiked: false
-          }
-        ]
-      }));
-    }
-    return saved;
+    return initialPosts.map((p) => ({
+      ...p,
+      commentsList: p.commentsList || []
+    }));
   });
+
+  const [stories, setStories] = useState(() => {
+    return [
+      { id: 's1', memberId: 'm1', name: 'Suresh Agrawal', initials: 'SA', avatar: null, image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800', timestamp: '2 hours ago', hasSeen: false },
+      { id: 's2', memberId: 'm2', name: 'Kavita Agrawal', initials: 'KA', avatar: null, image: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800', timestamp: '4 hours ago', hasSeen: false },
+      { id: 's3', memberId: 'm3', name: 'Deepak Agrawal', initials: 'DA', avatar: null, image: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800', timestamp: '6 hours ago', hasSeen: false },
+      { id: 's4', memberId: 'm4', name: 'Anita Agrawal', initials: 'AA', avatar: null, image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800', timestamp: '8 hours ago', hasSeen: false }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.removeItem('merisamaj_v6_posts');
+    localStorage.removeItem('posts');
+  }, []);
 
   const [followedAnnouncements, setFollowedAnnouncements] = useState(() => loadState('followedAnnouncements', {
     announcements: true,
@@ -300,7 +306,7 @@ export const DataProvider = ({ children }) => {
   useEffect(() => saveState('currentUser', currentUser), [currentUser]);
   useEffect(() => saveState('members', members), [members]);
   useEffect(() => saveState('admins', admins), [admins]);
-  useEffect(() => saveState('posts', posts), [posts]);
+  // useEffect(() => saveState('posts', posts), [posts]); // Disabled persistence for Feed redesign
   useEffect(() => saveState('followedAnnouncements', followedAnnouncements), [followedAnnouncements]);
   useEffect(() => saveState('events', events), [events]);
   useEffect(() => saveState('obituaries', obituaries), [obituaries]);
@@ -418,6 +424,37 @@ export const DataProvider = ({ children }) => {
     }));
   };
 
+  const addCommentReply = (postId, commentId, replyText) => {
+    setPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        return {
+          ...p,
+          commentsList: (p.commentsList || []).map(c => {
+            if (c.id === commentId) {
+              const newReply = {
+                id: `r-${Date.now()}`,
+                author: {
+                  name: currentUser.name,
+                  initials: currentUser.initials,
+                  avatar: currentUser.avatar,
+                  isVerified: true
+                },
+                text: replyText,
+                time: 'Just now'
+              };
+              return {
+                ...c,
+                replies: [...(c.replies || []), newReply]
+              };
+            }
+            return c;
+          })
+        };
+      }
+      return p;
+    }));
+  };
+
   const toggleCommentLike = (postId, commentId) => {
     setPosts(prev => prev.map(p => {
       if (p.id === postId) {
@@ -462,6 +499,21 @@ export const DataProvider = ({ children }) => {
 
   const addObituary = (obituary) => {
     setObituaries([obituary, ...obituaries]);
+  };
+
+  const addStory = (storyImage, storyText = '') => {
+    const newStory = {
+      id: `story-${Date.now()}`,
+      memberId: 'me',
+      name: currentUser.name,
+      initials: currentUser.initials,
+      avatar: currentUser.avatar,
+      image: storyImage || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800',
+      text: storyText,
+      timestamp: 'Just now',
+      hasSeen: false
+    };
+    setStories(prev => [newStory, ...prev]);
   };
 
   const toggleObituaryShraddhanjali = (obId) => {
@@ -672,6 +724,7 @@ export const DataProvider = ({ children }) => {
   const adaptedMembersList = adaptMembers(members, activeCommunity);
   const adaptedAdminsList = adaptAdmins(admins, activeCommunity);
   const adaptedPostsList = adaptPosts(posts, activeCommunity);
+  const adaptedStoriesList = adaptStories(stories, activeCommunity);
   const adaptedMatrimonialList = adaptMatrimonial(matrimonialProfiles, currentUser);
   const adaptedGroupsList = adaptGroups(groups, activeCommunity);
   const adaptedGroupMessagesMap = adaptGroupMessages(groupMessages, activeCommunity);
@@ -694,6 +747,7 @@ export const DataProvider = ({ children }) => {
     toggleEventRSVP,
     togglePostLike,
     addPostComment,
+    addCommentReply,
     toggleCommentLike,
     followedAnnouncements,
     toggleFollowedAnnouncement,
@@ -716,7 +770,9 @@ export const DataProvider = ({ children }) => {
     markAllNotificationsRead,
     updateGroupDetails,
     reactToGroupMessage,
-    clearChatMessages
+    clearChatMessages,
+    stories: adaptedStoriesList,
+    addStory
   };
 
   return (

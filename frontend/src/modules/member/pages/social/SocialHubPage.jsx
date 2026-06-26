@@ -37,6 +37,102 @@ const DiscoverContent = () => (
   </div>
 );
 
+// Custom Tab Icons matching the wireframe in Image 3
+const FeedIcon = ({ size = 22, isActive }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={isActive ? '#1877F2' : '#828E9E'}
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="transition-colors duration-200"
+  >
+    {/* Map Pin */}
+    <path d="M12 2a4 4 0 0 0-4 4c0 3.5 4 7.5 4 7.5s4-4 4-7.5a4 4 0 0 0-4-4z" />
+    <circle cx="12" cy="6" r="1.2" fill={isActive ? '#1877F2' : '#828E9E'} />
+    
+    {/* Left Person */}
+    <circle cx="8" cy="13.2" r="1.5" />
+    <path d="M5.5 17c0-1.2.9-2 2.5-2s2.5.8 2.5 2" />
+    
+    {/* Right Person */}
+    <circle cx="16" cy="13.2" r="1.5" />
+    <path d="M13.5 17c0-1.2.9-2 2.5-2s2.5.8 2.5 2" />
+    
+    {/* Center Person */}
+    <circle cx="12" cy="14.2" r="1.5" />
+    <path d="M9.5 18.2c0-1.2.9-2 2.5-2s2.5.8 2.5 2" />
+    
+    {/* Bottom Ellipse Ring */}
+    <ellipse cx="12" cy="18.5" rx="8.5" ry="2.5" />
+  </svg>
+);
+
+const GroupsIcon = ({ size = 22, isActive }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={isActive ? '#1877F2' : '#828E9E'}
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="transition-colors duration-200"
+  >
+    <circle cx="9" cy="8.5" r="3.5" />
+    <path d="M3 19c0-3.5 3-5 6-5s6 1.5 6 5" />
+    <circle cx="16" cy="10.5" r="3" />
+    <path d="M12.2 16.5c.8-1 2.3-1.5 3.8-1.5c3 0 5 1.5 5 4.5" />
+  </svg>
+);
+
+const ChatIcon = ({ size = 22, isActive }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={isActive ? '#1877F2' : '#828E9E'}
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="transition-colors duration-200"
+  >
+    {/* Background smaller bubble */}
+    <path d="M14.5 9a4 4 0 0 1 4 4c0 .9-.3 1.8-.8 2.5l1.3 2.5l-2.6-.8c-.7.5-1.5.8-2.4.8" />
+    
+    {/* Foreground larger bubble */}
+    <path d="M9.5 5A5.5 5.5 0 0 1 15 10.5A5.5 5.5 0 0 1 9.5 16c-.7 0-1.4-.1-2-.4L4 17.5l1.2-3.3A5.5 5.5 0 0 1 4 10.5A5.5 5.5 0 0 1 9.5 5Z" />
+    
+    {/* Three dots in foreground bubble */}
+    <circle cx="7.5" cy="10.5" r="0.9" fill={isActive ? '#1877F2' : '#828E9E'} />
+    <circle cx="10" cy="10.5" r="0.9" fill={isActive ? '#1877F2' : '#828E9E'} />
+    <circle cx="12.5" cy="10.5" r="0.9" fill={isActive ? '#1877F2' : '#828E9E'} />
+  </svg>
+);
+
+const DiscoverIcon = ({ size = 22, isActive }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={isActive ? '#1877F2' : '#828E9E'}
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="transition-colors duration-200"
+  >
+    <circle cx="12" cy="12" r="9" />
+    <path d="M16.2 7.8L13.8 13.8L7.8 16.2L10.2 10.2Z" />
+    <path d="M7.8 16.2L16.2 7.8" opacity="0.6" />
+  </svg>
+);
+
 const SocialHubPage = ({ initialTab = 'feed' }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,10 +141,10 @@ const SocialHubPage = ({ initialTab = 'feed' }) => {
   const scrollContainerRef = useRef(null);
 
   const tabs = [
-    { id: 'feed', label: 'Feed', icon: Rss, component: FeedPage },
-    { id: 'groups', label: 'Groups', icon: Users, component: GroupsPage },
-    { id: 'chat', label: 'Chat', icon: MessageCircle, component: ChatListPage },
-    { id: 'discover', label: 'Discover', icon: Compass, component: DiscoverContent }
+    { id: 'feed', label: 'Feed', icon: FeedIcon, component: FeedPage },
+    { id: 'groups', label: 'Groups', icon: GroupsIcon, component: GroupsPage },
+    { id: 'chat', label: 'Chat', icon: ChatIcon, component: ChatListPage },
+    { id: 'discover', label: 'Discover', icon: DiscoverIcon, component: DiscoverContent }
   ];
 
   // Set initial scroll position based on route state or initialTab
@@ -143,7 +239,7 @@ const SocialHubPage = ({ initialTab = 'feed' }) => {
                 onClick={() => scrollToTab(idx)}
                 className={`flex-1 py-3 flex flex-col items-center gap-1 transition-colors ${isActive ? 'text-[#1877F2]' : 'text-text-secondary hover:text-gray-700'}`}
               >
-                <Icon size={22} className={isActive ? 'drop-shadow-sm' : ''} />
+                <Icon size={22} isActive={isActive} className={isActive ? 'drop-shadow-sm' : ''} />
                 <span className="text-[11px] font-bold tracking-wide uppercase">{tab.label}</span>
               </button>
             );

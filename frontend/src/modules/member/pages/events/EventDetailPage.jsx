@@ -32,6 +32,22 @@ const EventDetailPage = () => {
   const event = events.find(e => e.id === eventId);
   const [isInterested, setIsInterested] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [showShareToast, setShowShareToast] = useState(false);
+  const [showAttendeesModal, setShowAttendeesModal] = useState(false);
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: event.title,
+        text: event.description,
+        url: window.location.href
+      }).catch(err => console.log(err));
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      setShowShareToast(true);
+      setTimeout(() => setShowShareToast(false), 2000);
+    }
+  };
 
   if (!event) return null;
 
@@ -81,7 +97,10 @@ const EventDetailPage = () => {
               >
                 {isBookmarked ? <BookmarkCheck size={18} className="text-amber-300" fill="currentColor" /> : <Bookmark size={18} className="text-white" />}
               </button>
-              <button className="w-10 h-10 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform border border-white/20">
+              <button 
+                onClick={handleShare}
+                className="w-10 h-10 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform border border-white/20"
+              >
                 <Share2 size={18} className="text-white" />
               </button>
             </div>
@@ -259,10 +278,16 @@ const EventDetailPage = () => {
                 <p className="text-[12px] text-gray-500 font-medium">{event.organizer.role}</p>
               </div>
               <div className="flex gap-2">
-                <button className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center active:scale-90 transition-transform border border-blue-100">
+                <button 
+                  onClick={() => window.open(`tel:${event.contact || '9876543210'}`)}
+                  className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center active:scale-90 transition-transform border border-blue-100"
+                >
                   <Phone size={15} className="text-blue-600" />
                 </button>
-                <button className="w-9 h-9 rounded-full bg-emerald-50 flex items-center justify-center active:scale-90 transition-transform border border-emerald-100">
+                <button 
+                  onClick={() => window.open(`https://wa.me/${(event.contact || '9876543210').replace(/[^0-9]/g, '')}`)}
+                  className="w-9 h-9 rounded-full bg-emerald-50 flex items-center justify-center active:scale-90 transition-transform border border-emerald-100"
+                >
                   <MessageCircle size={15} className="text-emerald-600" />
                 </button>
               </div>
@@ -286,7 +311,10 @@ const EventDetailPage = () => {
             <h3 className="text-[15px] font-extrabold text-gray-900 flex items-center gap-2">
               👥 शामिल सदस्य
             </h3>
-            <span className="text-[12px] text-brand-primary font-bold flex items-center gap-1 active:scale-95 cursor-pointer">
+            <span 
+              onClick={() => setShowAttendeesModal(true)}
+              className="text-[12px] text-brand-primary font-bold flex items-center gap-1 active:scale-95 cursor-pointer"
+            >
               सभी देखें <ChevronRight size={14} />
             </span>
           </div>
@@ -344,7 +372,10 @@ const EventDetailPage = () => {
               <p className="text-[11px] text-gray-600 font-bold text-center px-4">{event.venue}</p>
             </div>
           </div>
-          <button className="w-full py-3 text-[12px] font-bold text-blue-600 flex items-center justify-center gap-1 border-t border-gray-50 active:bg-gray-50">
+          <button 
+            onClick={() => window.open(`https://maps.google.com?q=${encodeURIComponent(event.venue)}`, '_blank')}
+            className="w-full py-3 text-[12px] font-bold text-blue-600 flex items-center justify-center gap-1 border-t border-gray-50 active:bg-gray-50"
+          >
             <ExternalLink size={13} /> Google Maps में खोलें
           </button>
         </div>
@@ -383,6 +414,58 @@ const EventDetailPage = () => {
           </button>
         </div>
       </div>
+
+      {/* ─── SHARE TOAST POPUP ─── */}
+      {showShareToast && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-md text-white px-4 py-2 rounded-2xl text-[12px] font-bold shadow-lg animate-fade-in flex items-center gap-1.5">
+          <CheckCircle size={14} className="text-emerald-400" /> Link copied to clipboard!
+        </div>
+      )}
+
+      {/* ─── ATTENDEES LIST MODAL ─── */}
+      {showAttendeesModal && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-end justify-center animate-fade-in" onClick={() => setShowAttendeesModal(false)}>
+          <div className="bg-white rounded-t-[28px] max-w-lg w-full h-[60vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up" onClick={e => e.stopPropagation()}>
+            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-3 shrink-0" />
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between shrink-0 bg-gray-50/50">
+              <h3 className="text-[15.5px] font-black text-gray-900">शामिल सदस्य (Attendees)</h3>
+              <button 
+                onClick={() => setShowAttendeesModal(false)}
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto divide-y divide-gray-50 px-5">
+              {mockAttendees.map((a, idx) => (
+                <div key={idx} className="py-3.5 flex items-center gap-3">
+                  <Avatar initials={a.initials} size="md" />
+                  <div>
+                    <h4 className="text-[13.5px] font-bold text-gray-900">{a.name}</h4>
+                    <p className="text-[10px] text-gray-400 font-semibold mt-0.5">Community Member</p>
+                  </div>
+                </div>
+              ))}
+              {[
+                { initials: 'MK', name: 'मनोज कुमार' },
+                { initials: 'SS', name: 'संजय सिंह' },
+                { initials: 'VP', name: 'विजय पटेल' },
+                { initials: 'NS', name: 'नवीन शर्मा' }
+              ].map((a, idx) => (
+                <div key={idx + 10} className="py-3.5 flex items-center gap-3">
+                  <Avatar initials={a.initials} size="md" />
+                  <div>
+                    <h4 className="text-[13.5px] font-bold text-gray-900">{a.name}</h4>
+                    <p className="text-[10px] text-gray-400 font-semibold mt-0.5">Community Member</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
