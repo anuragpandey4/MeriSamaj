@@ -228,7 +228,14 @@ export const DataProvider = ({ children }) => {
   // State Definitions
   const [currentUser, setCurrentUser] = useState(() => loadState('currentUser', initialUser));
   const [members, setMembers] = useState(() => loadState('members', initialMembers));
-  const [admins, setAdmins] = useState(() => loadState('admins', initialAdmins));
+  const [admins, setAdmins] = useState(() => {
+    const loaded = loadState('admins', initialAdmins);
+    if (loaded && loaded.length < initialAdmins.length) {
+      localStorage.setItem('merisamaj_v6_admins', JSON.stringify(initialAdmins));
+      return initialAdmins;
+    }
+    return loaded;
+  });
   const [posts, setPosts] = useState(() => {
     return initialPosts.map((p) => ({
       ...p,

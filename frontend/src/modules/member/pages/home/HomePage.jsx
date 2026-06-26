@@ -9,6 +9,7 @@ import { useData } from '../../context/DataProvider';
 import { t } from '../../utils/translations';
 import { StoryViewer } from '../../components/common/StoryViewer';
 import { CityLandscape } from '../../components/common/CityLandscape';
+import { mockAdmins as mockAdminsRaw } from '../../data/mockUsers';
 
 
 
@@ -59,7 +60,8 @@ const mockSuccessStories = [
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { currentUser, members: mockMembers, admins: mockAdmins, posts: mockPosts, events: mockEvents, language, setLanguage, followedAnnouncements } = useData();
+  const { currentUser, members: mockMembers, admins: contextAdmins, posts: mockPosts, events: mockEvents, language, setLanguage, followedAnnouncements } = useData();
+  const mockAdmins = contextAdmins && contextAdmins.length > 0 ? contextAdmins : mockAdminsRaw;
   const [activeAnnouncementIndex, setActiveAnnouncementIndex] = useState(0);
   const carouselRef = useDraggableScroll();
   const subHeadsRef = useDraggableScroll();
@@ -318,8 +320,8 @@ const HomePage = () => {
       {/* ─── YOUR LEADERS (Samaj Netrutva) ─── */}
       <div className="px-5 mb-8">
         {(() => {
-          const president = mockAdmins.find(a => a.role === 'President' && a.city === currentUser.city) || mockAdmins[1];
-          const coreCommittee = mockAdmins.filter(a => ['Vice President', 'Secretary', 'Joint Secretary', 'Treasurer'].includes(a.role) && a.city === currentUser.city);
+          const president = mockAdmins.find(a => a.role === 'President' && a.city?.toLowerCase() === currentUser.city?.toLowerCase()) || mockAdmins[1];
+          const coreCommittee = mockAdmins.filter(a => ['Vice President', 'Secretary', 'Joint Secretary', 'Treasurer'].includes(a.role) && a.city?.toLowerCase() === currentUser.city?.toLowerCase());
           
           return (
             <div className="flex flex-col gap-6">
@@ -372,30 +374,47 @@ const HomePage = () => {
                   </button>
                 </div>
                 
-                <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3.5 pb-3 -mx-5 px-5">
+                <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3.5 pb-4 -mx-5 px-5">
                   {coreCommittee.map(member => {
                     const badgeColor = member.role.includes('Vice') ? 'bg-[#1e58b8]' : member.role.includes('Secretary') ? 'bg-[#ff3b68]' : 'bg-[#00a651]';
                     const hindiRole = member.role.includes('Vice') ? 'उपाध्यक्ष' : member.role.includes('Secretary') ? 'सचिव' : 'कोषाध्यक्ष';
                     return (
-                      <div key={member.id} className="snap-center shrink-0 w-[150px] bg-white rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 flex flex-col">
-                        <div className="h-[150px] bg-gray-100 relative">
-                          <img src={`https://i.pravatar.cc/150?u=${member.initials}`} className="absolute inset-0 w-full h-full object-cover" alt={member.name} />
+                      <div 
+                        key={member.id} 
+                        onClick={() => navigate('/member/leadership', { state: { selectedId: member.id } })}
+                        className="snap-center shrink-0 w-[160px] bg-white rounded-[28px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.03)] border border-gray-150 p-3.5 flex flex-col items-center cursor-pointer active:scale-[0.98] transition-transform"
+                      >
+                        {/* Padded Portrait Photo */}
+                        <div className="w-full aspect-square rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0 mb-3.5 relative">
+                          <img src={`https://i.pravatar.cc/150?u=${member.initials}`} className="w-full h-full object-cover" alt={member.name} />
                         </div>
-                        <div className="p-3.5 pt-4 flex flex-col flex-1 items-center bg-white relative">
-                          <div className={`text-white text-[10px] font-bold px-4 py-1 rounded-full absolute -top-3 shadow-sm ${badgeColor}`}>
-                            {hindiRole}
-                          </div>
-                          <h4 className="text-gray-900 text-[13px] font-extrabold text-center leading-[1.2] mt-1 mb-4 flex-1">{member.name}</h4>
-                          <div className="flex gap-2 w-full mt-auto">
-                            <button className="flex-1 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm text-[#1e58b8] flex items-center justify-center flex-col gap-1 active:bg-gray-50 transition-colors">
-                              <Phone size={14} />
-                              <span className="text-[9px] font-bold text-gray-500">कॉल करें</span>
-                            </button>
-                            <button onClick={() => navigate(`/member/chat/${member.id}`)} className="flex-1 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm text-[#00a651] flex items-center justify-center flex-col gap-1 active:bg-gray-50 transition-colors">
-                              <MessageCircle size={14} />
-                              <span className="text-[9px] font-bold text-gray-500">चैट करें</span>
-                            </button>
-                          </div>
+                        
+                        {/* Role Capsule Badge */}
+                        <div className={`text-white text-[9.5px] font-black px-3.5 py-0.5 rounded-full shadow-sm/5 ${badgeColor}`}>
+                          {hindiRole}
+                        </div>
+                        
+                        {/* Office Bearer Name */}
+                        <h4 className="text-slate-800 text-[12.5px] font-black text-center leading-[1.3] mt-2 mb-3.5 flex-1 min-h-[32px] line-clamp-2">
+                          {member.name}
+                        </h4>
+                        
+                        {/* Call / Chat Action Buttons */}
+                        <div className="flex gap-2 w-full mt-auto" onClick={(e) => e.stopPropagation()}>
+                          <a 
+                            href={`tel:${member.phone}`} 
+                            className="flex-1 py-1.5 flex flex-col items-center justify-center rounded-2xl border border-gray-150 hover:bg-gray-50 transition-colors text-[#1e58b8]"
+                          >
+                            <Phone size={14} />
+                            <span className="text-[9px] font-bold text-gray-500 mt-0.5">कॉल करें</span>
+                          </a>
+                          <button 
+                            onClick={() => navigate(`/member/chat/${member.id}`)} 
+                            className="flex-1 py-1.5 flex flex-col items-center justify-center rounded-2xl border border-gray-150 hover:bg-gray-50 transition-colors text-[#00a651]"
+                          >
+                            <MessageCircle size={14} />
+                            <span className="text-[9px] font-bold text-gray-500 mt-0.5">चैट करें</span>
+                          </button>
                         </div>
                       </div>
                     );
