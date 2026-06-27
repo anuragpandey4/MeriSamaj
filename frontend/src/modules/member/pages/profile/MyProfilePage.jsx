@@ -6,7 +6,24 @@ import { Avatar } from '../../components/common/Avatar';
 
 const MyProfilePage = () => {
   const navigate = useNavigate();
-  const { currentUser, logoutUser, updateProfile } = useData();
+  
+  const { 
+    currentUser, 
+    logoutUser, 
+    updateProfile,
+    profilePrivacy,
+    followRelations,
+    blockedUsers,
+    members,
+    acceptFollowRequest,
+    rejectFollowRequest,
+    removeFollower,
+    unfollowUser,
+    updateProfilePrivacy,
+    updateGranularPrivacy,
+    granularPrivacy,
+    unblockUser
+  } = useData();
 
   // Social Links Modal State
   const [showSocialModal, setShowSocialModal] = useState(false);
@@ -14,11 +31,18 @@ const MyProfilePage = () => {
   const [twitter, setTwitter] = useState(currentUser.twitter || 'https://twitter.com/user');
   const [linkedin, setLinkedin] = useState(currentUser.linkedin || 'https://linkedin.com/in/user');
 
+  // Blocked Users Modal State
+  const [showBlockedModal, setShowBlockedModal] = useState(false);
+
   // Privacy Settings Modal State
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  const [showPhone, setShowPhone] = useState(currentUser.showPhone !== false);
-  const [showEmail, setShowEmail] = useState(currentUser.showEmail !== false);
-  const [showFamily, setShowFamily] = useState(currentUser.showFamily !== false);
+  const [myPrivacySetting, setMyPrivacySetting] = useState(profilePrivacy?.u1 || 'public');
+  const [myPhoneSetting, setMyPhoneSetting] = useState(granularPrivacy?.phone || 'followers');
+  const [myEmailSetting, setMyEmailSetting] = useState(granularPrivacy?.email || 'followers');
+  const [myFamilySetting, setMyFamilySetting] = useState(granularPrivacy?.familyTree || 'followers');
+
+  // Members lists Modal State (Followers/Following)
+  const [membersListModalType, setMembersListModalType] = useState(null); // 'followers', 'following', or null
 
   const handleSaveSocials = () => {
     updateProfile({ facebook, twitter, linkedin });
@@ -26,9 +50,27 @@ const MyProfilePage = () => {
   };
 
   const handleSavePrivacy = () => {
-    updateProfile({ showPhone, showEmail, showFamily });
+    updateProfilePrivacy(myPrivacySetting);
+    updateGranularPrivacy('phone', myPhoneSetting);
+    updateGranularPrivacy('email', myEmailSetting);
+    updateGranularPrivacy('familyTree', myFamilySetting);
     setShowPrivacyModal(false);
   };
+
+  // Follow states derivations
+  const myFollowerRelations = followRelations?.filter(r => r.followingId === 'u1' && r.status === 'accepted') || [];
+  const myFollowingRelations = followRelations?.filter(r => r.followerId === 'u1' && r.status === 'accepted') || [];
+
+  const myFollowers = members.filter(m => myFollowerRelations.some(r => r.followerId === m.id));
+  const myFollowing = members.filter(m => myFollowingRelations.some(r => r.followingId === m.id));
+
+  // Pending Received Requests
+  const pendingRequestsRelations = followRelations?.filter(r => r.followingId === 'u1' && r.status === 'pending') || [];
+  const pendingRequests = members.filter(m => pendingRequestsRelations.some(r => r.followerId === m.id));
+
+  // Blocked Members derivation
+  const blockedMembersIds = blockedUsers?.filter(b => b.blockerId === 'u1').map(b => b.blockedId) || [];
+  const blockedMembersList = members.filter(m => blockedMembersIds.includes(m.id));
 
   return (
     <div className="min-h-screen bg-surface pb-24 relative overflow-x-hidden">
@@ -51,7 +93,6 @@ const MyProfilePage = () => {
               <img src={currentUser.cover} alt="Cover" className="w-full h-full object-cover" />
             ) : (
               <div className="absolute inset-0 opacity-20">
-                {/* Simulated clouds pattern vector */}
                 <svg viewBox="0 0 100 100" className="w-full h-full text-white" fill="currentColor">
                   <path d="M10 80 Q25 50 40 80 T70 80 T100 80 L100 100 L0 100 Z" />
                 </svg>
@@ -82,7 +123,6 @@ const MyProfilePage = () => {
           {/* Profile Avatar (Overlapping cover) */}
           <div className="flex flex-col items-center -mt-14 relative z-10 px-4">
             <div className="relative">
-              {/* Premium shining ring indicator */}
               <div className={`w-28 h-28 rounded-full border-4 flex items-center justify-center overflow-hidden shadow-lg transition-all ${
                 currentUser.isPremium 
                   ? 'border-amber-400 bg-gradient-to-tr from-amber-500 to-yellow-300 ring-4 ring-amber-100/50' 
@@ -115,7 +155,10 @@ const MyProfilePage = () => {
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-1.5 mt-3.5 px-4 text-center">
-              <h2 className="text-lg font-black text-text-primary tracking-tight leading-none">{currentUser.name}</h2>
+              <h2 className="text-lg font-black text-text-primary tracking-tight leading-none flex items-center gap-1">
+                {currentUser.name}
+                {profilePrivacy?.u1 === 'private' && <span className="text-[10px]">🔒</span>}
+              </h2>
               {currentUser.isVerified && <CheckCircle size={17} className="text-emerald-500 fill-emerald-50 shrink-0" />}
               {currentUser.isPremium && (
                 <span className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white text-[8.5px] font-black uppercase px-2 py-1 rounded-full shadow-sm tracking-wider flex items-center gap-0.5 border border-amber-400/20 animate-pulse">
@@ -124,10 +167,23 @@ const MyProfilePage = () => {
               )}
             </div>
             <p className="text-xs font-bold text-text-secondary mt-1">{currentUser.profession || 'सदस्य'}</p>
+
+            {/* Followers and Following Counters */}
+            <div className="flex gap-6 mt-4 text-center bg-slate-50 border rounded-2xl px-5 py-2">
+              <button onClick={() => setMembersListModalType('followers')} className="active:scale-95 transition-all">
+                <span className="text-[15px] font-black text-slate-800 block">{myFollowers.length}</span>
+                <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Followers</span>
+              </button>
+              <div className="w-[1px] bg-slate-200" />
+              <button onClick={() => setMembersListModalType('following')} className="active:scale-95 transition-all">
+                <span className="text-[15px] font-black text-slate-800 block">{myFollowing.length}</span>
+                <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Following</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Premium Upgrade Promotion Banner / Subscription Info */}
+        {/* Premium Upgrade Promotion Banner */}
         <div className="px-4">
           {!currentUser.isPremium ? (
             <div 
@@ -164,7 +220,45 @@ const MyProfilePage = () => {
           )}
         </div>
 
-        {/* Profile Menu Actions List (Hindi) */}
+        {/* Follow Requests Manager */}
+        {pendingRequests.length > 0 && (
+          <div className="px-4">
+            <div className="bg-amber-50/70 border border-amber-100 rounded-3xl p-4">
+              <h3 className="text-xs font-black text-amber-800 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <span>👋</span> फ़ॉलो अनुरोध (Follow Requests - {pendingRequests.length})
+              </h3>
+              <div className="space-y-2.5">
+                {pendingRequests.map(reqUser => (
+                  <div key={reqUser.id} className="flex items-center justify-between bg-white rounded-2xl p-3 border border-amber-100/50 shadow-sm">
+                    <div className="flex items-center gap-2.5">
+                      <Avatar initials={reqUser.initials} size="sm" color="bg-slate-100 text-slate-700" />
+                      <div>
+                        <h4 className="text-[12.5px] font-black text-slate-800 leading-none">{reqUser.name}</h4>
+                        <p className="text-[10px] text-slate-400 mt-1">{reqUser.city}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-1.5">
+                      <button 
+                        onClick={() => acceptFollowRequest(reqUser.id)}
+                        className="px-3.5 py-1.5 bg-indigo-650 text-white rounded-xl text-[11px] font-bold shadow-sm hover:bg-indigo-750 press-scale"
+                      >
+                        स्वीकार करें
+                      </button>
+                      <button 
+                        onClick={() => rejectFollowRequest(reqUser.id)}
+                        className="px-3.5 py-1.5 bg-slate-100 text-slate-650 rounded-xl text-[11px] font-bold hover:bg-slate-200 press-scale"
+                      >
+                        रद्द करें
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Profile Menu Actions List */}
         <div className="px-4">
           <div className="bg-card rounded-3xl border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-100">
             {/* Action 1: व्यक्तिगत जानकारी */}
@@ -252,6 +346,23 @@ const MyProfilePage = () => {
               <ChevronRight size={16} className="text-gray-300" />
             </button>
 
+            {/* Action: अवरुद्ध सदस्य */}
+            <button 
+              onClick={() => setShowBlockedModal(true)}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-100/50 shadow-sm">
+                  <span className="text-base">🚫</span>
+                </div>
+                <div>
+                  <span className="text-[13px] font-extrabold text-text-primary block">अवरुद्ध सदस्य (Blocked Users)</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">ब्लॉक किए गए सदस्यों की सूची</span>
+                </div>
+              </div>
+              <ChevronRight size={16} className="text-gray-300" />
+            </button>
+
             {/* Action 6: लॉगआउट */}
             <button 
               onClick={() => {
@@ -271,7 +382,6 @@ const MyProfilePage = () => {
               </div>
               <ChevronRight size={16} className="text-gray-300 group-hover:text-red-300" />
             </button>
-
           </div>
         </div>
       </div>
@@ -281,7 +391,6 @@ const MyProfilePage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-card w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-4 animate-scale-up">
             <h3 className="text-sm font-bold text-text-primary">सोशल मीडिया लिंक जोड़ें</h3>
-            
             <div className="space-y-3">
               <div>
                 <label className="text-[10px] font-bold text-text-secondary uppercase">फेसबुक (Facebook)</label>
@@ -292,7 +401,6 @@ const MyProfilePage = () => {
                   className="w-full mt-1 bg-surface border border-gray-150 rounded-xl px-4 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
                 />
               </div>
-
               <div>
                 <label className="text-[10px] font-bold text-text-secondary uppercase">ट्विटर (Twitter)</label>
                 <input 
@@ -302,7 +410,6 @@ const MyProfilePage = () => {
                   className="w-full mt-1 bg-surface border border-gray-150 rounded-xl px-4 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
                 />
               </div>
-
               <div>
                 <label className="text-[10px] font-bold text-text-secondary uppercase">लिंक्डइन (LinkedIn)</label>
                 <input 
@@ -313,7 +420,6 @@ const MyProfilePage = () => {
                 />
               </div>
             </div>
-
             <div className="flex gap-3 pt-2">
               <button 
                 onClick={() => setShowSocialModal(false)}
@@ -335,42 +441,81 @@ const MyProfilePage = () => {
       {/* Privacy Settings Modal */}
       {showPrivacyModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-card w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-4 animate-scale-up">
-            <h3 className="text-sm font-bold text-text-primary">गोपनीयता सेटिंग्स प्रबंधित करें</h3>
+          <div className="bg-card w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-4 animate-scale-up max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b pb-2">
+              <h3 className="text-sm font-black text-text-primary">गोपनीयता सेटिंग्स (Privacy Settings)</h3>
+              <button onClick={() => setShowPrivacyModal(false)} className="text-slate-400">✕</button>
+            </div>
             
-            <div className="space-y-3.5 pt-2">
-              {/* Option 1: Phone */}
-              <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-xs font-bold text-text-primary">मेरा मोबाइल नंबर दिखाएं</span>
-                <input 
-                  type="checkbox" 
-                  checked={showPhone}
-                  onChange={(e) => setShowPhone(e.target.checked)}
-                  className="w-4.5 h-4.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-              </label>
+            <div className="space-y-4 pt-1">
+              {/* Profile Type Toggle */}
+              <div className="space-y-2">
+                <label className="text-[11px] font-black text-text-secondary uppercase block">प्रोफ़ाइल प्रकार (Profile Type)</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setMyPrivacySetting('public')}
+                    className={`py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 ${
+                      myPrivacySetting === 'public'
+                        ? 'bg-indigo-605 border-indigo-605 text-white shadow-sm font-extrabold'
+                        : 'bg-white border-gray-150 text-slate-650'
+                    }`}
+                  >
+                    🔓 Public
+                  </button>
+                  <button
+                    onClick={() => setMyPrivacySetting('private')}
+                    className={`py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 ${
+                      myPrivacySetting === 'private'
+                        ? 'bg-indigo-605 border-indigo-605 text-white shadow-sm font-extrabold'
+                        : 'bg-white border-gray-150 text-slate-650'
+                    }`}
+                  >
+                    🔒 Private
+                  </button>
+                </div>
+              </div>
 
-              {/* Option 2: Email */}
-              <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-xs font-bold text-text-primary">मेरा ईमेल एड्रेस दिखाएं</span>
-                <input 
-                  type="checkbox" 
-                  checked={showEmail}
-                  onChange={(e) => setShowEmail(e.target.checked)}
-                  className="w-4.5 h-4.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-              </label>
+              {/* Granular Option: Phone */}
+              <div className="space-y-2">
+                <label className="text-[11px] font-black text-text-secondary uppercase">मोबाइल नंबर गोपनीयता (Mobile Visibility)</label>
+                <select
+                  value={myPhoneSetting}
+                  onChange={(e) => setMyPhoneSetting(e.target.value)}
+                  className="w-full bg-surface border border-gray-150 rounded-xl px-3 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
+                >
+                  <option value="public">सभी को दिखाएं (Public)</option>
+                  <option value="followers">केवल फ़ॉलोअर्स को (Followers Only)</option>
+                  <option value="private">किसी को नहीं (Only Me)</option>
+                </select>
+              </div>
 
-              {/* Option 3: Family */}
-              <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-xs font-bold text-text-primary">मेरा पारिवारिक वृक्ष दिखाएं</span>
-                <input 
-                  type="checkbox" 
-                  checked={showFamily}
-                  onChange={(e) => setShowFamily(e.target.checked)}
-                  className="w-4.5 h-4.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-              </label>
+              {/* Granular Option: Email */}
+              <div className="space-y-2">
+                <label className="text-[11px] font-black text-text-secondary uppercase">ईमेल गोपनीयता (Email Visibility)</label>
+                <select
+                  value={myEmailSetting}
+                  onChange={(e) => setMyEmailSetting(e.target.value)}
+                  className="w-full bg-surface border border-gray-150 rounded-xl px-3 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
+                >
+                  <option value="public">सभी को दिखाएं (Public)</option>
+                  <option value="followers">केवल फ़ॉलोअर्स को (Followers Only)</option>
+                  <option value="private">किसी को नहीं (Only Me)</option>
+                </select>
+              </div>
+
+              {/* Granular Option: Family Tree */}
+              <div className="space-y-2">
+                <label className="text-[11px] font-black text-text-secondary uppercase">फैमिली ट्री गोपनीयता (Family Tree Visibility)</label>
+                <select
+                  value={myFamilySetting}
+                  onChange={(e) => setMyFamilySetting(e.target.value)}
+                  className="w-full bg-surface border border-gray-150 rounded-xl px-3 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
+                >
+                  <option value="public">सभी को दिखाएं (Public)</option>
+                  <option value="followers">केवल फ़ॉलोअर्स को (Followers Only)</option>
+                  <option value="private">किसी को नहीं (Only Me)</option>
+                </select>
+              </div>
             </div>
 
             <div className="flex gap-3 pt-4 border-t border-gray-100">
@@ -391,6 +536,108 @@ const MyProfilePage = () => {
         </div>
       )}
 
+      {/* Members List Modal (Followers / Following) */}
+      {membersListModalType && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-card w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col max-h-[75vh] animate-scale-up">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 shrink-0">
+              <h3 className="text-sm font-black text-text-primary uppercase tracking-wide">
+                {membersListModalType === 'followers' ? 'अनुयायी (Followers)' : 'फॉलोइंग (Following)'}
+              </h3>
+              <button 
+                onClick={() => setMembersListModalType(null)}
+                className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-250 flex items-center justify-center text-slate-500 font-bold active:scale-95"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="overflow-y-auto py-4 space-y-3 flex-1 min-h-[200px]">
+              {(membersListModalType === 'followers' ? myFollowers : myFollowing).length > 0 ? (
+                (membersListModalType === 'followers' ? myFollowers : myFollowing).map(m => (
+                  <div key={m.id} className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-2xl shadow-xs">
+                    <div className="flex items-center gap-2.5">
+                      <Avatar initials={m.initials} size="sm" color="bg-indigo-50 text-indigo-700 font-black" />
+                      <div>
+                        <h4 className="text-[13px] font-black text-gray-800 leading-none">{m.name}</h4>
+                        <p className="text-[10px] text-gray-450 mt-1">{m.city}</p>
+                      </div>
+                    </div>
+                    {membersListModalType === 'followers' ? (
+                      <button
+                        onClick={() => removeFollower(m.id)}
+                        className="px-3.5 py-1.5 bg-red-50 text-red-650 hover:bg-red-100 rounded-xl text-[11px] font-extrabold press-scale"
+                      >
+                        Remove
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => unfollowUser(m.id)}
+                        className="px-3.5 py-1.5 bg-slate-200 text-slate-700 hover:bg-slate-300 rounded-xl text-[11px] font-extrabold press-scale"
+                      >
+                        Unfollow
+                      </button>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-10 text-slate-400">
+                  <p className="text-xs font-semibold">
+                    कोई {membersListModalType === 'followers' ? 'फॉलोअर' : 'फॉलोइंग'} नहीं है।
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Blocked Users Modal */}
+      {showBlockedModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-card w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col max-h-[75vh] animate-scale-up">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 shrink-0">
+              <h3 className="text-sm font-black text-text-primary uppercase tracking-wide">
+                अवरुद्ध सदस्य (Blocked Users)
+              </h3>
+              <button 
+                onClick={() => setShowBlockedModal(false)}
+                className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-250 flex items-center justify-center text-slate-500 font-bold active:scale-95"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="overflow-y-auto py-4 space-y-3 flex-1 min-h-[200px]">
+              {blockedMembersList.length > 0 ? (
+                blockedMembersList.map(m => (
+                  <div key={m.id} className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-2xl shadow-xs">
+                    <div className="flex items-center gap-2.5">
+                      <Avatar initials={m.initials} size="sm" color="bg-red-50 text-red-700 font-black" />
+                      <div>
+                        <h4 className="text-[13px] font-black text-gray-800 leading-none">{m.name}</h4>
+                        <p className="text-[10px] text-gray-450 mt-1">{m.city}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => unblockUser(m.id)}
+                      className="px-3.5 py-1.5 bg-indigo-50 text-indigo-650 hover:bg-indigo-100 rounded-xl text-[11px] font-extrabold press-scale"
+                    >
+                      Unblock
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-10 text-slate-400">
+                  <p className="text-xs font-semibold">
+                    कोई अवरुद्ध सदस्य नहीं है।
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

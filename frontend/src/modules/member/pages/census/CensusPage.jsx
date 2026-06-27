@@ -287,6 +287,12 @@ export const CensusPage = () => {
   // States
   const [currentView, setCurrentView] = useState('dashboard'); // dashboard, males, females, kids, joint-families, nuclear-families, family-details
   const [selectedFamily, setSelectedFamily] = useState(null);
+
+  useEffect(() => {
+    if (location.state?.view) {
+      setCurrentView(location.state.view);
+    }
+  }, [location.state]);
   
   // Data
   const { males, females, kids, families } = getMockData(surname, currentUser?.city);

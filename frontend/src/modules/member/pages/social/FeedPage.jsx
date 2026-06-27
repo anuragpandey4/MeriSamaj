@@ -221,9 +221,17 @@ const MultiImageGrid = ({ images, onClick }) => {
 
 const PostCard = ({ post, index, lang, onShareClick }) => {
   const navigate = useNavigate();
-  const { togglePostLike } = useData();
+  const { togglePostLike, members, admins } = useData();
   const styles = getCategoryStyles(post.category, lang);
   const [doubleHeart, setDoubleHeart] = useState(false);
+
+  const matchedMember = members.find(m => m.name === post.author.name) || admins.find(a => a.name === post.author.name);
+
+  const handleAuthorClick = () => {
+    if (matchedMember) {
+      navigate(`/member/directory/${matchedMember.id}`);
+    }
+  };
 
   const handleDoubleTap = (e) => {
     if (e.detail === 2) {
@@ -255,11 +263,14 @@ const PostCard = ({ post, index, lang, onShareClick }) => {
 
       {/* Author Header */}
       <div className="flex items-center justify-between px-3 pt-4.5 pb-3">
-        <div className="flex items-center gap-3">
+        <div 
+          onClick={handleAuthorClick}
+          className={`flex items-center gap-3 ${matchedMember ? 'cursor-pointer group' : ''}`}
+        >
           <Avatar initials={post.author.initials} size="md" color="bg-indigo-50 text-indigo-700" />
           <div>
             <div className="flex items-center gap-1.5 flex-wrap">
-              <h4 className="text-[15px] font-black text-slate-800 leading-tight">{post.author.name}</h4>
+              <h4 className="text-[15px] font-black text-slate-800 leading-tight group-hover:text-indigo-600 transition-colors">{post.author.name}</h4>
               {post.author.isVerified && (
                 <span className="inline-flex items-center gap-0.5 text-[9.5px] font-bold bg-[#8B5CF6]/8 text-[#7C3AED] px-2 py-0.5 rounded-full select-none">
                   <Check size={9} strokeWidth={4} /> {localT[lang].verifiedMember}

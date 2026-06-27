@@ -60,6 +60,7 @@ const initialNotifications = [
   { id: 'n4', type: 'community', title: 'New Member Joined', message: 'Pooja Agrawal from Ahmedabad has joined the community.', time: '5 hours ago', isRead: true },
   { id: 'n5', type: 'announcement', title: 'Office Bearers Meeting', message: 'Monthly meeting scheduled for Sunday, 10 AM at Samaj Bhawan.', time: '1 day ago', isRead: true },
   { id: 'ng1', type: 'group', groupId: 'g1', groupName: 'Agrawal Youth Indore', title: 'New message in Agrawal Youth Indore', message: 'Vikas Jain: Has anyone got the details for the upcoming...', time: '12 min ago', isRead: false },
+  { id: 'nv1', type: 'voting', title: 'समाज चुनाव शुरू हुआ', message: 'Samaj Head election voting has started. Cast your vote before Jul 20.', time: '2 hours ago', isRead: false },
 ];
 
 const adaptGroups = (groupsList, community) => {
@@ -199,6 +200,33 @@ const adaptMatrimonial = (profilesList, currentUser) => {
     });
 };
 
+const defaultFollowRelations = [
+  { followerId: 'u1', followingId: 'm1', status: 'accepted' },
+  { followerId: 'm1', followingId: 'u1', status: 'accepted' },
+  { followerId: 'm2', followingId: 'u1', status: 'accepted' },
+  { followerId: 'm3', followingId: 'u1', status: 'pending' },
+  { followerId: 'u1', followingId: 'm2', status: 'pending' }
+];
+
+const defaultProfilePrivacy = {
+  u1: 'public',
+  m1: 'public',
+  m2: 'private',
+  m3: 'public',
+  m4: 'private',
+  m5: 'public',
+  m6: 'private'
+};
+
+const defaultBlockedUsers = [];
+
+const defaultGranularPrivacy = {
+  phone: 'followers',
+  email: 'followers',
+  familyTree: 'followers',
+  gallery: 'followers'
+};
+
 const DataContext = createContext(null);
 
 export const DataProvider = ({ children }) => {
@@ -315,6 +343,21 @@ export const DataProvider = ({ children }) => {
   });
   const [notifications, setNotifications] = useState(() => loadState('notifications', initialNotifications));
 
+  // Event Reminders State: { [eventId]: true/false }
+  const [eventReminders, setEventReminders] = useState(() => loadState('eventReminders', {}));
+
+  // Event RSVP Registrations: { [eventId]: { name, phone, attendees, registeredAt } }
+  const [eventRegistrations, setEventRegistrations] = useState(() => loadState('eventRegistrations', {}));
+
+  // Survey Responses State: { [surveyId]: { [questionId]: answer } }
+  const [surveyResponses, setSurveyResponses] = useState(() => loadState('surveyResponses', {}));
+
+  // Follow System & Privacy States
+  const [profilePrivacy, setProfilePrivacy] = useState(() => loadState('profilePrivacy', defaultProfilePrivacy));
+  const [followRelations, setFollowRelations] = useState(() => loadState('followRelations', defaultFollowRelations));
+  const [blockedUsers, setBlockedUsers] = useState(() => loadState('blockedUsers', defaultBlockedUsers));
+  const [granularPrivacy, setGranularPrivacy] = useState(() => loadState('granularPrivacy', defaultGranularPrivacy));
+
   // Sync to localStorage when state changes
   useEffect(() => saveState('currentUser', currentUser), [currentUser]);
   useEffect(() => saveState('members', members), [members]);
@@ -328,6 +371,110 @@ export const DataProvider = ({ children }) => {
   useEffect(() => saveState('groups', groups), [groups]);
   useEffect(() => saveState('groupMessages', groupMessages), [groupMessages]);
   useEffect(() => saveState('notifications', notifications), [notifications]);
+  useEffect(() => saveState('eventReminders', eventReminders), [eventReminders]);
+  useEffect(() => saveState('eventRegistrations', eventRegistrations), [eventRegistrations]);
+  useEffect(() => saveState('surveyResponses', surveyResponses), [surveyResponses]);
+  
+  // Follow System Syncs
+  useEffect(() => saveState('profilePrivacy', profilePrivacy), [profilePrivacy]);
+  useEffect(() => saveState('followRelations', followRelations), [followRelations]);
+  useEffect(() => saveState('blockedUsers', blockedUsers), [blockedUsers]);
+  useEffect(() => saveState('granularPrivacy', granularPrivacy), [granularPrivacy]);
+
+  // Follow System Methods
+  const sendFollowRequest = (targetUserId) => {
+    setFollowRelations(prev => {
+      const exists = prev.some(r => r.followerId === 'u1' && r.followingId === targetUserId);
+      if (exists) return prev;
+
+      const targetPrivacy = profilePrivacy[targetUserId] || 'public';
+      const status = targetPrivacy === 'private' ? 'pending' : 'accepted';
+
+      return [...prev, { followerId: 'u1', followingId: targetUserId, status }];
+    });
+
+    // Add simulated follow notification for other user if private
+    const targetPrivacy = profilePrivacy[targetUserId] || 'public';
+    if (targetPrivacy === 'private') {
+      const targetName = members.find(m => m.id === targetUserId)?.name || admins.find(a => a.id === targetUserId)?.name || 'Someone';
+      const newNotification = {
+        id: `nf_follow_req_${Date.now()}`,
+        type: 'follow_request_sent',
+        title: 'Follow Request Sent',
+        message: `You requested to follow ${targetName}.`,
+        time: 'Just now',
+        isRead: false
+      };
+      setNotifications(prev => [newNotification, ...prev]);
+    }
+  };
+
+  const cancelFollowRequest = (targetUserId) => {
+    setFollowRelations(prev => prev.filter(r => !(r.followerId === 'u1' && r.followingId === targetUserId && r.status === 'pending')));
+  };
+
+  const acceptFollowRequest = (senderUserId) => {
+    setFollowRelations(prev => prev.map(r => {
+      if (r.followerId === senderUserId && r.followingId === 'u1' && r.status === 'pending') {
+        return { ...r, status: 'accepted' };
+      }
+      return r;
+    }));
+
+    // Add a notification for current user
+    const sender = members.find(m => m.id === senderUserId) || admins.find(a => a.id === senderUserId);
+    const senderName = sender ? sender.name : 'A member';
+    const newNotification = {
+      id: `nf_accept_${Date.now()}`,
+      type: 'follow_accept',
+      title: 'Follow Request Accepted',
+      message: `You accepted ${senderName}'s follow request.`,
+      time: 'Just now',
+      isRead: false
+    };
+    setNotifications(prev => [newNotification, ...prev]);
+  };
+
+  const rejectFollowRequest = (senderUserId) => {
+    setFollowRelations(prev => prev.filter(r => !(r.followerId === senderUserId && r.followingId === 'u1' && r.status === 'pending')));
+  };
+
+  const unfollowUser = (targetUserId) => {
+    setFollowRelations(prev => prev.filter(r => !(r.followerId === 'u1' && r.followingId === targetUserId)));
+  };
+
+  const removeFollower = (targetUserId) => {
+    setFollowRelations(prev => prev.filter(r => !(r.followerId === targetUserId && r.followingId === 'u1')));
+  };
+
+  const updateProfilePrivacy = (privacySetting) => {
+    setProfilePrivacy(prev => ({
+      ...prev,
+      u1: privacySetting
+    }));
+  };
+
+  const updateGranularPrivacy = (field, setting) => {
+    setGranularPrivacy(prev => ({
+      ...prev,
+      [field]: setting
+    }));
+  };
+
+  const blockUser = (targetUserId) => {
+    setBlockedUsers(prev => {
+      if (prev.some(b => b.blockerId === 'u1' && b.blockedId === targetUserId)) return prev;
+      return [...prev, { blockerId: 'u1', blockedId: targetUserId }];
+    });
+    // Remove any follow relationships
+    setFollowRelations(prev => prev.filter(r => 
+      !( (r.followerId === 'u1' && r.followingId === targetUserId) || (r.followerId === targetUserId && r.followingId === 'u1') )
+    ));
+  };
+
+  const unblockUser = (targetUserId) => {
+    setBlockedUsers(prev => prev.filter(b => !(b.blockerId === 'u1' && b.blockedId === targetUserId)));
+  };
 
   const updateProfile = (updatedData) => {
     setCurrentUser(prev => ({ ...prev, ...updatedData }));
@@ -826,7 +973,63 @@ export const DataProvider = ({ children }) => {
     reactToGroupMessage,
     clearChatMessages,
     stories: adaptedStoriesList,
-    addStory
+    addStory,
+    
+    // Follow System & Privacy Exports
+    profilePrivacy,
+    followRelations,
+    blockedUsers,
+    granularPrivacy,
+    sendFollowRequest,
+    cancelFollowRequest,
+    acceptFollowRequest,
+    rejectFollowRequest,
+    unfollowUser,
+    removeFollower,
+    updateProfilePrivacy,
+    updateGranularPrivacy,
+    blockUser,
+    unblockUser,
+
+    // Event Reminders
+    eventReminders,
+    toggleEventReminder: (eventId) => {
+      setEventReminders(prev => {
+        const updated = { ...prev, [eventId]: !prev[eventId] };
+        return updated;
+      });
+    },
+
+    // Event RSVP Registrations
+    eventRegistrations,
+    registerForEvent: (eventId, registrationData) => {
+      setEventRegistrations(prev => ({
+        ...prev,
+        [eventId]: { ...registrationData, registeredAt: new Date().toISOString() }
+      }));
+    },
+    cancelEventRegistration: (eventId) => {
+      setEventRegistrations(prev => {
+        const updated = { ...prev };
+        delete updated[eventId];
+        return updated;
+      });
+    },
+
+    // Survey Responses
+    surveyResponses,
+    submitSurveyAnswer: (surveyId, questionId, answer) => {
+      setSurveyResponses(prev => ({
+        ...prev,
+        [surveyId]: { ...(prev[surveyId] || {}), [questionId]: answer }
+      }));
+    },
+    submitFullSurvey: (surveyId, answersMap) => {
+      setSurveyResponses(prev => ({
+        ...prev,
+        [surveyId]: { ...answersMap, submittedAt: new Date().toISOString() }
+      }));
+    },
   };
 
   return (

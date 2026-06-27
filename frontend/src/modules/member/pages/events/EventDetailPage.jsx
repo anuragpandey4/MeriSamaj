@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Clock, Users, CheckCircle, Share2, CalendarDays, Heart, Phone, MessageCircle, ExternalLink, ChevronRight, Star, Bookmark, BookmarkCheck } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, Users, CheckCircle, Share2, CalendarDays, Heart, Phone, MessageCircle, ExternalLink, ChevronRight, Star, Bookmark, BookmarkCheck, Bell, BellOff, X, Image, User, Ticket, ChevronDown } from 'lucide-react';
 import { Avatar } from '../../components/common/Avatar';
 import { useData } from '../../context/DataProvider';
 import { useDraggableScroll } from '../../../../hooks/useDraggableScroll';
@@ -26,14 +26,25 @@ const mockAttendees = [
 const EventDetailPage = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
-  const { events, toggleEventRSVP } = useData();
+  const { events, toggleEventRSVP, eventReminders, toggleEventReminder, eventRegistrations, registerForEvent } = useData();
   const attendeesRef = useDraggableScroll();
+  const galleryRef = useDraggableScroll();
 
   const event = events.find(e => e.id === eventId);
   const [isInterested, setIsInterested] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showShareToast, setShowShareToast] = useState(false);
   const [showAttendeesModal, setShowAttendeesModal] = useState(false);
+
+  // RSVP Registration Modal State
+  const [showRSVPModal, setShowRSVPModal] = useState(false);
+  const [rsvpStep, setRsvpStep] = useState(1); // 1: form | 2: success
+  const [rsvpForm, setRsvpForm] = useState({ name: '', phone: '', attendees: '1' });
+  const [rsvpErrors, setRsvpErrors] = useState({});
+
+  // Toast for reminder
+  const [showReminderToast, setShowReminderToast] = useState(false);
+  const [reminderToastMsg, setReminderToastMsg] = useState('');
 
   const handleShare = () => {
     if (navigator.share) {
@@ -49,7 +60,42 @@ const EventDetailPage = () => {
     }
   };
 
+  const handleReminderToggle = () => {
+    if (!event) return;
+    toggleEventReminder(event.id);
+    const isNowSet = !eventReminders[event.id];
+    setReminderToastMsg(isNowSet ? 'रिमाइंडर सेट किया गया' : 'रिमाइंडर हटाया गया');
+    setShowReminderToast(true);
+    setTimeout(() => setShowReminderToast(false), 2500);
+  };
+
+  const handleRSVPSubmit = () => {
+    const errors = {};
+    if (!rsvpForm.name.trim()) errors.name = true;
+    if (!rsvpForm.phone.trim() || rsvpForm.phone.replace(/\D/g,'').length < 10) errors.phone = true;
+    if (Object.keys(errors).length > 0) {
+      setRsvpErrors(errors);
+      return;
+    }
+    registerForEvent(event.id, rsvpForm);
+    setRsvpStep(2);
+  };
+
   if (!event) return null;
+
+  const isReminderSet = !!(eventReminders && eventReminders[event.id]);
+  const registration = eventRegistrations && eventRegistrations[event.id];
+  const isRegistered = !!(registration || event.isRegistered);
+
+  // Gallery images: use event-specific gallery or fallback to category-based photos
+  const galleryImages = event.gallery || [
+    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
+    'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80',
+    'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&q=80',
+    'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80',
+    'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80',
+    'https://images.unsplash.com/photo-1607190074257-dd4b7af0309f?w=800&q=80',
+  ];
 
   const config = categoryConfig[event.category] || categoryConfig.Cultural;
 
@@ -96,6 +142,16 @@ const EventDetailPage = () => {
                 className="w-10 h-10 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform border border-white/20"
               >
                 {isBookmarked ? <BookmarkCheck size={18} className="text-amber-300" fill="currentColor" /> : <Bookmark size={18} className="text-white" />}
+              </button>
+              <button 
+                onClick={handleReminderToggle}
+                className={`w-10 h-10 rounded-full backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform border ${
+                  isReminderSet
+                    ? 'bg-amber-400/30 border-amber-300/40'
+                    : 'bg-white/15 border-white/20'
+                }`}
+              >
+                {isReminderSet ? <Bell size={18} className="text-amber-300" fill="currentColor" /> : <Bell size={18} className="text-white" />}
               </button>
               <button 
                 onClick={handleShare}
