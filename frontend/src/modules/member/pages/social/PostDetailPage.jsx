@@ -136,7 +136,6 @@ const PostDetailPage = () => {
       <div className="flex-1 overflow-y-auto pb-24">
         {/* Post Container Card */}
         <div className="bg-white border-b border-slate-100/70 shadow-sm overflow-hidden mb-4">
-          <div className={`h-[5px] w-full ${colorBg}`} />
 
           {/* Author Header */}
           <div className="flex items-center justify-between px-5 pt-4.5 pb-3">

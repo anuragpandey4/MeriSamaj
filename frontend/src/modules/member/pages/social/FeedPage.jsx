@@ -404,11 +404,15 @@ const PostCard = ({ post, index, lang, onShareClick }) => {
   );
 };
 
-const FeedPage = ({ isHub = false, feedType = 'city' }) => {
+const FeedPage = ({ isHub = false, feedType = 'city', searchQuery = '' }) => {
   const navigate = useNavigate();
   const { posts, members: mockMembers, currentUser, language, stories = [] } = useData();
   const [activeTab, setActiveTab] = useState('all');
   const [searchText, setSearchText] = useState('');
+
+  useEffect(() => {
+    setSearchText(searchQuery);
+  }, [searchQuery]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeStory, setActiveStory] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
@@ -483,7 +487,9 @@ const FeedPage = ({ isHub = false, feedType = 'city' }) => {
                   3
                 </span>
               </button>
-              <Avatar initials={currentUser?.initials || 'U'} size="sm" color="bg-blue-100 text-blue-700" />
+              <div className="cursor-pointer active:scale-95 transition-transform" onClick={() => navigate('/member/profile')}>
+                <Avatar initials={currentUser?.initials || 'U'} size="sm" color="bg-blue-100 text-blue-700" />
+              </div>
             </div>
           </div>
         </div>
@@ -492,7 +498,13 @@ const FeedPage = ({ isHub = false, feedType = 'city' }) => {
       <div className="px-4.5 pt-4">
         {/* ─── STORY RINGS (ACTIVE MEMBERS) ─── */}
         <div className="pb-2.5">
-          <div ref={storiesRef} className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-4.5 px-4.5">
+          <div 
+            ref={storiesRef} 
+            className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-4.5 px-4.5"
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            data-swipe-block="true"
+          >
             {/* Add/View Story Button (Current User) */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.8 }}
@@ -570,7 +582,12 @@ const FeedPage = ({ isHub = false, feedType = 'city' }) => {
         </div>
 
         {/* ─── HORIZONTAL FILTER TABS ─── */}
-        <div className="overflow-x-auto snap-x scrollbar-hide py-1 -mx-4.5 px-4.5 flex gap-2 mb-5">
+        <div 
+          className="overflow-x-auto snap-x scrollbar-hide py-1 -mx-4.5 px-4.5 flex gap-2 mb-5"
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+          data-swipe-block="true"
+        >
           {categoryPills.map(pill => {
             const isActive = activeTab === pill.id;
             const Icon = categoryIcons[pill.id];

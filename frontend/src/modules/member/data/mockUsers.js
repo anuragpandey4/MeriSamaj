@@ -16,6 +16,7 @@ export const currentUser = {
   address: '42, Vijay Nagar, Indore, MP - 452010',
   memberSince: '2024-01-15',
   isVerified: true,
+  matrimonialBio: 'I run a fashion design studio in Indore. I spend...',
   familyMembers: [
     { id: 'f1', name: 'Sunita Agrawal', relation: 'Wife', age: 31, avatar: null, initials: 'SA' },
     { id: 'f2', name: 'Aarav Agrawal', relation: 'Son', age: 8, avatar: null, initials: 'AA' },

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Lock, Heart, CheckCircle, GraduationCap, Briefcase, MapPin, Search } from 'lucide-react';
+import { ArrowLeft, Lock, Heart, CheckCircle, GraduationCap, Briefcase, MapPin, Search, Check } from 'lucide-react';
 import { Avatar } from '../../components/common/Avatar';
 import { Badge } from '../../components/common/Badge';
 import { useData } from '../../context/DataProvider';
@@ -8,14 +8,13 @@ import { useData } from '../../context/DataProvider';
 const MatrimonialProfilePage = () => {
   const { profileId } = useParams();
   const navigate = useNavigate();
-  const { matrimonialProfiles } = useData();
+  const { matrimonialProfiles, toggleMatrimonialInterest } = useData();
 
   const profile = matrimonialProfiles.find(p => p.id === profileId) || matrimonialProfiles[0];
-  const [interested, setInterested] = useState(profile.interests.sent);
   
-  // Photo logic - blurred unless they sent interest and we accepted it (or vice versa in a real app)
-  // For demo: if we sent interest and they received it, assume accepted.
-  const isAccepted = profile.interests.received && interested;
+  // Photo logic - blurred unless accepted or visibility is set to public (all)
+  const interested = profile.interests?.sent;
+  const isAccepted = profile.interests?.accepted || profile.photoVisibility === 'all';
 
   return (
     <div className="min-h-screen bg-surface pb-24">
@@ -45,12 +44,12 @@ const MatrimonialProfilePage = () => {
 
         {isAccepted && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <Avatar initials={profile.initials} size="xl" className="scale-125 shadow-xl ring-4 ring-white" />
+            <img src={profile.avatar} alt={profile.name} className="w-full h-full object-cover" />
           </div>
         )}
 
         {/* Profile Stats over photo */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent z-10">
           <h1 className="text-2xl font-bold text-white mb-1">{profile.name}, {profile.age}</h1>
           <p className="text-sm text-white/90 font-medium">{profile.profession} · {profile.city}</p>
         </div>
@@ -77,7 +76,7 @@ const MatrimonialProfilePage = () => {
             </div>
             <div>
               <p className="text-xs text-text-secondary">Diet</p>
-              <p className="text-xs font-medium text-text-primary mt-0.5">Vegetarian</p>
+              <p className="text-xs font-medium text-text-primary mt-0.5">{profile.diet || 'Vegetarian'}</p>
             </div>
           </div>
         </div>
@@ -155,7 +154,7 @@ const MatrimonialProfilePage = () => {
       {/* Bottom Action Bar */}
       <div className="responsive-fixed-bottom bg-card border-t border-pink-100 p-4 z-40 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}>
         <button
-          onClick={() => setInterested(!interested)}
+          onClick={() => toggleMatrimonialInterest(profile.id)}
           className={`w-full py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 press-scale transition-all duration-300 ${
             interested
               ? 'bg-emerald-500 text-white shadow-emerald-200 shadow-lg'
@@ -163,7 +162,7 @@ const MatrimonialProfilePage = () => {
           }`}
         >
           {interested ? (
-            <><CheckCircle size={18} /> Interest Sent</>
+            <><Check size={18} strokeWidth={3} /> Interest Sent</>
           ) : (
             <><Heart size={18} fill="currentColor" /> Express Interest</>
           )}

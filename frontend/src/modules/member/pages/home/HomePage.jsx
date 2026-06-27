@@ -358,37 +358,67 @@ const HomePage = () => {
           return (
             <div className="flex flex-col gap-6">
               {/* President Section */}
-              <div className="relative w-full h-[360px] overflow-hidden group rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100">
-                <img src={`https://i.pravatar.cc/300?u=${president.initials}`} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt={president.name} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
-                
-                <div className="absolute inset-0 p-5 flex flex-col justify-end items-center text-center">
-                  <div className="mb-2">
-                    <Crown size={36} className="text-amber-400 fill-amber-400 drop-shadow-md" />
-                  </div>
-                  <div className="bg-[#f08c35] text-white text-[11px] font-bold px-4 py-1 rounded-full mb-2 shadow-sm uppercase tracking-widest">
-                    {t(president.role, language) === 'President' ? 'अध्यक्ष' : t(president.role, language)}
-                  </div>
-                  <h4 className="text-white text-[22px] font-extrabold leading-tight tracking-tight mb-1 drop-shadow-sm">{president.name}</h4>
-                  <p className="text-amber-300 text-[13px] font-bold mt-0 mb-3 drop-shadow-sm">समाज अध्यक्ष</p>
-                  
-                  <div className="flex gap-4 mb-4">
-                    <div className="flex items-center gap-1.5 text-white/90 text-[12px] font-medium">
-                      <Phone size={14} className="text-white/70" />
-                      {president.phone}
+              <div 
+                onClick={() => navigate('/member/leadership', { state: { selectedId: president.id } })}
+                className="relative w-full rounded-[28px] bg-gradient-to-r from-[#170e30] via-[#241344] to-[#401f68] shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-white/5 overflow-hidden p-5 shrink-0 cursor-pointer active:scale-[0.99] transition-all duration-300"
+              >
+                {/* Blended portrait face - rendered directly to card boundaries */}
+                <img 
+                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80" 
+                  className="absolute right-0 top-0 bottom-0 w-[58%] h-full object-cover object-[center_30%] pointer-events-none z-0" 
+                  alt={president.name} 
+                />
+                {/* Full-width seamless gradient overlay - completely blends the left edge of the image */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#170e30] via-[#241344] via-[#241344]/95 to-transparent pointer-events-none z-0" />
+
+                {/* Left content block */}
+                <div className="relative z-10 flex flex-col justify-between h-full max-w-[62%]">
+                  {/* Row 1: Crown Badge & Role */}
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-full border-2 border-amber-500/80 flex items-center justify-center bg-black/30 shadow-sm shrink-0">
+                      <Crown size={18} className="text-amber-400 fill-amber-400" />
                     </div>
-                    <div className="flex items-center gap-1.5 text-white/90 text-[12px] font-medium">
-                      <MapPin size={14} className="text-white/70" />
-                      {president.city}
-                    </div>
+                    <span className="bg-[#6B21A8]/90 text-white text-[10px] font-black px-3.5 py-0.5 rounded-full uppercase tracking-wider">
+                      अध्यक्ष
+                    </span>
                   </div>
-                  
-                  <div className="flex gap-3 w-full max-w-[280px]">
-                    <button className="flex-1 py-2.5 rounded-full bg-white text-[#1e58b8] text-[13px] font-bold flex items-center justify-center gap-1.5 shadow-lg active:scale-95 transition-transform">
-                      <Phone size={14} /> कॉल करें
-                    </button>
-                    <button onClick={() => navigate(`/member/chat/${president.id}`)} className="flex-1 py-2.5 rounded-full bg-[#4ab04e] text-white text-[13px] font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-green-900/20 active:scale-95 transition-transform">
-                      <MessageCircle size={14} /> चैट करें
+
+                  {/* Row 2: Name & Role Title */}
+                  <div className="mt-4">
+                    <h4 className="text-white text-[20px] font-black leading-tight tracking-tight drop-shadow-sm">
+                      {president.name}
+                    </h4>
+                    <p className="text-amber-300 text-[12px] font-extrabold mt-0.5 uppercase tracking-wide">
+                      समाज अध्यक्ष
+                    </p>
+                  </div>
+
+                  {/* Row 3: Golden Separator with Diamond */}
+                  <div className="flex items-center gap-1.5 my-3.5 w-32">
+                    <div className="h-[1px] flex-1 bg-amber-500/30" />
+                    <div className="w-1 h-1 rotate-45 bg-amber-500" />
+                    <div className="h-[1px] flex-1 bg-amber-500/30" />
+                  </div>
+
+                  {/* Row 4: Location */}
+                  <div className="flex items-center gap-2 text-white/95 text-[11px] font-semibold mb-4">
+                    <MapPin size={12} className="text-white/80 shrink-0" />
+                    <span>{president.city}, Madhya Pradesh</span>
+                  </div>
+
+                  {/* Row 5: Action Buttons */}
+                  <div className="flex gap-2 w-full" onClick={(e) => e.stopPropagation()}>
+                    <a 
+                      href={`tel:${president.phone}`}
+                      className="flex-1 py-2 rounded-xl border border-purple-400/40 hover:bg-white/5 text-white text-[11px] font-extrabold flex items-center justify-center gap-1.5 active:scale-95 transition-transform text-center"
+                    >
+                      <Phone size={12} /> कॉल करें
+                    </a>
+                    <button 
+                      onClick={() => navigate(`/member/chat/${president.id}`)}
+                      className="flex-1 py-2 rounded-xl border border-emerald-400/40 hover:bg-white/5 text-white text-[11px] font-extrabold flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
+                    >
+                      <MessageCircle size={12} /> चैट करें
                     </button>
                   </div>
                 </div>
