@@ -146,41 +146,61 @@ const HeroBanner = ({ leader, language, onBack, navigate }) => {
 
 // ─── CORE COMMITTEE: Horizontal Scroll Cards ───
 const CoreCommitteeCard = ({ member, language, isSelected, onSelect, navigate }) => {
+  // Map Joint Secretary role to bg-[#6B21A8] (purple) and "मंत्री" for badge consistency
+  const badgeColor = member.role === 'Vice President' 
+    ? 'bg-[#1e58b8]' 
+    : member.role === 'Secretary' 
+    ? 'bg-[#ff3b68]' 
+    : member.role === 'Joint Secretary' 
+    ? 'bg-[#6B21A8]' 
+    : getBadgeColor(member.role);
+    
+  const hindiRole = member.role === 'Vice President' 
+    ? 'उपाध्यक्ष' 
+    : member.role === 'Secretary' 
+    ? 'सचिव' 
+    : member.role === 'Joint Secretary' 
+    ? 'मंत्री' 
+    : getHindiRole(member.role);
+
   return (
     <div 
       onClick={onSelect}
-      className={`shrink-0 w-[140px] sm:w-[155px] bg-white rounded-[24px] overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.03)] border p-3 flex flex-col items-center cursor-pointer active:scale-[0.98] transition-transform ${isSelected ? 'border-brand-primary ring-2 ring-brand-primary/20' : 'border-gray-150'}`}
+      className={`shrink-0 w-[108px] sm:w-[118px] bg-white rounded-[16px] overflow-hidden shadow-[0_3px_12px_rgba(0,0,0,0.04)] border flex flex-col items-center cursor-pointer active:scale-[0.98] transition-transform pb-2 ${isSelected ? 'border-brand-primary ring-2 ring-brand-primary/20' : 'border-gray-100'}`}
     >
-      {/* Padded Portrait Photo */}
-      <div className="w-full aspect-square rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0 mb-3 relative">
+      {/* Full Width Portrait Photo */}
+      <div className="w-full aspect-square overflow-hidden bg-gray-50 shrink-0 mb-1.5 relative">
         <img src={`https://i.pravatar.cc/150?u=${member.initials}`} className="w-full h-full object-cover" alt={member.name} />
       </div>
       
-      {/* Role Capsule Badge */}
-      <div className={`text-white text-[9px] font-black px-3 py-0.5 rounded-full shadow-sm ${getBadgeColor(member.role)}`}>
-        {getHindiRole(member.role)}
+      {/* Role Badge - below photo, above name */}
+      <div className="mb-1 shrink-0">
+        <span className={`text-white text-[7px] sm:text-[8px] font-black px-1.5 py-0.5 rounded-md shadow-sm ${badgeColor}`}>
+          {hindiRole}
+        </span>
       </div>
       
       {/* Office Bearer Name */}
-      <h4 className="text-slate-800 text-[12px] font-extrabold text-center leading-tight mt-2 mb-3 flex-1 min-h-[32px] line-clamp-2">
-        {member.name}
+      <h4 className="text-slate-800 text-[9px] sm:text-[9.5px] font-black text-center leading-tight mb-1.5 px-1 line-clamp-2">
+        {member.name.replace(' Agrawal', '').replace(' Sharma', '').replace(' Patel', '')}
       </h4>
+
+      {/* Centered Short purple divider line */}
+      <div className="w-4.5 h-[1.2px] bg-purple-600 rounded-full mb-1.5" />
       
       {/* Call / Chat Action Buttons */}
-      <div className="flex gap-1.5 w-full mt-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="flex gap-1 justify-center w-full mt-auto" onClick={(e) => e.stopPropagation()}>
         <a 
           href={`tel:${member.phone}`} 
-          className="flex-1 py-1.5 flex flex-col items-center justify-center rounded-xl border border-gray-150 hover:bg-gray-50 transition-colors text-[#1e58b8]"
+          className="w-6 h-6 rounded-full border border-purple-200 flex items-center justify-center hover:bg-purple-50 transition-colors text-purple-600 shrink-0"
         >
-          <Phone size={13} />
-          <span className="text-[8px] font-bold text-gray-500 mt-0.5">कॉल करें</span>
+          <Phone size={10} />
         </a>
         <button 
           onClick={() => navigate(`/member/chat/${member.id}`)} 
-          className="flex-1 py-1.5 flex flex-col items-center justify-center rounded-xl border border-gray-150 hover:bg-gray-50 transition-colors text-[#00a651]"
+          className="w-6 h-6 rounded-full border border-emerald-200 flex items-center justify-center hover:bg-emerald-50 transition-colors text-emerald-600 shrink-0"
         >
-          <MessageCircle size={13} />
-          <span className="text-[8px] font-bold text-gray-500 mt-0.5">चैट करें</span>
+          <MessageCircle size={10} />
         </button>
       </div>
     </div>
