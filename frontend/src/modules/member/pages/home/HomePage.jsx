@@ -233,6 +233,38 @@ const HomePage = () => {
         )}
       </motion.div>
 
+      {/* ─── CENSUS QUICK BANNER ─── */}
+      <div className="px-5 mt-5 relative z-10">
+        <div 
+          onClick={() => navigate('/member/census')}
+          className="w-full bg-gradient-to-r from-purple-700 via-indigo-700 to-indigo-600 rounded-[28px] p-5 shadow-lg border border-indigo-400/20 text-white relative overflow-hidden cursor-pointer press-scale group"
+        >
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-white/10 to-transparent rounded-bl-[100px]" />
+          <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-white/5 rounded-full blur-xl" />
+          <div className="flex items-center justify-between relative z-10">
+            <div className="flex-1 min-w-0 pr-2">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="bg-white/20 text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  {language === 'en' ? 'Samaj Directory Analytics' : 'जनगणना & रिपोर्ट्स'}
+                </span>
+                <span className="bg-amber-400 text-slate-900 text-[8px] font-extrabold px-2 py-0.5 rounded-full uppercase flex items-center gap-0.5 shadow-sm">
+                  <Sparkles size={8} className="fill-slate-900" /> LIVE
+                </span>
+              </div>
+              <h3 className="text-[19px] font-serif font-extrabold leading-tight">
+                {language === 'en' ? 'Community Census' : 'समाज की कुल जानकारी'}
+              </h3>
+              <p className="text-white/80 text-[12.5px] mt-1 font-medium leading-snug">
+                {language === 'en' ? 'Explore demographics, family trees, active cities & download reports.' : 'हमारे समाज की एक विस्तृत झलक एवं रिपोर्ट्स देखें।'}
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner group-hover:bg-white/25 transition-colors shrink-0">
+              <ChevronRight size={22} className="text-white" />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ─── 3D BENTO GRID (QUICK ACTIONS) ─── */}
       <div className="px-5 mt-6 relative z-10">
         <h3 className="text-[14px] font-bold text-text-secondary tracking-widest uppercase mb-3 px-1">{t('Exclusive Features', language)}</h3>
@@ -374,46 +406,44 @@ const HomePage = () => {
                   </button>
                 </div>
                 
-                <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3.5 pb-4 -mx-5 px-5">
-                  {coreCommittee.map(member => {
+                <div className="grid grid-cols-3 gap-2 pb-4">
+                  {coreCommittee.slice(0, 3).map(member => {
                     const badgeColor = member.role.includes('Vice') ? 'bg-[#1e58b8]' : member.role.includes('Secretary') ? 'bg-[#ff3b68]' : 'bg-[#00a651]';
                     const hindiRole = member.role.includes('Vice') ? 'उपाध्यक्ष' : member.role.includes('Secretary') ? 'सचिव' : 'कोषाध्यक्ष';
                     return (
                       <div 
                         key={member.id} 
                         onClick={() => navigate('/member/leadership', { state: { selectedId: member.id } })}
-                        className="snap-center shrink-0 w-[160px] bg-white rounded-[28px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.03)] border border-gray-150 p-3.5 flex flex-col items-center cursor-pointer active:scale-[0.98] transition-transform"
+                        className="w-full bg-white rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-gray-150 p-2 py-3 flex flex-col items-center cursor-pointer active:scale-[0.98] transition-transform"
                       >
                         {/* Padded Portrait Photo */}
-                        <div className="w-full aspect-square rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0 mb-3.5 relative">
+                        <div className="w-full aspect-square rounded-xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0 mb-2 relative">
                           <img src={`https://i.pravatar.cc/150?u=${member.initials}`} className="w-full h-full object-cover" alt={member.name} />
                         </div>
                         
                         {/* Role Capsule Badge */}
-                        <div className={`text-white text-[9.5px] font-black px-3.5 py-0.5 rounded-full shadow-sm/5 ${badgeColor}`}>
+                        <div className={`text-white text-[8px] sm:text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm ${badgeColor}`}>
                           {hindiRole}
                         </div>
                         
                         {/* Office Bearer Name */}
-                        <h4 className="text-slate-800 text-[12.5px] font-black text-center leading-[1.3] mt-2 mb-3.5 flex-1 min-h-[32px] line-clamp-2">
-                          {member.name}
+                        <h4 className="text-slate-800 text-[10.5px] sm:text-[11.5px] font-extrabold text-center leading-tight mt-1.5 mb-2.5 flex-1 min-h-[26px] line-clamp-2">
+                          {member.name.replace(' Agrawal', '').replace(' Sharma', '').replace(' Patel', '')}
                         </h4>
                         
                         {/* Call / Chat Action Buttons */}
-                        <div className="flex gap-2 w-full mt-auto" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex gap-1.5 justify-center w-full mt-auto" onClick={(e) => e.stopPropagation()}>
                           <a 
                             href={`tel:${member.phone}`} 
-                            className="flex-1 py-1.5 flex flex-col items-center justify-center rounded-2xl border border-gray-150 hover:bg-gray-50 transition-colors text-[#1e58b8]"
+                            className="w-7 h-7 rounded-full border border-gray-150 flex items-center justify-center hover:bg-gray-50 transition-colors text-[#1e58b8] shrink-0"
                           >
-                            <Phone size={14} />
-                            <span className="text-[9px] font-bold text-gray-500 mt-0.5">कॉल करें</span>
+                            <Phone size={12} />
                           </a>
                           <button 
                             onClick={() => navigate(`/member/chat/${member.id}`)} 
-                            className="flex-1 py-1.5 flex flex-col items-center justify-center rounded-2xl border border-gray-150 hover:bg-gray-50 transition-colors text-[#00a651]"
+                            className="w-7 h-7 rounded-full border border-gray-150 flex items-center justify-center hover:bg-gray-50 transition-colors text-[#00a651] shrink-0"
                           >
-                            <MessageCircle size={14} />
-                            <span className="text-[9px] font-bold text-gray-500 mt-0.5">चैट करें</span>
+                            <MessageCircle size={12} />
                           </button>
                         </div>
                       </div>

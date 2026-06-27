@@ -149,38 +149,38 @@ const CoreCommitteeCard = ({ member, language, isSelected, onSelect, navigate })
   return (
     <div 
       onClick={onSelect}
-      className={`shrink-0 w-[160px] bg-white rounded-[28px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.03)] border p-3.5 flex flex-col items-center cursor-pointer active:scale-[0.98] transition-transform ${isSelected ? 'border-brand-primary ring-2 ring-brand-primary/20' : 'border-gray-150'}`}
+      className={`shrink-0 w-[140px] sm:w-[155px] bg-white rounded-[24px] overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.03)] border p-3 flex flex-col items-center cursor-pointer active:scale-[0.98] transition-transform ${isSelected ? 'border-brand-primary ring-2 ring-brand-primary/20' : 'border-gray-150'}`}
     >
       {/* Padded Portrait Photo */}
-      <div className="w-full aspect-square rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0 mb-3.5 relative">
+      <div className="w-full aspect-square rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0 mb-3 relative">
         <img src={`https://i.pravatar.cc/150?u=${member.initials}`} className="w-full h-full object-cover" alt={member.name} />
       </div>
       
       {/* Role Capsule Badge */}
-      <div className={`text-white text-[9.5px] font-black px-3.5 py-0.5 rounded-full shadow-sm/5 ${getBadgeColor(member.role)}`}>
+      <div className={`text-white text-[9px] font-black px-3 py-0.5 rounded-full shadow-sm ${getBadgeColor(member.role)}`}>
         {getHindiRole(member.role)}
       </div>
       
       {/* Office Bearer Name */}
-      <h4 className="text-slate-800 text-[12.5px] font-black text-center leading-[1.3] mt-2 mb-3.5 flex-1 min-h-[32px] line-clamp-2">
+      <h4 className="text-slate-800 text-[12px] font-extrabold text-center leading-tight mt-2 mb-3 flex-1 min-h-[32px] line-clamp-2">
         {member.name}
       </h4>
       
       {/* Call / Chat Action Buttons */}
-      <div className="flex gap-2 w-full mt-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="flex gap-1.5 w-full mt-auto" onClick={(e) => e.stopPropagation()}>
         <a 
           href={`tel:${member.phone}`} 
-          className="flex-1 py-1.5 flex flex-col items-center justify-center rounded-2xl border border-gray-150 hover:bg-gray-50 transition-colors text-[#1e58b8]"
+          className="flex-1 py-1.5 flex flex-col items-center justify-center rounded-xl border border-gray-150 hover:bg-gray-50 transition-colors text-[#1e58b8]"
         >
-          <Phone size={14} />
-          <span className="text-[9px] font-bold text-gray-500 mt-0.5">कॉल करें</span>
+          <Phone size={13} />
+          <span className="text-[8px] font-bold text-gray-500 mt-0.5">कॉल करें</span>
         </a>
         <button 
           onClick={() => navigate(`/member/chat/${member.id}`)} 
-          className="flex-1 py-1.5 flex flex-col items-center justify-center rounded-2xl border border-gray-150 hover:bg-gray-50 transition-colors text-[#00a651]"
+          className="flex-1 py-1.5 flex flex-col items-center justify-center rounded-xl border border-gray-150 hover:bg-gray-50 transition-colors text-[#00a651]"
         >
-          <MessageCircle size={14} />
-          <span className="text-[9px] font-bold text-gray-500 mt-0.5">चैट करें</span>
+          <MessageCircle size={13} />
+          <span className="text-[8px] font-bold text-gray-500 mt-0.5">चैट करें</span>
         </button>
       </div>
     </div>
@@ -268,12 +268,16 @@ const LeadershipPage = () => {
   const location = useLocation();
   const { currentUser, language } = useData();
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All'); // All, Zonal Head, Area Sub-Head
+  const [sortOrder, setSortOrder] = useState('none'); // none, name-asc, name-desc, members-desc
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [showSortMenu, setShowSortMenu] = useState(false);
   
   const cityAdmins = mockAdmins.filter(a => a.city === currentUser.city);
   
   const patron = cityAdmins.find(a => a.role === 'Patron');
   const president = cityAdmins.find(a => a.role === 'President');
-  const coreCommittee = cityAdmins.filter(a => ['President', 'Vice President', 'Secretary', 'Joint Secretary', 'Treasurer'].includes(a.role));
+  const coreCommittee = cityAdmins.filter(a => ['Vice President', 'Secretary', 'Joint Secretary', 'Treasurer'].includes(a.role));
   const ministers = cityAdmins.filter(a => a.role.startsWith('Minister'));
   const zonalHeads = cityAdmins.filter(a => a.role === 'Zonal Head');
   const areaDelegates = cityAdmins.filter(a => a.role === 'Area Sub-Head');
@@ -293,12 +297,27 @@ const LeadershipPage = () => {
   // Selected leader profile matching selectedId
   const selectedLeader = cityAdmins.find(a => a.id === selectedId) || president || patron || cityAdmins[0];
 
-  const filteredDelegates = [...zonalHeads, ...areaDelegates].filter(d =>
+  // Apply Filter and Search
+  let delegates = [...zonalHeads, ...areaDelegates];
+  if (activeFilter !== 'All') {
+    delegates = delegates.filter(d => d.role === activeFilter);
+  }
+
+  const filteredDelegates = delegates.filter(d =>
     !searchQuery || 
     d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (d.area && d.area.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (d.zone && d.zone.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  // Apply Sorting
+  if (sortOrder === 'name-asc') {
+    filteredDelegates.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortOrder === 'name-desc') {
+    filteredDelegates.sort((a, b) => b.name.localeCompare(a.name));
+  } else if (sortOrder === 'members-desc') {
+    filteredDelegates.sort((a, b) => (b.members || 0) - (a.members || 0));
+  }
 
   const handleSelectLeader = (id) => {
     setSelectedId(id);
@@ -410,12 +429,37 @@ const LeadershipPage = () => {
               className="w-full bg-white border border-gray-200 rounded-xl py-2.5 pl-9 pr-3 text-[12px] text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
             />
           </div>
-          <button className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 shrink-0 active:scale-95 transition-transform">
-            <SlidersHorizontal size={16} />
-          </button>
-          <button className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 shrink-0 active:scale-95 transition-transform">
-            <ArrowUpDown size={16} />
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => { setShowFilterMenu(!showFilterMenu); setShowSortMenu(false); }}
+              className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 active:scale-95 transition-transform ${activeFilter !== 'All' ? 'bg-blue-50 border-blue-200 text-[#1e58b8]' : 'bg-white border-gray-250 text-gray-400'}`}
+            >
+              <SlidersHorizontal size={16} />
+            </button>
+            {showFilterMenu && (
+              <div className="absolute right-0 mt-1 bg-white border border-gray-150 rounded-xl shadow-lg p-1.5 z-30 flex flex-col gap-0.5 text-[11px] font-extrabold w-[160px]">
+                <button type="button" onClick={() => { setActiveFilter('All'); setShowFilterMenu(false); }} className={`p-2 text-left rounded-lg transition-colors ${activeFilter === 'All' ? 'bg-blue-50 text-[#1e58b8]' : 'text-gray-600 hover:bg-gray-50'}`}>सभी (All)</button>
+                <button type="button" onClick={() => { setActiveFilter('Zonal Head'); setShowFilterMenu(false); }} className={`p-2 text-left rounded-lg transition-colors ${activeFilter === 'Zonal Head' ? 'bg-blue-50 text-[#1e58b8]' : 'text-gray-600 hover:bg-gray-50'}`}>क्षेत्रीय प्रभारी (Zonal)</button>
+                <button type="button" onClick={() => { setActiveFilter('Area Sub-Head'); setShowFilterMenu(false); }} className={`p-2 text-left rounded-lg transition-colors ${activeFilter === 'Area Sub-Head' ? 'bg-blue-50 text-[#1e58b8]' : 'text-gray-600 hover:bg-gray-50'}`}>क्षेत्रीय प्रतिनिधि (Area)</button>
+              </div>
+            )}
+          </div>
+          <div className="relative">
+            <button 
+              onClick={() => { setShowSortMenu(!showSortMenu); setShowFilterMenu(false); }}
+              className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 active:scale-95 transition-transform ${sortOrder !== 'none' ? 'bg-blue-50 border-blue-200 text-[#1e58b8]' : 'bg-white border-gray-250 text-gray-400'}`}
+            >
+              <ArrowUpDown size={16} />
+            </button>
+            {showSortMenu && (
+              <div className="absolute right-0 mt-1 bg-white border border-gray-155 rounded-xl shadow-lg p-1.5 z-30 flex flex-col gap-0.5 text-[11px] font-extrabold w-[150px]">
+                <button type="button" onClick={() => { setSortOrder('none'); setShowSortMenu(false); }} className={`p-2 text-left rounded-lg transition-colors ${sortOrder === 'none' ? 'bg-blue-50 text-[#1e58b8]' : 'text-gray-600 hover:bg-gray-50'}`}>डिफ़ॉल्ट (Default)</button>
+                <button type="button" onClick={() => { setSortOrder('name-asc'); setShowSortMenu(false); }} className={`p-2 text-left rounded-lg transition-colors ${sortOrder === 'name-asc' ? 'bg-blue-50 text-[#1e58b8]' : 'text-gray-600 hover:bg-gray-50'}`}>नाम: A से Z (Name A-Z)</button>
+                <button type="button" onClick={() => { setSortOrder('name-desc'); setShowSortMenu(false); }} className={`p-2 text-left rounded-lg transition-colors ${sortOrder === 'name-desc' ? 'bg-blue-50 text-[#1e58b8]' : 'text-gray-600 hover:bg-gray-50'}`}>नाम: Z से A (Name Z-A)</button>
+                <button type="button" onClick={() => { setSortOrder('members-desc'); setShowSortMenu(false); }} className={`p-2 text-left rounded-lg transition-colors ${sortOrder === 'members-desc' ? 'bg-blue-50 text-[#1e58b8]' : 'text-gray-600 hover:bg-gray-50'}`}>सदस्य संख्या (Members)</button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Delegate list */}

@@ -14,6 +14,7 @@ const CreatePostPage = () => {
   const attachPhotoOnStart = location.state?.attachPhoto || false;
   const attachVideoOnStart = location.state?.attachVideo || false;
   const createStoryMode = location.state?.createStoryMode || false;
+  const feedType = location.state?.feedType || 'city';
 
   const [postType, setPostType] = useState(createStoryMode ? 'story' : 'feed');
   const [title, setTitle] = useState('');
@@ -78,6 +79,7 @@ const CreatePostPage = () => {
       views: Math.floor(Math.random() * 50) + 1,
       isLiked: false,
       images: selectedImages,
+      feedType,
       author: {
         name: currentUser.name,
         initials: currentUser.initials,

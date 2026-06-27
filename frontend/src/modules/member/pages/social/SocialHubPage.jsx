@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, Search, Bell, Users, MessageCircle, Rss, Compass } from 'lucide-react';
+import { Menu, Search, Bell, Users, MessageCircle, MapPin, Compass } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Avatar } from '../../components/common/Avatar';
 import { useData } from '../../context/DataProvider';
@@ -43,53 +43,32 @@ const DiscoverContent = () => (
   </div>
 );
 
-// Custom Tab Icons matching the wireframe in Image 3
 // Custom Tab Icons matching the requested design and React Icons
-const FeedIcon = ({ size = 22, isActive }) => (
-  <FiUsers size={size} className={`transition-colors duration-200 ${isActive ? 'text-[#1877F2]' : 'text-[#828E9E]'}`} />
-);
-
-const ConnectIcon = ({ size = 22, isActive }) => (
+const CityFeedIcon = ({ size = 22, isActive }) => (
   <svg
     width={size}
     height={size}
     viewBox="0 0 24 24"
     fill="none"
     stroke={isActive ? '#1877F2' : '#828E9E'}
-    strokeWidth="1.6"
+    strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
     className="transition-colors duration-200"
   >
-    {/* Map Pin Top Center */}
-    <path d="M12 2a2.5 2.5 0 0 0-2.5 2.5c0 2.2 2.5 4.5 2.5 4.5s2.5-2.3 2.5-4.5A2.5 2.5 0 0 0 12 2z" />
-    <circle cx="12" cy="4.5" r="0.8" fill={isActive ? '#1877F2' : '#828E9E'} />
-
-    {/* Map Pin Left */}
-    <path d="M4.5 7a2 2 0 0 0-2 2c0 1.8 2 3.5 2 3.5s2-1.7 2-3.5a2 2 0 0 0-2-2z" />
-    <circle cx="4.5" cy="9" r="0.6" fill={isActive ? '#1877F2' : '#828E9E'} />
-
-    {/* Map Pin Right */}
-    <path d="M19.5 7a2 2 0 0 0-2 2c0 1.8 2 3.5 2 3.5s2-1.7 2-3.5a2 2 0 0 0-2-2z" />
-    <circle cx="19.5" cy="9" r="0.6" fill={isActive ? '#1877F2' : '#828E9E'} />
-
-    {/* Dotted Connection Lines */}
-    <path d="M4.5 12.5 C 7 14, 9 14, 12 14" strokeDasharray="1.5 1.5" />
-    <path d="M19.5 12.5 C 17 14, 15 14, 12 14" strokeDasharray="1.5 1.5" />
-    <path d="M12 9 L 12 13" strokeDasharray="1.5 1.5" />
-
-    {/* Bottom People */}
-    <circle cx="9" cy="15.5" r="1.2" />
-    <path d="M7 18.5c0-.8.6-1.5 1.5-1.5h1c.9 0 1.5.7 1.5 1.5" />
-
-    <circle cx="15" cy="15.5" r="1.2" />
-    <path d="M13 18.5c0-.8.6-1.5 1.5-1.5h1c.9 0 1.5.7 1.5 1.5" />
-
-    <circle cx="12" cy="14.5" r="1.2" />
-    <path d="M10 17.5c0-.8.6-1.5 1.5-1.5h1c.9 0 1.5.7 1.5 1.5" />
-
-    <ellipse cx="12" cy="19.2" rx="7.5" ry="1.8" />
+    {/* User Outline */}
+    <path d="M14 19a5 5 0 0 0-10 0" />
+    <circle cx="9" cy="9" r="3" />
+    
+    {/* Broadcast/Feed Waves */}
+    <path d="M17 13a3 3 0 0 1 3-3" strokeWidth="1.8" />
+    <path d="M17 17a5 5 0 0 1 5-5" strokeWidth="1.8" />
+    <circle cx="17" cy="9" r="1" fill={isActive ? '#1877F2' : '#828E9E'} />
   </svg>
+);
+
+const CommunityFeedIcon = ({ size = 22, isActive }) => (
+  <FiUsers size={size} className={`transition-colors duration-200 ${isActive ? 'text-[#1877F2]' : 'text-[#828E9E]'}`} />
 );
 
 const GroupsIcon = ({ size = 22, isActive }) => (
@@ -118,7 +97,7 @@ const DiscoverIcon = ({ size = 22, isActive }) => (
   </svg>
 );
 
-const SocialHubPage = ({ initialTab = 'feed' }) => {
+const SocialHubPage = ({ initialTab = 'city-feed' }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUser } = useData();
@@ -132,8 +111,8 @@ const SocialHubPage = ({ initialTab = 'feed' }) => {
   const wheelTimeoutRef = useRef(null);
 
   const tabs = [
-    { id: 'feed', label: 'Feed', icon: FeedIcon, component: FeedPage },
-    { id: 'connect', label: 'Connect', icon: ConnectIcon, component: DirectoryPage },
+    { id: 'city-feed', label: 'City Feed', icon: CityFeedIcon, component: FeedPage, feedProps: { feedType: 'city' } },
+    { id: 'community-feed', label: 'Community Feed', icon: CommunityFeedIcon, component: FeedPage, feedProps: { feedType: 'community' } },
     { id: 'groups', label: 'Groups', icon: GroupsIcon, component: GroupsPage },
     { id: 'chat', label: 'Chat', icon: ChatIcon, component: ChatListPage },
     { id: 'discover', label: 'Discover', icon: DiscoverIcon, component: DiscoverContent }
@@ -141,7 +120,9 @@ const SocialHubPage = ({ initialTab = 'feed' }) => {
 
   // Set initial scroll position based on route state or initialTab
   useEffect(() => {
-    const passedTabId = location.state?.tab || initialTab;
+    let passedTabId = location.state?.tab || initialTab;
+    if (passedTabId === 'feed') passedTabId = 'city-feed';
+    if (passedTabId === 'connect') passedTabId = 'community-feed';
     const tabIndex = tabs.findIndex(t => t.id === passedTabId);
     if (tabIndex !== -1 && scrollContainerRef.current) {
       setActiveTab(tabIndex);
@@ -264,9 +245,16 @@ const SocialHubPage = ({ initialTab = 'feed' }) => {
 
   // Render unified FAB based on active tab
   const renderFAB = () => {
-    if (activeTab === 0) { // Feed
+    if (activeTab === 0) { // City Feed
       return (
-        <button onClick={() => navigate('/member/social/create')} className="responsive-fixed-fab w-14 h-14 bg-[#1877F2] text-white rounded-full shadow-lg flex items-center justify-center press-scale hover:bg-blue-600 transition-colors absolute bottom-6 right-5 z-50">
+        <button onClick={() => navigate('/member/social/create', { state: { feedType: 'city' } })} className="responsive-fixed-fab w-14 h-14 bg-[#1877F2] text-white rounded-full shadow-lg flex items-center justify-center press-scale hover:bg-blue-600 transition-colors absolute bottom-6 right-5 z-50">
+          <PlusCircle size={28} />
+        </button>
+      );
+    }
+    if (activeTab === 1) { // Community Feed
+      return (
+        <button onClick={() => navigate('/member/social/create', { state: { feedType: 'community' } })} className="responsive-fixed-fab w-14 h-14 bg-[#1877F2] text-white rounded-full shadow-lg flex items-center justify-center press-scale hover:bg-blue-600 transition-colors absolute bottom-6 right-5 z-50">
           <PlusCircle size={28} />
         </button>
       );
