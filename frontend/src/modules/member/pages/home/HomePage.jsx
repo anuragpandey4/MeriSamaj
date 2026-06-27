@@ -356,53 +356,68 @@ const HomePage = () => {
           const coreCommittee = mockAdmins.filter(a => ['Vice President', 'Secretary', 'Joint Secretary', 'Treasurer'].includes(a.role) && a.city?.toLowerCase() === currentUser.city?.toLowerCase());
           
           return (
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-5">
+              {/* Core Committee Header */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-[18px] font-extrabold text-gray-900 tracking-tight">मुख्य पदाधिकारी</h3>
+                  <p className="text-[13px] text-gray-500 font-medium">Core Committee</p>
+                </div>
+                <button onClick={() => navigate('/member/leadership')} className="text-[14px] text-[#1e58b8] font-bold press-scale flex items-center gap-1">
+                  सभी देखें <ChevronRight size={16} />
+                </button>
+              </div>
+
               {/* President Section */}
               <div 
                 onClick={() => navigate('/member/leadership', { state: { selectedId: president.id } })}
                 className="relative w-full rounded-[28px] bg-gradient-to-r from-[#170e30] via-[#241344] to-[#401f68] shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-white/5 overflow-hidden p-5 shrink-0 cursor-pointer active:scale-[0.99] transition-all duration-300"
               >
-                {/* Blended portrait face - rendered directly to card boundaries */}
+                {/* Blended portrait face - rendered directly to card boundaries with CSS Mask for partition-free smooth transition */}
                 <img 
                   src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80" 
                   className="absolute right-0 top-0 bottom-0 w-[58%] h-full object-cover object-[center_30%] pointer-events-none z-0" 
+                  style={{
+                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.05) 8%, rgba(0,0,0,0.85) 60%, black 100%)',
+                    maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.05) 8%, rgba(0,0,0,0.85) 60%, black 100%)'
+                  }}
                   alt={president.name} 
                 />
-                {/* Full-width seamless gradient overlay - completely blends the left edge of the image */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#170e30] via-[#241344] via-[#241344]/95 to-transparent pointer-events-none z-0" />
+                {/* Full-width seamless gradient overlay - completely blends the left edge of the image with a lighter fade */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#170e30] via-[#241344]/70 via-[#241344]/15 to-transparent pointer-events-none z-0" />
 
                 {/* Left content block */}
                 <div className="relative z-10 flex flex-col justify-between h-full max-w-[62%]">
                   {/* Row 1: Crown Badge & Role */}
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-full border-2 border-amber-500/80 flex items-center justify-center bg-black/30 shadow-sm shrink-0">
-                      <Crown size={18} className="text-amber-400 fill-amber-400" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-full border-2 border-amber-500/80 flex items-center justify-center bg-black/30 shadow-sm shrink-0">
+                      <Crown size={16} className="text-amber-400 fill-amber-400" />
                     </div>
-                    <span className="bg-[#6B21A8]/90 text-white text-[10px] font-black px-3.5 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="bg-[#6B21A8]/90 text-white text-[9px] font-black px-3 py-0.5 rounded-full uppercase tracking-wider">
                       अध्यक्ष
                     </span>
                   </div>
 
                   {/* Row 2: Name & Role Title */}
-                  <div className="mt-4">
-                    <h4 className="text-white text-[20px] font-black leading-tight tracking-tight drop-shadow-sm">
+                  <div className="mt-3.5">
+                    <h4 className="text-white text-[18px] font-black leading-tight tracking-tight drop-shadow-sm">
                       {president.name}
                     </h4>
-                    <p className="text-amber-300 text-[12px] font-extrabold mt-0.5 uppercase tracking-wide">
+                    <p className="text-amber-300 text-[11px] font-extrabold mt-0.5 uppercase tracking-wide">
                       समाज अध्यक्ष
                     </p>
                   </div>
 
                   {/* Row 3: Golden Separator with Diamond */}
-                  <div className="flex items-center gap-1.5 my-3.5 w-32">
+                  <div className="flex items-center gap-1.5 my-3 w-32">
                     <div className="h-[1px] flex-1 bg-amber-500/30" />
                     <div className="w-1 h-1 rotate-45 bg-amber-500" />
                     <div className="h-[1px] flex-1 bg-amber-500/30" />
                   </div>
 
                   {/* Row 4: Location */}
-                  <div className="flex items-center gap-2 text-white/95 text-[11px] font-semibold mb-4">
-                    <MapPin size={12} className="text-white/80 shrink-0" />
+                  <div className="flex items-center gap-2 text-white/95 text-[10px] font-semibold mb-3.5">
+                    <MapPin size={11} className="text-white/80 shrink-0" />
                     <span>{president.city}, Madhya Pradesh</span>
                   </div>
 
@@ -410,77 +425,81 @@ const HomePage = () => {
                   <div className="flex gap-2 w-full" onClick={(e) => e.stopPropagation()}>
                     <a 
                       href={`tel:${president.phone}`}
-                      className="flex-1 py-2 rounded-xl border border-purple-400/40 hover:bg-white/5 text-white text-[11px] font-extrabold flex items-center justify-center gap-1.5 active:scale-95 transition-transform text-center"
+                      className="flex-1 py-1.5 rounded-xl border border-purple-400/40 hover:bg-white/5 text-white text-[10px] font-extrabold flex items-center justify-center gap-1.5 active:scale-95 transition-transform text-center"
                     >
-                      <Phone size={12} /> कॉल करें
+                      <Phone size={11} /> कॉल करें
                     </a>
                     <button 
                       onClick={() => navigate(`/member/chat/${president.id}`)}
-                      className="flex-1 py-2 rounded-xl border border-emerald-400/40 hover:bg-white/5 text-white text-[11px] font-extrabold flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
+                      className="flex-1 py-1.5 rounded-xl border border-emerald-400/40 hover:bg-white/5 text-white text-[10px] font-extrabold flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
                     >
-                      <MessageCircle size={12} /> चैट करें
+                      <MessageCircle size={11} /> चैट करें
                     </button>
                   </div>
                 </div>
               </div>
-
-              {/* Core Committee Section */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-[18px] font-extrabold text-gray-900 tracking-tight">मुख्य पदाधिकारी</h3>
-                    <p className="text-[13px] text-gray-500 font-medium">Core Committee</p>
-                  </div>
-                  <button onClick={() => navigate('/member/leadership')} className="text-[14px] text-[#1e58b8] font-bold press-scale flex items-center gap-1">
-                    सभी देखें <ChevronRight size={16} />
-                  </button>
-                </div>
                 
                 <div className="grid grid-cols-3 gap-2 pb-4">
                   {coreCommittee.slice(0, 3).map(member => {
-                    const badgeColor = member.role.includes('Vice') ? 'bg-[#1e58b8]' : member.role.includes('Secretary') ? 'bg-[#ff3b68]' : 'bg-[#00a651]';
-                    const hindiRole = member.role.includes('Vice') ? 'उपाध्यक्ष' : member.role.includes('Secretary') ? 'सचिव' : 'कोषाध्यक्ष';
+                    const badgeColor = member.role === 'Vice President' 
+                      ? 'bg-[#1e58b8]' 
+                      : member.role === 'Secretary' 
+                      ? 'bg-[#ff3b68]' 
+                      : member.role === 'Joint Secretary' 
+                      ? 'bg-[#6B21A8]' 
+                      : 'bg-[#00a651]';
+                    const hindiRole = member.role === 'Vice President' 
+                      ? 'उपाध्यक्ष' 
+                      : member.role === 'Secretary' 
+                      ? 'सचिव' 
+                      : member.role === 'Joint Secretary' 
+                      ? 'मंत्री' 
+                      : 'कोषाध्यक्ष';
                     return (
                       <div 
                         key={member.id} 
                         onClick={() => navigate('/member/leadership', { state: { selectedId: member.id } })}
-                        className="w-full bg-white rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-gray-150 p-2 py-3 flex flex-col items-center cursor-pointer active:scale-[0.98] transition-transform"
+                        className="w-full bg-white rounded-[18px] overflow-hidden shadow-[0_3px_12px_rgba(0,0,0,0.05)] border border-gray-100/65 flex flex-col items-center cursor-pointer active:scale-[0.98] transition-transform pb-2.5"
                       >
-                        {/* Padded Portrait Photo */}
-                        <div className="w-full aspect-square rounded-xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0 mb-2 relative">
+                        {/* Full Width Portrait Photo */}
+                        <div className="w-full aspect-square overflow-hidden bg-gray-50 shrink-0 mb-2 relative">
                           <img src={`https://i.pravatar.cc/150?u=${member.initials}`} className="w-full h-full object-cover" alt={member.name} />
-                        </div>
-                        
-                        {/* Role Capsule Badge */}
-                        <div className={`text-white text-[8px] sm:text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm ${badgeColor}`}>
-                          {hindiRole}
+                          
+                          {/* Role Badge inside the photo container at top-left - closer to top/left and smaller text */}
+                          <div className="absolute top-1.5 left-1.5 z-10">
+                            <span className={`text-white text-[7px] sm:text-[8px] font-black px-1.5 py-0.5 rounded-md shadow-sm ${badgeColor}`}>
+                              {hindiRole}
+                            </span>
+                          </div>
                         </div>
                         
                         {/* Office Bearer Name */}
-                        <h4 className="text-slate-800 text-[10.5px] sm:text-[11.5px] font-extrabold text-center leading-tight mt-1.5 mb-2.5 flex-1 min-h-[26px] line-clamp-2">
+                        <h4 className="text-slate-800 text-[9px] sm:text-[10px] font-black text-center leading-tight mb-2 px-1 line-clamp-2">
                           {member.name.replace(' Agrawal', '').replace(' Sharma', '').replace(' Patel', '')}
                         </h4>
+
+                        {/* Centered Short purple divider line */}
+                        <div className="w-5 h-[1.5px] bg-purple-600 rounded-full mb-2" />
                         
                         {/* Call / Chat Action Buttons */}
                         <div className="flex gap-1.5 justify-center w-full mt-auto" onClick={(e) => e.stopPropagation()}>
                           <a 
                             href={`tel:${member.phone}`} 
-                            className="w-7 h-7 rounded-full border border-gray-150 flex items-center justify-center hover:bg-gray-50 transition-colors text-[#1e58b8] shrink-0"
+                            className="w-7 h-7 rounded-full border border-purple-200 flex items-center justify-center hover:bg-purple-50 transition-colors text-purple-600 shrink-0"
                           >
-                            <Phone size={12} />
+                            <Phone size={11} />
                           </a>
                           <button 
                             onClick={() => navigate(`/member/chat/${member.id}`)} 
-                            className="w-7 h-7 rounded-full border border-gray-150 flex items-center justify-center hover:bg-gray-50 transition-colors text-[#00a651] shrink-0"
+                            className="w-7 h-7 rounded-full border border-emerald-200 flex items-center justify-center hover:bg-emerald-50 transition-colors text-emerald-600 shrink-0"
                           >
-                            <MessageCircle size={12} />
+                            <MessageCircle size={11} />
                           </button>
                         </div>
                       </div>
                     );
                   })}
                 </div>
-              </div>
             </div>
           );
         })()}
