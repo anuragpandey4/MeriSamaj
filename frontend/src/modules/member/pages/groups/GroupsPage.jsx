@@ -151,7 +151,12 @@ const GroupsPage = ({ isHub = false }) => {
       </div>
 
       {/* ─── HORIZONTAL FILTER PILLS ─── */}
-      <div className="overflow-x-auto snap-x snap-mandatory scrollbar-hide py-2.5 px-4 flex gap-2 bg-[#F5F6FA]">
+      <div 
+        className="overflow-x-auto snap-x snap-mandatory scrollbar-hide py-2.5 px-4 flex gap-2 bg-[#F5F6FA]"
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        data-swipe-block="true"
+      >
         {categoryPills.map(pill => {
           const isActive = activeCategory === pill.id;
           return (
