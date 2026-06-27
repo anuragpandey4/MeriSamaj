@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ThumbsUp, MessageCircle, Share2, MoreHorizontal, PlusCircle, Image as ImageIcon, Send, Search, Bell, Radio, Clock, Camera, Video, Calendar, Eye, Heart, Award, Sparkles, Smile, Phone, MapPin, Check, Gift, X } from 'lucide-react';
+import { ThumbsUp, MessageCircle, Share2, MoreHorizontal, PlusCircle, Image as ImageIcon, Send, Search, Bell, Radio, Clock, Camera, Video, Calendar, Eye, Heart, Award, Sparkles, Smile, Phone, MapPin, Check, Gift, X, SlidersHorizontal } from 'lucide-react';
 import { Avatar } from '../../components/common/Avatar';
 import { useData } from '../../context/DataProvider';
 import { PostSkeleton } from '../../components/common/Skeleton';
@@ -409,6 +409,7 @@ const FeedPage = ({ isHub = false, feedType = 'city', searchQuery = '' }) => {
   const { posts, members: mockMembers, currentUser, language, stories = [] } = useData();
   const [activeTab, setActiveTab] = useState('all');
   const [searchText, setSearchText] = useState('');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
     setSearchText(searchQuery);
@@ -564,50 +565,38 @@ const FeedPage = ({ isHub = false, feedType = 'city', searchQuery = '' }) => {
 
 
 
-        {/* ─── SEARCH INPUT ─── */}
-        <div className="bg-white rounded-2xl flex items-center px-4 py-2.5 border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.015)] focus-within:border-brand-primary/20 transition-all mb-4.5">
-          <Search size={18} className="text-gray-400 shrink-0 mr-2.5" />
-          <input
-            type="text"
-            placeholder={localT[lang].searchPlaceholder}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            className="bg-transparent outline-none w-full text-[13.5px] text-slate-800 placeholder:text-gray-400 font-medium"
-          />
-          {searchText && (
-            <button onClick={() => setSearchText('')} className="text-slate-400 hover:text-slate-600 active:scale-90 p-0.5">
-              <X size={14} className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-
-        {/* ─── HORIZONTAL FILTER TABS ─── */}
-        <div 
-          className="overflow-x-auto snap-x scrollbar-hide py-1 -mx-4.5 px-4.5 flex gap-2 mb-5"
-          onTouchStart={(e) => e.stopPropagation()}
-          onTouchMove={(e) => e.stopPropagation()}
-          data-swipe-block="true"
-        >
-          {categoryPills.map(pill => {
-            const isActive = activeTab === pill.id;
-            const Icon = categoryIcons[pill.id];
-            const pillLabel = pill.id === 'all' ? localT[lang].all : localT[lang][pill.id];
-            
-            return (
-              <button
-                key={pill.id}
-                onClick={() => setActiveTab(pill.id)}
-                className={`snap-center shrink-0 px-4 py-2 rounded-full text-[12.5px] font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${
-                  isActive 
-                    ? 'bg-brand-primary text-white shadow-brand-primary/20' 
-                    : 'bg-white text-slate-500 border border-slate-150/40 hover:text-slate-700 hover:border-slate-200'
-                }`}
-              >
-                {Icon && <Icon size={14} />}
-                <span>{pillLabel}</span>
+        {/* ─── SEARCH & FILTER CONTAINER ─── */}
+        <div className="flex items-center gap-3 mb-4.5">
+          <div className="flex-1 bg-white rounded-2xl flex items-center px-4 py-2.5 border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.015)] focus-within:border-brand-primary/20 transition-all">
+            <Search size={18} className="text-gray-400 shrink-0 mr-2.5" />
+            <input
+              type="text"
+              placeholder={localT[lang].searchPlaceholder}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="bg-transparent outline-none w-full text-[13.5px] text-slate-800 placeholder:text-gray-400 font-medium"
+            />
+            {searchText && (
+              <button onClick={() => setSearchText('')} className="text-slate-400 hover:text-slate-600 active:scale-90 p-0.5">
+                <X size={14} className="w-3.5 h-3.5" />
               </button>
-            );
-          })}
+            )}
+          </div>
+          
+          <button 
+            onClick={() => setIsFilterOpen(true)}
+            className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border transition-all press-scale shadow-sm relative ${
+              activeTab !== 'all' 
+                ? 'bg-brand-primary border-brand-primary text-white shadow-md shadow-brand-primary/20' 
+                : 'bg-white border-slate-100 text-slate-500 hover:text-slate-700 hover:border-slate-200'
+            }`}
+            title="Filter Category"
+          >
+            <SlidersHorizontal size={18} />
+            {activeTab !== 'all' && (
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border border-white text-[8px] font-black text-white flex items-center justify-center shadow-sm" />
+            )}
+          </button>
         </div>
 
         {/* ─── POSTS FEED LIST ─── */}
@@ -649,6 +638,94 @@ const FeedPage = ({ isHub = false, feedType = 'city', searchQuery = '' }) => {
         onStoryChange={(nextStory) => setActiveStory(nextStory)}
         onClose={() => setActiveStory(null)} 
       />
+
+      {/* Category Filter Bottom Sheet */}
+      <AnimatePresence>
+        {isFilterOpen && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center">
+            {/* Backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsFilterOpen(false)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-xs"
+            />
+            
+            {/* Sheet Container */}
+            <motion.div 
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 250 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white w-full rounded-t-[32px] max-w-md flex flex-col overflow-hidden max-h-[80vh] shadow-2xl relative z-10"
+              data-swipe-block="true"
+            >
+              {/* Drag Handle Indicator */}
+              <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto my-3 shrink-0" />
+              
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 pb-4 border-b border-slate-100/60 shrink-0">
+                <div>
+                  <h3 className="text-[17px] font-black text-slate-800">Filter Posts</h3>
+                  <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Select Category</p>
+                </div>
+                <button 
+                  onClick={() => setIsFilterOpen(false)}
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center active:scale-95 transition-all text-slate-500"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              
+              {/* List */}
+              <div className="p-5 overflow-y-auto space-y-2.5 max-h-[55vh] pb-10">
+                {categoryPills.map(pill => {
+                  const isActive = activeTab === pill.id;
+                  const Icon = categoryIcons[pill.id];
+                  const pillLabel = pill.id === 'all' ? localT[lang].all : localT[lang][pill.id];
+                  const styles = getCategoryStyles(pill.id === 'all' ? '' : pill.id, lang);
+                  
+                  return (
+                    <button
+                      key={pill.id}
+                      onClick={() => {
+                        setActiveTab(pill.id);
+                        setIsFilterOpen(false);
+                      }}
+                      className={`w-full p-3.5 rounded-2xl border-2 flex items-center justify-between transition-all active:scale-[0.99] ${
+                        isActive 
+                          ? 'bg-brand-primary/5 border-brand-primary' 
+                          : 'bg-white border-slate-100 hover:border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                          isActive ? 'bg-brand-primary text-white' : `${styles.bg} ${styles.text}`
+                        }`}>
+                          {Icon && <Icon size={18} />}
+                        </div>
+                        <span className={`text-[14px] font-extrabold ${
+                          isActive ? 'text-brand-primary' : 'text-slate-700'
+                        }`}>
+                          {pillLabel}
+                        </span>
+                      </div>
+                      
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        isActive ? 'border-brand-primary bg-brand-primary text-white' : 'border-slate-250 bg-white'
+                      }`}>
+                        {isActive && <Check size={11} strokeWidth={3} />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
