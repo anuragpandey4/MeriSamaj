@@ -9,6 +9,7 @@ import { useData } from '../../context/DataProvider';
 import { t } from '../../utils/translations';
 import { StoryViewer } from '../../components/common/StoryViewer';
 import { CityLandscape } from '../../components/common/CityLandscape';
+import { mockAdmins as mockAdminsRaw } from '../../data/mockUsers';
 
 
 
@@ -59,7 +60,8 @@ const mockSuccessStories = [
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { currentUser, members: mockMembers, admins: mockAdmins, posts: mockPosts, events: mockEvents, language, setLanguage, followedAnnouncements } = useData();
+  const { currentUser, members: mockMembers, admins: contextAdmins, posts: mockPosts, events: mockEvents, language, setLanguage, followedAnnouncements } = useData();
+  const mockAdmins = contextAdmins && contextAdmins.length > 0 ? contextAdmins : mockAdminsRaw;
   const [activeAnnouncementIndex, setActiveAnnouncementIndex] = useState(0);
   const carouselRef = useDraggableScroll();
   const subHeadsRef = useDraggableScroll();
@@ -231,6 +233,38 @@ const HomePage = () => {
         )}
       </motion.div>
 
+      {/* ─── CENSUS QUICK BANNER ─── */}
+      <div className="px-5 mt-5 relative z-10">
+        <div 
+          onClick={() => navigate('/member/census')}
+          className="w-full bg-gradient-to-r from-purple-700 via-indigo-700 to-indigo-600 rounded-[28px] p-5 shadow-lg border border-indigo-400/20 text-white relative overflow-hidden cursor-pointer press-scale group"
+        >
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-white/10 to-transparent rounded-bl-[100px]" />
+          <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-white/5 rounded-full blur-xl" />
+          <div className="flex items-center justify-between relative z-10">
+            <div className="flex-1 min-w-0 pr-2">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="bg-white/20 text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  {language === 'en' ? 'Samaj Directory Analytics' : 'जनगणना & रिपोर्ट्स'}
+                </span>
+                <span className="bg-amber-400 text-slate-900 text-[8px] font-extrabold px-2 py-0.5 rounded-full uppercase flex items-center gap-0.5 shadow-sm">
+                  <Sparkles size={8} className="fill-slate-900" /> LIVE
+                </span>
+              </div>
+              <h3 className="text-[19px] font-serif font-extrabold leading-tight">
+                {language === 'en' ? 'Community Census' : 'समाज की कुल जानकारी'}
+              </h3>
+              <p className="text-white/80 text-[12.5px] mt-1 font-medium leading-snug">
+                {language === 'en' ? 'Explore demographics, family trees, active cities & download reports.' : 'हमारे समाज की एक विस्तृत झलक एवं रिपोर्ट्स देखें।'}
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner group-hover:bg-white/25 transition-colors shrink-0">
+              <ChevronRight size={22} className="text-white" />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ─── 3D BENTO GRID (QUICK ACTIONS) ─── */}
       <div className="px-5 mt-6 relative z-10">
         <h3 className="text-[14px] font-bold text-text-secondary tracking-widest uppercase mb-3 px-1">{t('Exclusive Features', language)}</h3>
@@ -318,8 +352,8 @@ const HomePage = () => {
       {/* ─── YOUR LEADERS (Samaj Netrutva) ─── */}
       <div className="px-5 mb-8">
         {(() => {
-          const president = mockAdmins.find(a => a.role === 'President' && a.city === currentUser.city) || mockAdmins[1];
-          const coreCommittee = mockAdmins.filter(a => ['Vice President', 'Secretary', 'Joint Secretary', 'Treasurer'].includes(a.role) && a.city === currentUser.city);
+          const president = mockAdmins.find(a => a.role === 'President' && a.city?.toLowerCase() === currentUser.city?.toLowerCase()) || mockAdmins[1];
+          const coreCommittee = mockAdmins.filter(a => ['Vice President', 'Secretary', 'Joint Secretary', 'Treasurer'].includes(a.role) && a.city?.toLowerCase() === currentUser.city?.toLowerCase());
           
           return (
             <div className="flex flex-col gap-6">
@@ -372,30 +406,45 @@ const HomePage = () => {
                   </button>
                 </div>
                 
-                <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3.5 pb-3 -mx-5 px-5">
-                  {coreCommittee.map(member => {
+                <div className="grid grid-cols-3 gap-2 pb-4">
+                  {coreCommittee.slice(0, 3).map(member => {
                     const badgeColor = member.role.includes('Vice') ? 'bg-[#1e58b8]' : member.role.includes('Secretary') ? 'bg-[#ff3b68]' : 'bg-[#00a651]';
                     const hindiRole = member.role.includes('Vice') ? 'उपाध्यक्ष' : member.role.includes('Secretary') ? 'सचिव' : 'कोषाध्यक्ष';
                     return (
-                      <div key={member.id} className="snap-center shrink-0 w-[150px] bg-white rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 flex flex-col">
-                        <div className="h-[150px] bg-gray-100 relative">
-                          <img src={`https://i.pravatar.cc/150?u=${member.initials}`} className="absolute inset-0 w-full h-full object-cover" alt={member.name} />
+                      <div 
+                        key={member.id} 
+                        onClick={() => navigate('/member/leadership', { state: { selectedId: member.id } })}
+                        className="w-full bg-white rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-gray-150 p-2 py-3 flex flex-col items-center cursor-pointer active:scale-[0.98] transition-transform"
+                      >
+                        {/* Padded Portrait Photo */}
+                        <div className="w-full aspect-square rounded-xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0 mb-2 relative">
+                          <img src={`https://i.pravatar.cc/150?u=${member.initials}`} className="w-full h-full object-cover" alt={member.name} />
                         </div>
-                        <div className="p-3.5 pt-4 flex flex-col flex-1 items-center bg-white relative">
-                          <div className={`text-white text-[10px] font-bold px-4 py-1 rounded-full absolute -top-3 shadow-sm ${badgeColor}`}>
-                            {hindiRole}
-                          </div>
-                          <h4 className="text-gray-900 text-[13px] font-extrabold text-center leading-[1.2] mt-1 mb-4 flex-1">{member.name}</h4>
-                          <div className="flex gap-2 w-full mt-auto">
-                            <button className="flex-1 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm text-[#1e58b8] flex items-center justify-center flex-col gap-1 active:bg-gray-50 transition-colors">
-                              <Phone size={14} />
-                              <span className="text-[9px] font-bold text-gray-500">कॉल करें</span>
-                            </button>
-                            <button onClick={() => navigate(`/member/chat/${member.id}`)} className="flex-1 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm text-[#00a651] flex items-center justify-center flex-col gap-1 active:bg-gray-50 transition-colors">
-                              <MessageCircle size={14} />
-                              <span className="text-[9px] font-bold text-gray-500">चैट करें</span>
-                            </button>
-                          </div>
+                        
+                        {/* Role Capsule Badge */}
+                        <div className={`text-white text-[8px] sm:text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm ${badgeColor}`}>
+                          {hindiRole}
+                        </div>
+                        
+                        {/* Office Bearer Name */}
+                        <h4 className="text-slate-800 text-[10.5px] sm:text-[11.5px] font-extrabold text-center leading-tight mt-1.5 mb-2.5 flex-1 min-h-[26px] line-clamp-2">
+                          {member.name.replace(' Agrawal', '').replace(' Sharma', '').replace(' Patel', '')}
+                        </h4>
+                        
+                        {/* Call / Chat Action Buttons */}
+                        <div className="flex gap-1.5 justify-center w-full mt-auto" onClick={(e) => e.stopPropagation()}>
+                          <a 
+                            href={`tel:${member.phone}`} 
+                            className="w-7 h-7 rounded-full border border-gray-150 flex items-center justify-center hover:bg-gray-50 transition-colors text-[#1e58b8] shrink-0"
+                          >
+                            <Phone size={12} />
+                          </a>
+                          <button 
+                            onClick={() => navigate(`/member/chat/${member.id}`)} 
+                            className="w-7 h-7 rounded-full border border-gray-150 flex items-center justify-center hover:bg-gray-50 transition-colors text-[#00a651] shrink-0"
+                          >
+                            <MessageCircle size={12} />
+                          </button>
                         </div>
                       </div>
                     );

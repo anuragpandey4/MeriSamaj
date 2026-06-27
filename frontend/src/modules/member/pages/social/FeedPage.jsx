@@ -248,11 +248,10 @@ const PostCard = ({ post, index, lang, onShareClick }) => {
 
   return (
     <div 
-      className="bg-white border-y border-slate-150/60 shadow-sm transition-all duration-300 relative overflow-hidden"
+      className="bg-white border-b border-slate-150/60 transition-all duration-300 relative overflow-hidden"
       style={{ animationDelay: `${index * 80}ms` }}
     >
-      {/* Accent Top Border representing category color */}
-      <div className={`h-[5px] w-full bg-current ${styles.text}`} />
+
 
       {/* Author Header */}
       <div className="flex items-center justify-between px-3 pt-4.5 pb-3">
@@ -405,7 +404,7 @@ const PostCard = ({ post, index, lang, onShareClick }) => {
   );
 };
 
-const FeedPage = ({ isHub = false }) => {
+const FeedPage = ({ isHub = false, feedType = 'city' }) => {
   const navigate = useNavigate();
   const { posts, members: mockMembers, currentUser, language, stories = [] } = useData();
   const [activeTab, setActiveTab] = useState('all');
@@ -430,14 +429,27 @@ const FeedPage = ({ isHub = false }) => {
     setTimeout(() => setToastMessage(''), 3000);
   };
 
-  // Filter posts based on active tab and search query
+  // Filter posts based on active tab, search query, and feed visibility rules
   const filteredFeedPosts = posts.filter(post => {
     const matchesCategory = activeTab === 'all' || post.category === activeTab;
     const matchesSearch = searchText.trim() === '' || 
       post.content.toLowerCase().includes(searchText.toLowerCase()) ||
       (post.title && post.title.toLowerCase().includes(searchText.toLowerCase())) ||
       post.author.name.toLowerCase().includes(searchText.toLowerCase());
-    return matchesCategory && matchesSearch;
+
+    // Feed Visibility Filter
+    let matchesFeedType = false;
+    if (feedType === 'city') {
+      // City Feed: only posts from the user's specific city
+      matchesFeedType = post.city === currentUser.city && (post.feedType === 'city' || !post.feedType);
+    } else if (feedType === 'community') {
+      // Community Feed: only posts from the user's community
+      matchesFeedType = post.community === currentUser.community && (post.feedType === 'community' || !post.feedType);
+    } else {
+      matchesFeedType = true;
+    }
+
+    return matchesCategory && matchesSearch && matchesFeedType;
   });
 
   return (
@@ -582,7 +594,7 @@ const FeedPage = ({ isHub = false }) => {
         </div>
 
         {/* ─── POSTS FEED LIST ─── */}
-        <div className="space-y-3.5 pb-16 -mx-4.5">
+        <div className="space-y-0 pb-16 -mx-4.5">
           {isLoading ? (
             <>
               <PostSkeleton />
@@ -616,6 +628,8 @@ const FeedPage = ({ isHub = false }) => {
       {/* Floating Story Viewer Modal */}
       <StoryViewer 
         story={activeStory} 
+        stories={stories}
+        onStoryChange={(nextStory) => setActiveStory(nextStory)}
         onClose={() => setActiveStory(null)} 
       />
     </div>

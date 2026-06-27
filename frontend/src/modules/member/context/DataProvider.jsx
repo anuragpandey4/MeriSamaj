@@ -228,7 +228,14 @@ export const DataProvider = ({ children }) => {
   // State Definitions
   const [currentUser, setCurrentUser] = useState(() => loadState('currentUser', initialUser));
   const [members, setMembers] = useState(() => loadState('members', initialMembers));
-  const [admins, setAdmins] = useState(() => loadState('admins', initialAdmins));
+  const [admins, setAdmins] = useState(() => {
+    const loaded = loadState('admins', initialAdmins);
+    if (loaded && loaded.length < initialAdmins.length) {
+      localStorage.setItem('merisamaj_v6_admins', JSON.stringify(initialAdmins));
+      return initialAdmins;
+    }
+    return loaded;
+  });
   const [posts, setPosts] = useState(() => {
     return initialPosts.map((p) => ({
       ...p,
@@ -239,7 +246,9 @@ export const DataProvider = ({ children }) => {
   const [stories, setStories] = useState(() => {
     return [
       { id: 's1', memberId: 'm1', name: 'Suresh Agrawal', initials: 'SA', avatar: null, image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800', timestamp: '2 hours ago', hasSeen: false },
+      { id: 's1_2', memberId: 'm1', name: 'Suresh Agrawal', initials: 'SA', avatar: null, image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800', timestamp: '1 hour ago', text: 'Indore Samaj General Meeting', hasSeen: false },
       { id: 's2', memberId: 'm2', name: 'Kavita Agrawal', initials: 'KA', avatar: null, image: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800', timestamp: '4 hours ago', hasSeen: false },
+      { id: 's2_2', memberId: 'm2', name: 'Kavita Agrawal', initials: 'KA', avatar: null, image: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800', timestamp: '3 hours ago', text: 'Mahila Udyog Exhibition', hasSeen: false },
       { id: 's3', memberId: 'm3', name: 'Deepak Agrawal', initials: 'DA', avatar: null, image: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800', timestamp: '6 hours ago', hasSeen: false },
       { id: 's4', memberId: 'm4', name: 'Anita Agrawal', initials: 'AA', avatar: null, image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800', timestamp: '8 hours ago', hasSeen: false }
     ];
@@ -248,7 +257,11 @@ export const DataProvider = ({ children }) => {
   useEffect(() => {
     localStorage.removeItem('merisamaj_v6_posts');
     localStorage.removeItem('posts');
-  }, []);
+    setPosts(initialPosts.map((p) => ({
+      ...p,
+      commentsList: p.commentsList || []
+    })));
+  }, [initialPosts]);
 
   const [followedAnnouncements, setFollowedAnnouncements] = useState(() => loadState('followedAnnouncements', {
     announcements: true,

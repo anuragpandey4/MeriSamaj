@@ -37,6 +37,7 @@ import InterestsPage from '../pages/matrimonial/InterestsPage';
 import EditProfilePage from '../pages/profile/EditProfilePage';
 import FamilyPage from '../pages/profile/FamilyPage';
 import VerifyMembershipPage from '../pages/profile/VerifyMembershipPage';
+import UpgradeMembershipPage from '../pages/profile/UpgradeMembershipPage';
 import ProfessionalDirectoryPage from '../pages/directory/ProfessionalDirectoryPage';
 import ApplyProfessionalPage from '../pages/directory/ApplyProfessionalPage';
 import VotingPage from '../pages/voting/VotingPage';
@@ -56,6 +57,9 @@ import CreateObituaryPage from '../pages/obituary/CreateObituaryPage';
 
 // Feature: Leadership
 import LeadershipPage from '../pages/leadership/LeadershipPage';
+
+// Feature: Census
+import { CensusPage } from '../pages/census/CensusPage';
 
 // Feature: Chat
 // import ChatListPage from '../pages/chat/ChatListPage';
@@ -105,6 +109,7 @@ export const MemberRoutes = () => {
           <Route path="profile/edit" element={<AnimatedPage><EditProfilePage /></AnimatedPage>} />
           <Route path="profile/family" element={<AnimatedPage><FamilyPage /></AnimatedPage>} />
           <Route path="profile/verify" element={<AnimatedPage><VerifyMembershipPage /></AnimatedPage>} />
+          <Route path="profile/upgrade" element={<AnimatedPage><UpgradeMembershipPage /></AnimatedPage>} />
 
           <Route path="professional" element={<AnimatedPage><ProfessionalDirectoryPage /></AnimatedPage>} />
           <Route path="professional/apply" element={<AnimatedPage><ApplyProfessionalPage /></AnimatedPage>} />
@@ -126,6 +131,7 @@ export const MemberRoutes = () => {
           <Route path="notifications" element={<AnimatedPage><NotificationsPage /></AnimatedPage>} />
 
           <Route path="leadership" element={<AnimatedPage><LeadershipPage /></AnimatedPage>} />
+          <Route path="census" element={<AnimatedPage><CensusPage /></AnimatedPage>} />
 
           {/* Chat base route mapped to SocialHub */}
           <Route path="chat" element={<AnimatedPage><SocialHubPage initialTab="chat" /></AnimatedPage>} />

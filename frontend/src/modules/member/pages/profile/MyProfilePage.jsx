@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, ChevronRight, Camera, LogOut, Globe, Lock, Check, ArrowLeft } from 'lucide-react';
+import { CheckCircle, ChevronRight, Camera, LogOut, Globe, Lock, Check, ArrowLeft, Sparkles, ShieldCheck, User, Briefcase, Package } from 'lucide-react';
 import { useData } from '../../context/DataProvider';
 import { Avatar } from '../../components/common/Avatar';
 
@@ -31,7 +31,7 @@ const MyProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-24 relative">
+    <div className="min-h-screen bg-surface pb-24 relative overflow-x-hidden">
       {/* Header Bar */}
       <div className="bg-card border-b border-gray-100 flex items-center justify-between px-4 h-14 sticky top-0 z-30">
         <div className="flex items-center gap-3">
@@ -46,7 +46,7 @@ const MyProfilePage = () => {
         {/* Cover Photo & Profile Avatar Block */}
         <div className="relative bg-card pb-4 border-b border-gray-100 shadow-sm">
           {/* Cover Photo Wrapper */}
-          <div className="h-40 bg-gradient-to-r from-sky-400 to-indigo-500 relative overflow-hidden flex items-center justify-center">
+          <div className={`h-40 bg-gradient-to-r ${currentUser.isPremium ? 'from-amber-500 via-rose-500 to-indigo-600' : 'from-sky-400 via-indigo-500 to-purple-600'} relative overflow-hidden flex items-center justify-center transition-all duration-300`}>
             {currentUser.cover ? (
               <img src={currentUser.cover} alt="Cover" className="w-full h-full object-cover" />
             ) : (
@@ -80,12 +80,21 @@ const MyProfilePage = () => {
           </div>
 
           {/* Profile Avatar (Overlapping cover) */}
-          <div className="flex flex-col items-center -mt-12 relative z-10 px-4">
+          <div className="flex flex-col items-center -mt-14 relative z-10 px-4">
             <div className="relative">
-              <div className="w-24 h-24 rounded-full border-4 border-card overflow-hidden shadow-md">
-                <Avatar initials={currentUser.initials} src={currentUser.avatar} size="xl" />
+              {/* Premium shining ring indicator */}
+              <div className={`w-28 h-28 rounded-full border-4 flex items-center justify-center overflow-hidden shadow-lg transition-all ${
+                currentUser.isPremium 
+                  ? 'border-amber-400 bg-gradient-to-tr from-amber-500 to-yellow-300 ring-4 ring-amber-100/50' 
+                  : 'border-white bg-white shadow-md'
+              }`}>
+                <div className="w-full h-full rounded-full overflow-hidden">
+                  <Avatar initials={currentUser.initials} src={currentUser.avatar} size="xl" className="w-full h-full object-cover" />
+                </div>
               </div>
-              <label className="absolute bottom-0 right-0 w-8 h-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center press-scale border-2 border-white cursor-pointer">
+              <label className={`absolute bottom-0 right-0 w-8.5 h-8.5 text-white rounded-full shadow-lg flex items-center justify-center press-scale border-2 border-white cursor-pointer ${
+                currentUser.isPremium ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-200' : 'bg-indigo-600 hover:bg-indigo-700'
+              }`}>
                 <Camera size={14} />
                 <input 
                   type="file" 
@@ -105,29 +114,71 @@ const MyProfilePage = () => {
               </label>
             </div>
 
-            <div className="flex items-center gap-1.5 mt-3">
-              <h2 className="text-base font-bold text-text-primary">{currentUser.name}</h2>
-              {currentUser.isVerified && <CheckCircle size={16} className="text-emerald-500 fill-emerald-50 shrink-0" />}
+            <div className="flex flex-wrap items-center justify-center gap-1.5 mt-3.5 px-4 text-center">
+              <h2 className="text-lg font-black text-text-primary tracking-tight leading-none">{currentUser.name}</h2>
+              {currentUser.isVerified && <CheckCircle size={17} className="text-emerald-500 fill-emerald-50 shrink-0" />}
+              {currentUser.isPremium && (
+                <span className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white text-[8.5px] font-black uppercase px-2 py-1 rounded-full shadow-sm tracking-wider flex items-center gap-0.5 border border-amber-400/20 animate-pulse">
+                  👑 {currentUser.membershipPlan || 'PRO MAX'}
+                </span>
+              )}
             </div>
-            <p className="text-[10px] font-semibold text-text-secondary mt-0.5">{currentUser.profession || 'सदस्य'}</p>
+            <p className="text-xs font-bold text-text-secondary mt-1">{currentUser.profession || 'सदस्य'}</p>
           </div>
+        </div>
+
+        {/* Premium Upgrade Promotion Banner / Subscription Info */}
+        <div className="px-4">
+          {!currentUser.isPremium ? (
+            <div 
+              onClick={() => navigate('/member/profile/upgrade')}
+              className="p-4 rounded-3xl bg-gradient-to-r from-rose-500 via-pink-500 to-[#e62e52] text-white shadow-md flex items-center justify-between cursor-pointer press-scale border border-rose-400/20"
+            >
+              <div className="space-y-1 text-left">
+                <div className="flex items-center gap-1.5">
+                  <Sparkles size={16} className="text-amber-300 fill-amber-300 animate-pulse" />
+                  <h3 className="text-xs font-black uppercase tracking-wider text-white">Upgrade Membership</h3>
+                </div>
+                <p className="text-[10px] text-white/90 font-semibold leading-relaxed">
+                  Access direct contacts, send 50+ super interests & get a Gold Badge!
+                </p>
+              </div>
+              <ChevronRight size={18} className="text-white/80 shrink-0 ml-2" />
+            </div>
+          ) : (
+            <div 
+              onClick={() => navigate('/member/profile/upgrade')}
+              className="p-4 rounded-3xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white shadow-md flex items-center justify-between cursor-pointer press-scale border border-yellow-400/20"
+            >
+              <div className="space-y-1 text-left">
+                <div className="flex items-center gap-1.5">
+                  <ShieldCheck size={16} className="text-white fill-white/10" />
+                  <h3 className="text-xs font-black uppercase tracking-wider text-white">{currentUser.membershipPlan || 'Pro Max'} Active</h3>
+                </div>
+                <p className="text-[10px] text-white/90 font-semibold leading-relaxed">
+                  Valid plan until: {currentUser.membershipExpiry || 'Till Marriage'} · Enjoy premium matchmaking!
+                </p>
+              </div>
+              <ChevronRight size={18} className="text-white/80 shrink-0 ml-2" />
+            </div>
+          )}
         </div>
 
         {/* Profile Menu Actions List (Hindi) */}
         <div className="px-4">
-          <div className="bg-card rounded-3xl border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-50">
+          <div className="bg-card rounded-3xl border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-100">
             {/* Action 1: व्यक्तिगत जानकारी */}
             <button 
               onClick={() => navigate('/member/profile/edit')}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                  <CheckCircle size={18} />
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100/50 shadow-sm">
+                  <User size={18} />
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-text-primary block">व्यक्तिगत जानकारी</span>
-                  <span className="text-[9px] font-semibold text-text-secondary mt-0.5 block">अपनी जानकारी जोड़ें और अपडेट करें</span>
+                  <span className="text-[13px] font-extrabold text-text-primary block">व्यक्तिगत जानकारी</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">अपनी जानकारी जोड़ें और अपडेट करें</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-gray-300" />
@@ -138,13 +189,13 @@ const MyProfilePage = () => {
               onClick={() => navigate('/member/professional/apply')}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-                  <Camera size={18} />
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100/50 shadow-sm">
+                  <Briefcase size={18} />
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-text-primary block">व्यवसाय जानकारी</span>
-                  <span className="text-[9px] font-semibold text-text-secondary mt-0.5 block">व्यवसाय और सेवाएँ जोड़ें</span>
+                  <span className="text-[13px] font-extrabold text-text-primary block">व्यवसाय जानकारी</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">व्यवसाय और सेवाएँ जोड़ें</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-gray-300" />
@@ -155,13 +206,13 @@ const MyProfilePage = () => {
               onClick={() => navigate('/member/professional')}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                  <Camera size={18} />
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100/50 shadow-sm">
+                  <Package size={18} />
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-text-primary block">सेवाएँ / उत्पाद</span>
-                  <span className="text-[9px] font-semibold text-text-secondary mt-0.5 block">आपके उत्पाद और व्यावसायिक सेवाएँ</span>
+                  <span className="text-[13px] font-extrabold text-text-primary block">सेवाएँ / उत्पाद</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">आपके उत्पाद और व्यावसायिक सेवाएँ</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-gray-300" />
@@ -172,13 +223,13 @@ const MyProfilePage = () => {
               onClick={() => setShowSocialModal(true)}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 border border-sky-100/50 shadow-sm">
                   <Globe size={18} />
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-text-primary block">सोशल मीडिया लिंक</span>
-                  <span className="text-[9px] font-semibold text-text-secondary mt-0.5 block">सोशल मीडिया प्रोफाइल लिंक जोड़ें</span>
+                  <span className="text-[13px] font-extrabold text-text-primary block">सोशल मीडिया लिंक</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">सोशल मीडिया प्रोफाइल लिंक जोड़ें</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-gray-300" />
@@ -189,13 +240,13 @@ const MyProfilePage = () => {
               onClick={() => setShowPrivacyModal(true)}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100/50 shadow-sm">
                   <Lock size={18} />
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-text-primary block">गोपनीयता सेटिंग्स</span>
-                  <span className="text-[9px] font-semibold text-text-secondary mt-0.5 block">प्रोफ़ाइल गोपनीयता प्रबंधित करें</span>
+                  <span className="text-[13px] font-extrabold text-text-primary block">गोपनीयता सेटिंग्स</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">प्रोफ़ाइल गोपनीयता प्रबंधित करें</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-gray-300" />
@@ -209,13 +260,13 @@ const MyProfilePage = () => {
               }}
               className="w-full flex items-center justify-between p-4 hover:bg-red-50/50 transition-colors text-left group"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-red-50 group-hover:bg-red-100 text-red-500 flex items-center justify-center">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-2xl bg-red-50 group-hover:bg-red-100 text-red-500 flex items-center justify-center shrink-0 border border-red-100/50 shadow-sm">
                   <LogOut size={18} />
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-red-500 block">लॉगआउट</span>
-                  <span className="text-[9px] font-semibold text-text-secondary mt-0.5 block">एप्लीकेशन से लॉगआउट करें</span>
+                  <span className="text-[13px] font-extrabold text-red-500 block">लॉगआउट</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">एप्लीकेशन से लॉगआउट करें</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-gray-300 group-hover:text-red-300" />
