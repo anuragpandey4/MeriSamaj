@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Megaphone, Heart, Calendar, Users, Check } from 'lucide-react';
+import { Megaphone, Heart, Calendar, Users, Check, Vote } from 'lucide-react';
 import { PageHeader } from '../../components/layout/PageHeader';
 import { useData } from '../../context/DataProvider';
 import { mockNotifications } from '../../data/mockEvents';
@@ -10,6 +10,7 @@ const typeConfig = {
   event: { icon: Calendar, color: 'bg-social-module/10 text-social-module' },
   community: { icon: Users, color: 'bg-emerald-100 text-emerald-600' },
   group: { icon: Users, color: 'bg-indigo-100 text-indigo-600' },
+  voting: { icon: Vote, color: 'bg-purple-100 text-purple-600' },
 };
 
 const NotificationsPage = () => {
@@ -25,6 +26,7 @@ const NotificationsPage = () => {
     if (n.type === 'announcement') return followedAnnouncements?.announcements;
     if (n.type === 'matrimonial') return followedAnnouncements?.matrimonial;
     if (n.type === 'event') return followedAnnouncements?.events;
+    if (n.type === 'voting') return followedAnnouncements?.voting !== false; // default true
     if (n.type === 'group') {
       const g = groups.find(group => group.id === n.groupId);
       return followedAnnouncements?.groups && (!g || !g.isMuted);
@@ -107,6 +109,19 @@ const NotificationsPage = () => {
                     type="checkbox" 
                     checked={followedAnnouncements?.groups} 
                     onChange={() => toggleFollowedAnnouncement('groups')} 
+                    className="sr-only peer" 
+                  />
+                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-text-primary">Voting & Elections</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={followedAnnouncements?.voting !== false} 
+                    onChange={() => toggleFollowedAnnouncement('voting')} 
                     className="sr-only peer" 
                   />
                   <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>

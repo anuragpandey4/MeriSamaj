@@ -43,6 +43,7 @@ import ApplyProfessionalPage from '../pages/directory/ApplyProfessionalPage';
 import VotingPage from '../pages/voting/VotingPage';
 import PollDetailPage from '../pages/voting/PollDetailPage';
 import ElectionsListPage from '../pages/voting/ElectionsListPage';
+import SurveysPage from '../pages/voting/SurveysPage';
 import { VotingProvider } from '../pages/voting/VotingContext';
 import DonationPage from '../pages/donation/DonationPage';
 import DonateSetupPage from '../pages/donation/DonateSetupPage';
@@ -117,6 +118,7 @@ export const MemberRoutes = () => {
           <Route path="voting" element={<VotingProvider />}>
             <Route index element={<AnimatedPage><VotingPage /></AnimatedPage>} />
             <Route path="list" element={<AnimatedPage><ElectionsListPage /></AnimatedPage>} />
+            <Route path="surveys" element={<AnimatedPage><SurveysPage /></AnimatedPage>} />
             <Route path=":pollId" element={<AnimatedPage><PollDetailPage /></AnimatedPage>} />
           </Route>
 

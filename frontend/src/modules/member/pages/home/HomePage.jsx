@@ -611,22 +611,34 @@ const HomePage = () => {
           </button>
         </div>
         <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3 pb-2 -mx-5 px-5">
-          {communityPosts.slice(0, 5).map((post, i) => (
-            <div key={post.id} className="card-std p-4 card-press animate-stagger-fade-in shrink-0 w-[280px] snap-center" style={{ animationDelay: `${i * 80}ms` }} onClick={() => navigate(`/member/social/${post.id}`)}>
-              <div className="flex items-center gap-3 mb-3">
-                <Avatar initials={post.author.initials} size="sm" />
-                <div className="flex-1">
-                  <h4 className="text-[14px] font-bold text-text-primary">{post.author.name}</h4>
-                  <p className="text-[12px] text-text-secondary">{post.community} · {post.timestamp}</p>
+          {communityPosts.slice(0, 5).map((post, i) => {
+            const matchedMember = mockMembers.find(m => m.name === post.author.name) || mockAdmins.find(a => a.name === post.author.name);
+            const handleAuthorClick = (e) => {
+              if (matchedMember) {
+                e.stopPropagation();
+                navigate(`/member/directory/${matchedMember.id}`);
+              }
+            };
+
+            return (
+              <div key={post.id} className="card-std p-4 card-press animate-stagger-fade-in shrink-0 w-[280px] snap-center" style={{ animationDelay: `${i * 80}ms` }} onClick={() => navigate(`/member/social/${post.id}`)}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div onClick={handleAuthorClick} className={matchedMember ? 'cursor-pointer' : ''}>
+                    <Avatar initials={post.author.initials} size="sm" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 onClick={handleAuthorClick} className={`text-[14px] font-bold text-text-primary ${matchedMember ? 'cursor-pointer hover:underline hover:text-indigo-650' : ''}`}>{post.author.name}</h4>
+                    <p className="text-[12px] text-text-secondary">{post.community} · {post.timestamp}</p>
+                  </div>
                 </div>
-              </div>
               <p className="text-[14px] text-text-primary leading-relaxed line-clamp-2">{post.content}</p>
               <div className="flex items-center gap-5 mt-3 pt-3 border-t border-gray-50">
                 <span className="text-[13px] text-text-secondary font-medium">❤️ {post.likes}</span>
                 <span className="text-[13px] text-text-secondary font-medium">💬 {post.comments}</span>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -640,20 +652,29 @@ const HomePage = () => {
         <h3 className="text-[17px] font-bold text-text-primary tracking-tight mb-4">Community Stats</h3>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { label: 'Total Members', value: '1,247', icon: Users, iconBg: 'bg-blue-50', iconColor: 'text-blue-600' },
-            { label: 'Men', value: '520', icon: User, iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600' },
-            { label: 'Women', value: '480', icon: User, iconBg: 'bg-pink-50', iconColor: 'text-pink-600' },
-            { label: 'Children', value: '247', icon: Smile, iconBg: 'bg-yellow-50', iconColor: 'text-yellow-600' },
-            { label: 'Active Cities', value: '12', icon: MapPin, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
-            { label: 'Events This Month', value: '4', icon: Calendar, iconBg: 'bg-orange-50', iconColor: 'text-orange-600' },
-            { label: 'Matrimonial', value: '186', icon: Heart, iconBg: 'bg-red-50', iconColor: 'text-red-600' },
+            { label: 'Total Members', value: '1,247', icon: Users, iconBg: 'bg-blue-50', iconColor: 'text-blue-600', path: '/member/census', state: { view: 'dashboard' } },
+            { label: 'Men', value: '520', icon: User, iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600', path: '/member/census', state: { view: 'males' } },
+            { label: 'Women', value: '480', icon: User, iconBg: 'bg-pink-50', iconColor: 'text-pink-600', path: '/member/census', state: { view: 'females' } },
+            { label: 'Children', value: '247', icon: Smile, iconBg: 'bg-yellow-50', iconColor: 'text-yellow-600', path: '/member/census', state: { view: 'kids' } },
+            { label: 'Active Cities', value: '12', icon: MapPin, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600', path: '/member/directory' },
+            { label: 'Events This Month', value: '4', icon: Calendar, iconBg: 'bg-orange-50', iconColor: 'text-orange-600', path: '/member/events' },
+            { label: 'Matrimonial', value: '186', icon: Heart, iconBg: 'bg-red-50', iconColor: 'text-red-600', path: '/member/matrimonial' },
           ].map((stat) => (
-            <div key={stat.label} className="card-std p-4">
-              <div className={`w-10 h-10 rounded-xl ${stat.iconBg} ${stat.iconColor} flex items-center justify-center mb-3`}>
-                <stat.icon size={20} />
+            <div 
+              key={stat.label} 
+              onClick={() => navigate(stat.path, { state: stat.state })}
+              className="card-std p-4 cursor-pointer active:scale-[0.98] hover:shadow-md transition-all flex flex-col justify-between"
+            >
+              <div>
+                <div className={`w-10 h-10 rounded-xl ${stat.iconBg} ${stat.iconColor} flex items-center justify-center mb-3`}>
+                  <stat.icon size={20} />
+                </div>
+                <p className="text-[22px] font-extrabold text-text-primary leading-none tracking-tight">{stat.value}</p>
               </div>
-              <p className="text-[22px] font-extrabold text-text-primary leading-none tracking-tight">{stat.value}</p>
-              <p className="text-[13px] text-text-secondary mt-1">{stat.label}</p>
+              <p className="text-[13px] text-text-secondary mt-2 flex items-center justify-between font-medium">
+                {stat.label}
+                <ChevronRight size={14} className="text-gray-400 opacity-60" />
+              </p>
             </div>
           ))}
         </div>

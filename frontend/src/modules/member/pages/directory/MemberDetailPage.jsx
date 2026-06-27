@@ -50,7 +50,19 @@ const businessTypeMap = {
 const MemberDetailPage = () => {
   const { memberId } = useParams();
   const navigate = useNavigate();
-  const { members, admins } = useData();
+  
+  const { 
+    members, 
+    admins,
+    profilePrivacy,
+    followRelations,
+    blockedUsers,
+    sendFollowRequest,
+    cancelFollowRequest,
+    unfollowUser,
+    blockUser,
+    unblockUser
+  } = useData();
 
   // Find member in either members or admins list
   const member = members.find(m => m.id === memberId) || 
@@ -101,6 +113,14 @@ const MemberDetailPage = () => {
 
   const familyMembers = getMockFamilyMembers(member);
 
+  // Follow system state derivations
+  const isBlocked = blockedUsers?.some(b => b.blockerId === 'u1' && b.blockedId === member.id);
+  const privacy = profilePrivacy?.[member.id] || 'public';
+  const isFollowing = followRelations?.some(r => r.followerId === 'u1' && r.followingId === member.id && r.status === 'accepted');
+  const hasRequested = followRelations?.some(r => r.followerId === 'u1' && r.followingId === member.id && r.status === 'pending');
+  const isPrivate = privacy === 'private';
+  const canAccess = member.id === 'u1' || !isPrivate || isFollowing;
+
   return (
     <div className="min-h-screen bg-surface pb-12">
       {/* Header */}
@@ -121,83 +141,174 @@ const MemberDetailPage = () => {
           <div className="flex items-center gap-1.5 mt-4">
             <h2 className="text-lg font-bold text-text-primary">{member.name}</h2>
             {member.isVerified && <CheckCircle size={18} className="text-emerald-500 fill-emerald-50 shrink-0" />}
+            {isPrivate && (
+              <span className="px-2 py-0.5 rounded-full bg-slate-100 text-[9px] font-bold text-slate-500 border flex items-center gap-0.5">
+                🔒 PRIVATE
+              </span>
+            )}
           </div>
           
           <p className="text-xs font-semibold text-text-secondary mt-1">{hindiProfession}</p>
           <p className="text-[10px] font-medium text-text-secondary mt-0.5">{hindiCity}</p>
 
-          {/* Action Buttons */}
-          <div className="w-full grid grid-cols-3 gap-2.5 mt-6 pt-5 border-t border-gray-50">
-            <button 
-              onClick={() => navigate(`/member/chat/${member.id}`)}
-              className="py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale shadow-sm shadow-indigo-100"
-            >
-              <MessageCircle size={14} /> संपर्क करें
-            </button>
-            <button 
-              onClick={() => navigate(`/member/chat/${member.id}`)}
-              className="py-3 bg-card border border-gray-200 text-text-primary rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale hover:bg-gray-50"
-            >
-              <Mail size={14} /> मैसेज करें
-            </button>
-            <a 
-              href={`tel:${phoneNum}`}
-              className="py-3 bg-card border border-gray-200 text-text-primary rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale hover:bg-gray-50 text-center"
-            >
-              <Phone size={14} /> कॉल करें
-            </a>
-          </div>
+          {/* Follow Button */}
+          {member.id !== 'u1' && (
+            <div className="w-full mt-4 border-t border-slate-50 pt-4">
+              {isBlocked ? (
+                <button
+                  onClick={() => unblockUser(member.id)}
+                  className="w-full py-3 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale shadow-sm"
+                >
+                  Unblock User
+                </button>
+              ) : isFollowing ? (
+                <div className="flex gap-2 w-full">
+                  <button
+                    onClick={() => unfollowUser(member.id)}
+                    className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale"
+                  >
+                    Following
+                  </button>
+                  <button
+                    onClick={() => blockUser(member.id)}
+                    className="px-4 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale"
+                  >
+                    Block
+                  </button>
+                </div>
+              ) : hasRequested ? (
+                <button
+                  onClick={() => cancelFollowRequest(member.id)}
+                  className="w-full py-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale"
+                >
+                  Requested (Click to Cancel)
+                </button>
+              ) : (
+                <div className="flex gap-2 w-full">
+                  <button
+                    onClick={() => sendFollowRequest(member.id)}
+                    className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale shadow-sm shadow-indigo-100"
+                  >
+                    Follow {isPrivate && '🔒'}
+                  </button>
+                  <button
+                    onClick={() => blockUser(member.id)}
+                    className="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale"
+                  >
+                    Block
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Action Buttons (Only visible if canAccess and not blocked) */}
+          {canAccess && !isBlocked && (
+            <div className="w-full grid grid-cols-3 gap-2.5 mt-5 pt-5 border-t border-gray-50">
+              <button 
+                onClick={() => navigate(`/member/chat/${member.id}`)}
+                className="py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale shadow-sm shadow-indigo-100"
+              >
+                <MessageCircle size={14} /> संपर्क करें
+              </button>
+              <button 
+                onClick={() => navigate(`/member/chat/${member.id}`)}
+                className="py-3 bg-card border border-gray-200 text-text-primary rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale hover:bg-gray-50"
+              >
+                <Mail size={14} /> मैसेज करें
+              </button>
+              <a 
+                href={`tel:${phoneNum}`}
+                className="py-3 bg-card border border-gray-200 text-text-primary rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale hover:bg-gray-50 text-center"
+              >
+                <Phone size={14} /> कॉल करें
+              </a>
+            </div>
+          )}
         </div>
 
-        {/* Section 1: व्यक्तिगत जानकारी */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">व्यक्तिगत जानकारी</h3>
-          <div className="bg-card rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50 overflow-hidden">
-            <InfoField label="सदस्य ID" value={memberIdCode} />
-            <InfoField label="जन्म तिथि" value={dobStr} />
-            <InfoField label="मोबाइल नंबर" value={phoneNum} />
-            <InfoField label="ईमेल" value={emailAddr} />
-            <InfoField label="शहर" value={hindiCity} />
+        {/* Restricted Area Placeholder / Details Area */}
+        {isBlocked ? (
+          <div className="bg-card rounded-3xl p-8 border border-gray-100 shadow-sm flex flex-col items-center text-center mt-4">
+            <div className="w-16 h-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center mb-4">
+              <span className="text-3xl">🚫</span>
+            </div>
+            <h3 className="text-[15px] font-bold text-text-primary">सदस्य अवरुद्ध (Blocked) है</h3>
+            <p className="text-xs text-text-secondary mt-2 max-w-xs leading-relaxed">
+              आपने इस सदस्य को ब्लॉक किया हुआ है। उनके विवरण देखने के लिए पहले उन्हें अनब्लॉक करें।
+            </p>
           </div>
-        </div>
-
-        {/* Section 2: व्यवसाय जानकारी */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">व्यवसाय जानकारी</h3>
-          <div className="bg-card rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50 overflow-hidden">
-            <InfoField label="पेशा" value={hindiProfession} />
-            <InfoField label="कंपनी" value={companyName} />
-            <InfoField label="व्यवसाय" value={businessSector} />
-            <InfoField label="स्थापना वर्ष" value={estYear.toString()} />
+        ) : !canAccess ? (
+          <div className="bg-card rounded-3xl p-8 border border-gray-100 shadow-sm flex flex-col items-center text-center mt-4">
+            <div className="w-16 h-16 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4">
+              <span className="text-3xl">🔒</span>
+            </div>
+            <h3 className="text-[15px] font-bold text-text-primary">यह प्रोफ़ाइल निजी (Private) है</h3>
+            <p className="text-xs text-text-secondary mt-2 max-w-xs leading-relaxed">
+              केवल स्वीकृत फ़ॉलोअर्स ही इस सदस्य की व्यक्तिगत जानकारी, संपर्क विवरण और पारिवारिक वृक्ष (Family Tree) देख सकते हैं।
+            </p>
+            {!hasRequested && (
+              <button
+                onClick={() => sendFollowRequest(member.id)}
+                className="mt-5 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-bold text-xs press-scale shadow-sm"
+              >
+                फ़ॉलो करने के लिए अनुरोध भेजें
+              </button>
+            )}
           </div>
-        </div>
-
-        {/* Section 3: पता */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">पता</h3>
-          <div className="bg-card rounded-2xl p-4 border border-gray-100 shadow-sm">
-            <div className="flex gap-2.5 items-start">
-              <MapPin size={16} className="text-text-secondary mt-0.5 shrink-0" />
-              <div>
-                <p className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">पूर्ण पता</p>
-                <p className="text-xs font-semibold text-text-primary mt-1 leading-relaxed">{fullAddress}</p>
+        ) : (
+          <>
+            {/* Section 1: व्यक्तिगत जानकारी */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">व्यक्तिगत जानकारी</h3>
+              <div className="bg-card rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50 overflow-hidden">
+                <InfoField label="सदस्य ID" value={memberIdCode} />
+                <InfoField label="जन्म तिथि" value={dobStr} />
+                <InfoField label="मोबाइल नंबर" value={phoneNum} />
+                <InfoField label="ईमेल" value={emailAddr} />
+                <InfoField label="शहर" value={hindiCity} />
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Section 4: पारिवारिक वृक्ष (Family Tree) */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">पारिवारिक विवरण (फ़ैमिली ट्री)</h3>
-          <div className="bg-card rounded-2xl border border-gray-100 shadow-sm overflow-hidden p-2">
-            <div className="w-full overflow-hidden relative rounded-xl border border-gray-50">
-              <BranchingFamilyTree 
-                primaryMember={member} 
-                familyMembers={familyMembers} 
-              />
+            {/* Section 2: व्यवसाय जानकारी */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">व्यवसाय जानकारी</h3>
+              <div className="bg-card rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50 overflow-hidden">
+                <InfoField label="पेशा" value={hindiProfession} />
+                <InfoField label="कंपनी" value={companyName} />
+                <InfoField label="व्यवसाय" value={businessSector} />
+                <InfoField label="स्थापना वर्ष" value={estYear.toString()} />
+              </div>
             </div>
-          </div>
-        </div>
+
+            {/* Section 3: पता */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">पता</h3>
+              <div className="bg-card rounded-2xl p-4 border border-gray-100 shadow-sm">
+                <div className="flex gap-2.5 items-start">
+                  <MapPin size={16} className="text-text-secondary mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">पूर्ण पता</p>
+                    <p className="text-xs font-semibold text-text-primary mt-1 leading-relaxed">{fullAddress}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 4: पारिवारिक वृक्ष (Family Tree) */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">पारिवारिक विवरण (फ़ैमिली ट्री)</h3>
+              <div className="bg-card rounded-2xl border border-gray-100 shadow-sm overflow-hidden p-2">
+                <div className="w-full overflow-hidden relative rounded-xl border border-gray-50">
+                  <BranchingFamilyTree 
+                    primaryMember={member} 
+                    familyMembers={familyMembers} 
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
       </div>
     </div>
