@@ -5,7 +5,7 @@ import { Home, Users, Heart, MessageCircle, User } from 'lucide-react';
 const tabPaths = ['/member/home', '/member/social', '/member/matrimonial', '/member/chat', '/member/profile'];
 
 // Sub-pages where bottom nav should be hidden
-const hiddenPaths = ['/member/events', '/member/groups', '/member/notifications', '/member/splash', '/member/login', '/member/setup-profile', '/member/select-community', '/member/verify-otp', '/member/chat/room', '/member/chat/call'];
+const hiddenPaths = ['/member/events', '/member/groups', '/member/notifications', '/member/splash', '/member/login', '/member/setup-profile', '/member/select-community', '/member/verify-otp', '/member/chat/room', '/member/chat/call', '/member/matrimonial'];
 
 export const BottomNav = () => {
   const location = useLocation();

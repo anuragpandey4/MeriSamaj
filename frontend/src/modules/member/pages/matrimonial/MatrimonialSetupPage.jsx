@@ -1,8 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Camera, CheckCircle, Lock } from 'lucide-react';
 import { PageHeader } from '../../components/layout/PageHeader';
 import { useData } from '../../context/DataProvider';
+
+// ─── CUSTOM DROPDOWN COMPONENT (FOR MOBILE VIEW RESETS) ───
+const CustomSelect = ({ value, onChange, options }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
+
+  const selectedOption = options.find(opt => opt.value === value) || options[0];
+
+  return (
+    <div className="relative w-full" ref={containerRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full bg-card border border-gray-200 rounded-xl px-4 py-3 flex items-center justify-between text-xs sm:text-sm text-text-primary outline-none focus:border-matrimonial-module transition-all appearance-none pr-8 font-semibold select-none active:scale-[0.98]"
+      >
+        <span>{selectedOption ? selectedOption.label : value}</span>
+        <span className="text-[10px] text-text-secondary">▼</span>
+      </button>
+
+      {isOpen && (
+        <div className="absolute left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl z-50 py-1.5 max-h-48 overflow-y-auto">
+          {options.map(opt => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => {
+                onChange(opt.value);
+                setIsOpen(false);
+              }}
+              className={`w-full px-4 py-2.5 text-left text-xs sm:text-sm font-semibold transition-all hover:bg-slate-50 ${
+                opt.value === value ? 'text-pink-500 bg-pink-50/20' : 'text-slate-700'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const MatrimonialSetupPage = ({ isHub = false, onPublish }) => {
   const navigate = useNavigate();
@@ -15,6 +66,7 @@ const MatrimonialSetupPage = ({ isHub = false, onPublish }) => {
     gotra: '',
     manglik: 'No',
     diet: 'Vegetarian',
+    photoVisibility: 'connections',
     education: '',
     occupation: '',
     income: '',
@@ -41,6 +93,7 @@ const MatrimonialSetupPage = ({ isHub = false, onPublish }) => {
         gotra: form.gotra || 'N/A',
         manglik: form.manglik || 'No',
         diet: form.diet || 'Vegetarian',
+        photoVisibility: form.photoVisibility || 'connections',
       };
       if (onPublish) {
         onPublish(profileData);
@@ -74,8 +127,23 @@ const MatrimonialSetupPage = ({ isHub = false, onPublish }) => {
             <div className="bg-pink-50 rounded-xl p-3 flex items-start gap-2 mb-4">
               <Lock size={14} className="text-matrimonial-module shrink-0 mt-0.5" />
               <p className="text-xs text-matrimonial-module/80 leading-relaxed">
-                Photos will be blurred by default. They are only visible to profiles whose interest you accept.
+                Set who can see your photos. Blurred photos protect your privacy until a match connection is established.
               </p>
+            </div>
+
+            <div className="mb-4">
+              <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Photo Visibility</label>
+              <div className="mt-1.5">
+                <CustomSelect
+                  value={form.photoVisibility}
+                  onChange={(val) => setForm({ ...form, photoVisibility: val })}
+                  options={[
+                    { value: 'all', label: 'Public (Visible to all members)' },
+                    { value: 'connections', label: 'Connections Only (Blurred for unconnected members)' },
+                    { value: 'private', label: 'Private (Hidden until request)' }
+                  ]}
+                />
+              </div>
             </div>
 
             <InputField label="Height" name="height" placeholder="e.g. 5'8&quot;" value={form.height} onChange={handleChange} />
@@ -84,34 +152,30 @@ const MatrimonialSetupPage = ({ isHub = false, onPublish }) => {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Manglik</label>
-                <div className="relative mt-1.5">
-                  <select 
-                    name="manglik" 
-                    value={form.manglik} 
-                    onChange={handleChange}
-                    className="w-full bg-card border border-gray-200 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-text-primary outline-none focus:border-matrimonial-module transition-all appearance-none pr-8"
-                  >
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                    <option value="Don't Know">Don't Know</option>
-                  </select>
-                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary text-[10px]">▼</div>
+                <div className="mt-1.5">
+                  <CustomSelect
+                    value={form.manglik}
+                    onChange={(val) => setForm({ ...form, manglik: val })}
+                    options={[
+                      { value: 'No', label: 'No' },
+                      { value: 'Yes', label: 'Yes' },
+                      { value: "Don't Know", label: "Don't Know" }
+                    ]}
+                  />
                 </div>
               </div>
               <div>
                 <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Diet</label>
-                <div className="relative mt-1.5">
-                  <select 
-                    name="diet" 
-                    value={form.diet} 
-                    onChange={handleChange}
-                    className="w-full bg-card border border-gray-200 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-text-primary outline-none focus:border-matrimonial-module transition-all appearance-none pr-8"
-                  >
-                    <option value="Vegetarian">Vegetarian</option>
-                    <option value="Non-Vegetarian">Non-Vegetarian</option>
-                    <option value="Eggetarian">Eggetarian</option>
-                  </select>
-                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary text-[10px]">▼</div>
+                <div className="mt-1.5">
+                  <CustomSelect
+                    value={form.diet}
+                    onChange={(val) => setForm({ ...form, diet: val })}
+                    options={[
+                      { value: 'Vegetarian', label: 'Vegetarian' },
+                      { value: 'Non-Vegetarian', label: 'Non-Vegetarian' },
+                      { value: 'Eggetarian', label: 'Eggetarian' }
+                    ]}
+                  />
                 </div>
               </div>
             </div>

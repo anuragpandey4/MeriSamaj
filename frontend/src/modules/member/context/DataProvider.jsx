@@ -510,6 +510,44 @@ export const DataProvider = ({ children }) => {
     setMatrimonialProfiles(prev => [newProfile, ...prev]);
   };
 
+  const toggleMatrimonialInterest = (profileId) => {
+    setMatrimonialProfiles(prev => prev.map(p => {
+      if (p.id === profileId) {
+        return {
+          ...p,
+          interests: {
+            ...p.interests,
+            sent: !p.interests.sent
+          }
+        };
+      }
+      return p;
+    }));
+  };
+
+  const handleMatrimonialInterestResponse = (profileId, status) => {
+    setMatrimonialProfiles(prev => prev.map(p => {
+      if (p.id === profileId) {
+        return {
+          ...p,
+          interests: {
+            ...p.interests,
+            received: false,
+            accepted: status === 'accept'
+          }
+        };
+      }
+      return p;
+    }));
+  };
+
+  const updateMatrimonialBio = (newBio) => {
+    setCurrentUser(prev => ({
+      ...prev,
+      matrimonialBio: newBio
+    }));
+  };
+
   const addObituary = (obituary) => {
     setObituaries([obituary, ...obituaries]);
   };
@@ -765,6 +803,9 @@ export const DataProvider = ({ children }) => {
     followedAnnouncements,
     toggleFollowedAnnouncement,
     addMatrimonialProfile,
+    toggleMatrimonialInterest,
+    handleMatrimonialInterestResponse,
+    updateMatrimonialBio,
     obituaries,
     addObituary,
     toggleObituaryShraddhanjali,

@@ -58,39 +58,6 @@ export const StoryViewer = ({ story, stories = [], onStoryChange, onClose }) => 
     setPrevStoryId(story.id);
   }
 
-  // Two-finger pull down dismiss gesture detection
-  const [touchStartY, setTouchStartY] = useState(null);
-  const [isTwoFingerActive, setIsTwoFingerActive] = useState(false);
-
-  const handleTouchStart = (e) => {
-    if (e.touches.length === 2) {
-      const y1 = e.touches[0].clientY;
-      const y2 = e.touches[1].clientY;
-      setTouchStartY((y1 + y2) / 2);
-      setIsTwoFingerActive(true);
-    }
-  };
-
-  const handleTouchMove = (e) => {
-    if (isTwoFingerActive && e.touches.length === 2 && touchStartY !== null) {
-      const y1 = e.touches[0].clientY;
-      const y2 = e.touches[1].clientY;
-      const currentY = (y1 + y2) / 2;
-      const deltaY = currentY - touchStartY;
-      
-      // Close if 2 fingers dragged down past threshold (80px)
-      if (deltaY > 80) {
-        onClose();
-        setIsTwoFingerActive(false);
-      }
-    }
-  };
-
-  const handleTouchEnd = () => {
-    setIsTwoFingerActive(false);
-    setTouchStartY(null);
-  };
-
   // Auto advance timeline (5 seconds total)
   useEffect(() => {
     if (!story) return;
@@ -174,11 +141,20 @@ export const StoryViewer = ({ story, stories = [], onStoryChange, onClose }) => 
   return (
     <AnimatePresence>
       {story && (
-      <div 
-        className="fixed inset-0 z-[100] bg-black flex flex-col overflow-hidden"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+      <motion.div 
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0.02, bottom: 0.8 }}
+        onDragEnd={(event, info) => {
+          if (info.offset.y > 100) {
+            onClose();
+          }
+        }}
+        initial={{ opacity: 0, y: '100%' }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: '100%' }}
+        transition={{ type: 'spring', damping: 26, stiffness: 260 }}
+        className="fixed inset-0 z-[100] bg-black flex flex-col overflow-hidden touch-none"
       >
         
         {/* Full Card sliding container */}
@@ -194,15 +170,7 @@ export const StoryViewer = ({ story, stories = [], onStoryChange, onClose }) => 
               x: { type: "spring", stiffness: 280, damping: 28 },
               opacity: { duration: 0.18 }
             }}
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0.15, bottom: 0.8 }}
-            onDragEnd={(event, info) => {
-              if (info.offset.y > 100 || info.velocity.y > 500) {
-                onClose();
-              }
-            }}
-            className="absolute inset-0 w-full h-full flex flex-col bg-black touch-none"
+            className="absolute inset-0 w-full h-full flex flex-col bg-black"
           >
             {/* Progress Bar Container - ONLY for the current member's stories */}
             <div className="absolute top-0 pt-4 left-0 right-0 z-20 px-2 flex gap-1.5">
@@ -289,7 +257,7 @@ export const StoryViewer = ({ story, stories = [], onStoryChange, onClose }) => 
           <div className="w-2/3 h-full cursor-pointer" onClick={() => handleTap('right')} />
         </div>
 
-      </div>
+      </motion.div>
       )}
     </AnimatePresence>
   );

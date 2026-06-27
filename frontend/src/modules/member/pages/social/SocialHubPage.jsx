@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, Search, Bell, Users, MessageCircle, MapPin, Compass } from 'lucide-react';
+import { Menu, Search, Bell, Users, MessageCircle, MapPin, Compass, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Avatar } from '../../components/common/Avatar';
 import { useData } from '../../context/DataProvider';
@@ -102,6 +102,8 @@ const SocialHubPage = ({ initialTab = 'city-feed' }) => {
   const location = useLocation();
   const { currentUser } = useData();
   const [activeTab, setActiveTab] = useState(0);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const scrollContainerRef = useRef(null);
   const isTransitioningRef = useRef(false);
   const touchStartXRef = useRef(0);
@@ -185,6 +187,7 @@ const SocialHubPage = ({ initialTab = 'city-feed' }) => {
   // Custom Touch Gestures
   const handleTouchStart = (e) => {
     if (isTransitioningRef.current) return;
+    if (e.target.closest('[data-swipe-block="true"]')) return;
     touchStartXRef.current = e.touches[0].clientX;
     touchStartYRef.current = e.touches[0].clientY;
     touchTriggeredRef.current = false; // Reset trigger status for this touch session
@@ -192,6 +195,7 @@ const SocialHubPage = ({ initialTab = 'city-feed' }) => {
 
   const handleTouchMove = (e) => {
     if (isTransitioningRef.current || touchTriggeredRef.current) return;
+    if (e.target.closest('[data-swipe-block="true"]')) return;
     
     const diffX = e.touches[0].clientX - touchStartXRef.current;
     const diffY = e.touches[0].clientY - touchStartYRef.current;
@@ -217,6 +221,7 @@ const SocialHubPage = ({ initialTab = 'city-feed' }) => {
 
   // Custom Wheel/Trackpad Gestures with debounce for inertial scrolling momentum
   const handleWheel = (e) => {
+    if (e.target.closest('[data-swipe-block="true"]')) return;
     if (Math.abs(e.deltaX) > 15) {
       if (!isTransitioningRef.current && !isWheelingRef.current) {
         isWheelingRef.current = true;
@@ -275,24 +280,48 @@ const SocialHubPage = ({ initialTab = 'city-feed' }) => {
       {/* ─── FIXED GLOBAL HEADER ─── */}
       <div className="bg-white sticky top-0 z-40 border-b border-gray-100 flex-shrink-0">
         <div className="flex items-center justify-between px-5 h-14">
-          <div className="flex items-center gap-4">
-            <button className="text-text-primary">
-              <Menu size={24} />
-            </button>
-            <h1 className="text-[20px] font-semibold text-text-primary tracking-tight">Social Hub</h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="text-text-primary">
-              <Search size={22} />
-            </button>
-            <button className="relative text-text-primary" onClick={() => navigate('/member/notifications')}>
-              <Bell size={22} />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                3
-              </span>
-            </button>
-            <Avatar initials={currentUser?.initials || 'U'} size="sm" color="bg-blue-100 text-blue-700" />
-          </div>
+          {isSearchOpen ? (
+            <div className="flex-1 flex items-center gap-3 bg-slate-100 px-3.5 py-1.5 rounded-xl">
+              <Search size={18} className="text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search posts..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-transparent outline-none w-full text-[14.5px] text-slate-800 font-semibold"
+                autoFocus
+              />
+              <button onClick={() => {
+                setSearchQuery('');
+                setIsSearchOpen(false);
+              }} className="text-slate-400 hover:text-slate-600 p-0.5">
+                <X size={18} />
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center gap-4">
+                <button className="text-text-primary">
+                  <Menu size={24} />
+                </button>
+                <h1 className="text-[20px] font-semibold text-text-primary tracking-tight">Social Hub</h1>
+              </div>
+              <div className="flex items-center gap-4">
+                <button className="text-text-primary" onClick={() => setIsSearchOpen(true)}>
+                  <Search size={22} />
+                </button>
+                <button className="relative text-text-primary" onClick={() => navigate('/member/notifications')}>
+                  <Bell size={22} />
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                    3
+                  </span>
+                </button>
+                <div className="cursor-pointer active:scale-95 transition-transform" onClick={() => navigate('/member/profile')}>
+                  <Avatar initials={currentUser?.initials || 'U'} size="sm" color="bg-blue-100 text-blue-700" />
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* ─── TAB BAR ─── */}
@@ -329,9 +358,10 @@ const SocialHubPage = ({ initialTab = 'city-feed' }) => {
       >
         {tabs.map((tab) => {
           const Component = tab.component;
+          const extraProps = tab.feedProps || {};
           return (
             <div key={tab.id} className="w-full h-full flex-shrink-0 overflow-y-auto pb-28">
-              <Component isHub={true} />
+              <Component isHub={true} {...extraProps} searchQuery={searchQuery} />
             </div>
           );
         })}
