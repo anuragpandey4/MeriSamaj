@@ -197,6 +197,110 @@ const dummyMatrimonialFeed = [
   }
 ];
 
+const mockProfileVisitors = [
+  {
+    id: 'vis_1',
+    name: 'Kajal Patel',
+    age: 25,
+    gender: 'Female',
+    height: "5' 4\"",
+    city: 'Ahmedabad',
+    community: 'Patel',
+    gotra: 'Charan',
+    profession: 'Digital Marketer',
+    income: '₹6-8 Lacs p.a',
+    education: 'MBA Marketing',
+    managedBy: 'Self',
+    activeStatus: 'Active Today',
+    photoCount: 4,
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80',
+    membershipTier: 'Normal',
+    visitedDate: 'Today, 10:15 AM',
+    requiresUpgrade: true
+  },
+  {
+    id: 'vis_2',
+    name: 'Shreya Sharma',
+    age: 26,
+    gender: 'Female',
+    height: "5' 3\"",
+    city: 'Bhopal',
+    community: 'Sharma',
+    gotra: 'Bhardwaj',
+    profession: 'HR Manager',
+    income: '₹5-7 Lacs p.a',
+    education: 'MBA HR',
+    managedBy: 'Brother',
+    activeStatus: 'Active Yesterday',
+    photoCount: 3,
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=800&q=80',
+    membershipTier: 'Pro',
+    visitedDate: 'Yesterday, 4:30 PM',
+    requiresUpgrade: false
+  },
+  {
+    id: 'vis_3',
+    name: 'Tanya Sen',
+    age: 24,
+    gender: 'Female',
+    height: "5' 5\"",
+    city: 'Jabalpur',
+    community: 'Verma',
+    gotra: 'Sen',
+    profession: 'UI/UX Designer',
+    income: '₹8 Lacs p.a',
+    education: 'B.Des, NID',
+    managedBy: 'Parents',
+    activeStatus: 'Online Now',
+    photoCount: 2,
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+    membershipTier: 'Pro Max',
+    visitedDate: '26 Jun 2026',
+    requiresUpgrade: true
+  }
+];
+
+const mockProfilesIVisited = [
+  {
+    id: 'vis_4',
+    name: 'Priyel Bhatnagar',
+    age: 27,
+    gender: 'Female',
+    height: "5' 2\"",
+    city: 'Kota',
+    community: 'Sharma',
+    gotra: 'Bhatnagar',
+    profession: 'Finance Professional',
+    income: '₹10 Lacs p.a',
+    education: 'MBA Finance',
+    managedBy: 'Sibling',
+    activeStatus: 'Active Today',
+    photoCount: 1,
+    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80',
+    membershipTier: 'Normal',
+    visitedDate: '26 Jun 2026'
+  },
+  {
+    id: 'vis_5',
+    name: 'Nehal Gupta',
+    age: 25,
+    gender: 'Female',
+    height: "5' 3\"",
+    city: 'Indore',
+    community: 'Gupta',
+    gotra: 'Garg',
+    profession: 'Software Engineer',
+    income: '₹12 Lacs p.a',
+    education: 'B.Tech',
+    managedBy: 'Self',
+    activeStatus: 'Online Now',
+    photoCount: 5,
+    avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=800&q=80',
+    membershipTier: 'Pro Supreme',
+    visitedDate: '25 Jun 2026'
+  }
+];
+
 // Membership rank calculation helper
 const membershipRanks = {
   'Normal': 0,
@@ -384,10 +488,10 @@ const MatrimonialHomePage = () => {
                 
                 <div className="flex items-center gap-4">
                   <button
-                    className="text-slate-700 active:scale-95 transition-transform relative"
+                    className="text-rose-500 active:scale-95 transition-transform relative"
                     onClick={() => navigate('/member/matrimonial/interests')}
                   >
-                    <Bell size={22} className="stroke-[1.8]" />
+                    <Heart size={22} fill="currentColor" className="drop-shadow-[0_1px_4px_rgba(244,63,94,0.5)] hover:scale-110 transition-transform" />
                     <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border border-white">
                       3
                     </span>
@@ -669,7 +773,7 @@ const MatrimonialHomePage = () => {
                 onClick={() => setCurrentSubView('visits')}
                 className="flex-1 bg-white rounded-2xl p-3.5 border border-slate-200/50 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-center cursor-pointer active:scale-95 transition-all"
               >
-                <span className="text-[26px] font-black text-indigo-600 block leading-none">13</span>
+                <span className="text-[26px] font-black text-indigo-600 block leading-none">{mockProfileVisitors.length}</span>
                 <span className="text-[11.5px] font-bold text-slate-650 mt-1.5 block leading-tight">Profile<br/>Visits</span>
               </div>
 
@@ -890,187 +994,214 @@ const MatrimonialHomePage = () => {
           {/* List Scroll Area */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {visitsTab === 'visitors' ? (
-              <>
-                {/* Blurred Visitor Profile Card (Cloned from Image 1) */}
-                <div className="bg-white rounded-[32px] overflow-hidden border border-slate-200/40 shadow-md relative">
-                  <div className="relative aspect-[3/4.5] overflow-hidden bg-slate-900 cursor-pointer flex flex-col justify-end" style={{ minHeight: '480px' }}>
-                    
-                    {/* Blurred Photo Base */}
-                    <div className="absolute inset-0 bg-slate-800/80 backdrop-blur-3xl z-0" />
-                    
-                    {/* Blur Overlays */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-15">
-                      <Lock size={26} className="text-white/80 mb-3" />
-                      <p className="text-white text-[13.5px] font-black leading-snug tracking-wide">
-                        Photo visible to paid members only
-                      </p>
-                      <button
-                        onClick={() => setIsMembershipPopupOpen(true)}
-                        className="mt-4 px-5 py-2.5 bg-transparent text-white border-2 border-white rounded-full text-[12.5px] font-black active:scale-95"
-                      >
-                        Upgrade to view
-                      </button>
-                    </div>
-
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent pt-36 pb-26 px-5 z-5" />
-
-                    {/* Text parameters on top of the image */}
-                    <div className="relative z-10 px-5 pb-3 pointer-events-none">
-                      <span className="text-[11px] text-white/80 font-bold uppercase tracking-wider">
-                        Active Today
-                      </span>
-                      <h2 className="text-white text-[23px] font-black mt-1 leading-none">
-                        XXXXX, 24
-                      </h2>
-                      <p className="text-white/80 text-[13px] font-bold mt-2 leading-none">
-                        5' 6" · Bangalore · Saini
-                      </p>
-                      <p className="text-white/85 text-[12.5px] font-semibold mt-1.5 leading-none">
-                        Finance Professional · No Income
-                      </p>
-                      <p className="text-white/70 text-[12px] font-semibold mt-1.5 leading-none">
-                        B.Com
-                      </p>
-                    </div>
-
-                    {/* Translucent Managed-By Strip */}
-                    <div className="relative z-10 bg-black/35 backdrop-blur-xs py-2 px-5 text-center text-white/85 text-[11px] font-semibold italic border-y border-white/10 select-none pointer-events-none">
-                      Profile managed by Parent
-                    </div>
-
-                    {/* Action Circle overlays */}
-                    <div className="relative z-10 py-4 px-4 flex justify-around items-center select-none bg-transparent">
-                      <button className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#9E2045] text-white">
-                          <Mail size={20} />
+              <div className="space-y-6">
+                {mockProfileVisitors.map((visitor) => (
+                  <div key={visitor.id} className="bg-white rounded-[32px] overflow-hidden border border-slate-200/40 shadow-md relative">
+                    <div className="relative aspect-[3/4.5] overflow-hidden bg-slate-900 cursor-pointer flex flex-col justify-end" style={{ minHeight: '480px' }}>
+                      {/* Photo base */}
+                      <img
+                        src={visitor.avatar}
+                        alt={visitor.name}
+                        className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ${
+                          visitor.requiresUpgrade ? 'blur-2xl brightness-75 scale-105' : ''
+                        }`}
+                      />
+                      
+                      {/* If requires upgrade, show locked blur overlay */}
+                      {visitor.requiresUpgrade ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-black/35 backdrop-blur-xs z-15">
+                          <Lock size={28} className="text-white/90 mb-3" />
+                          <p className="text-white text-[13.5px] font-black leading-snug tracking-wide px-4">
+                            Photo visible to paid members only
+                          </p>
+                          <button
+                            onClick={() => setIsMembershipPopupOpen(true)}
+                            className="mt-4 px-5 py-2.5 bg-transparent hover:bg-white/10 text-white border-2 border-white rounded-full text-[12.5px] font-black tracking-wide transition-all active:scale-95"
+                          >
+                            Upgrade to view
+                          </button>
                         </div>
-                        <span className="text-[10px] font-bold text-white tracking-wide">Interest</span>
-                      </button>
-                      <button className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white">
-                          <Star size={20} />
-                        </div>
-                        <span className="text-[10px] font-bold text-white tracking-wide">Shortlist</span>
-                      </button>
-                      <button className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white">
-                          <X size={20} />
-                        </div>
-                        <span className="text-[10px] font-bold text-white tracking-wide">Ignore</span>
-                      </button>
-                      <button className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white">
-                          <MessageCircle size={20} />
-                        </div>
-                        <span className="text-[10px] font-bold text-white tracking-wide">Chat</span>
-                      </button>
+                      ) : null}
+
+                      {/* Header Badge: Visited Time */}
+                      <div className="absolute top-4 left-4 text-white text-[11.5px] font-extrabold tracking-wide text-left bg-black/35 backdrop-blur-xs px-2.5 py-1.5 rounded-lg z-10">
+                        Visited {visitor.visitedDate}
+                      </div>
+
+                      {/* Top Right Photo Count Badge */}
+                      <div className="absolute top-4 right-4 bg-black/45 backdrop-blur-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 pointer-events-none z-10">
+                        <Image size={12} className="text-white" />
+                        <span className="text-[10px] font-black text-white">
+                          {visitor.photoCount}
+                        </span>
+                      </div>
+
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent pt-36 pb-26 px-5 z-5" />
+
+                      {/* Text parameters on top of the image */}
+                      <div className="relative z-10 px-5 pb-3 pointer-events-none">
+                        <span className="text-[11px] text-white/80 font-bold uppercase tracking-wider">
+                          {visitor.activeStatus}
+                        </span>
+                        <h2 className="text-white text-[23px] font-black mt-1 leading-none">
+                          {visitor.requiresUpgrade ? 'XXXXX' : visitor.name}, {visitor.age}
+                        </h2>
+                        <p className="text-white/80 text-[13px] font-bold mt-2 leading-none">
+                          {visitor.height} · {visitor.city} · {visitor.community}
+                        </p>
+                        <p className="text-white/85 text-[12.5px] font-semibold mt-1.5 leading-none">
+                          {visitor.profession} · {visitor.income}
+                        </p>
+                        <p className="text-white/70 text-[12px] font-semibold mt-1.5 leading-none">
+                          {visitor.education}
+                        </p>
+                      </div>
+
+                      {/* Translucent Managed-By Strip */}
+                      <div className="relative z-10 bg-black/35 backdrop-blur-xs py-2 px-5 text-center text-white/85 text-[11px] font-semibold italic border-y border-white/10 select-none pointer-events-none">
+                        Profile managed by {visitor.managedBy}
+                      </div>
+
+                      {/* Action Circle overlays */}
+                      <div className="relative z-10 py-4 px-4 flex justify-around items-center select-none bg-transparent">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleInterest(visitor.id); }}
+                          className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                        >
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#9E2045] text-white hover:bg-[#B82B55] transition-all">
+                            <Mail size={20} />
+                          </div>
+                          <span className="text-[10px] font-bold text-white tracking-wide">Interest</span>
+                        </button>
+                        
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleShortlist(visitor.id); }}
+                          className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                        >
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                            <Star size={20} className={isShortlisted(visitor.id) ? 'text-amber-400 fill-amber-400' : 'text-white'} />
+                          </div>
+                          <span className="text-[10px] font-bold text-white tracking-wide">Shortlist</span>
+                        </button>
+                        
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleIgnore(visitor.id); }}
+                          className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                        >
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                            <X size={20} />
+                          </div>
+                          <span className="text-[10px] font-bold text-white tracking-wide">Ignore</span>
+                        </button>
+                        
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!visitor.requiresUpgrade) {
+                              navigate(`/member/chat/${visitor.id}`);
+                            } else {
+                              showToast('Upgrade to chat with this profile!');
+                            }
+                          }}
+                          className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                        >
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                            <MessageCircle size={20} />
+                          </div>
+                          <span className="text-[10px] font-bold text-white tracking-wide">Chat</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Visitor Card 2: Placeholder with Request Photo (Cloned from Image 1) */}
-                <div className="bg-[#1A2536] rounded-[32px] p-6 text-center border border-white/5 relative overflow-hidden flex flex-col justify-end h-80 shadow-md">
-                  <div className="absolute top-4 left-4 text-white/70 text-[11px] font-semibold text-left">
-                    They visited<br/>on 26 Jun 26
-                  </div>
-                  
-                  {/* Face outline mock */}
-                  <div className="w-28 h-28 bg-[#2C384C] rounded-full mx-auto mb-4 border border-white/10 flex items-center justify-center text-white/10">
-                    <User size={64} />
-                  </div>
-
-                  <button
-                    onClick={() => showToast('Photo Request Sent successfully!')}
-                    className="w-full py-3 bg-transparent text-white border-2 border-white rounded-full text-[12.5px] font-black active:scale-95 transition-all shadow-md mt-auto"
-                  >
-                    Request photo
-                  </button>
-                </div>
-              </>
+                ))}
+              </div>
             ) : (
-              /* Profiles I Visited list (Cloned from Image 3) */
-              <div className="bg-white rounded-[32px] overflow-hidden border border-slate-200/40 shadow-md relative">
-                <div className="relative aspect-[3/4.5] overflow-hidden bg-slate-900 cursor-pointer flex flex-col justify-end" style={{ minHeight: '480px' }}>
-                  
-                  {/* Dynamic background photo */}
-                  <img
-                    src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80"
-                    alt="Priyel Bhatnagar"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  
-                  <div className="absolute top-4 left-4 text-white text-[11.5px] font-extrabold tracking-wide text-left bg-black/30 backdrop-blur-xs px-2.5 py-1.5 rounded-lg z-10">
-                    I visited<br/>on 26 Jun 26
-                  </div>
-
-                  {/* Top Right Photo Count Badge */}
-                  <div className="absolute top-4 right-4 bg-black/45 backdrop-blur-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 pointer-events-none z-10">
-                    <Image size={12} className="text-white" />
-                    <span className="text-[10px] font-black text-white">1</span>
-                  </div>
-
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent pt-36 pb-26 px-5 z-5" />
-
-                  {/* Text details */}
-                  <div className="relative z-10 px-5 pb-3 pointer-events-none">
-                    <span className="text-[11px] text-white/80 font-bold uppercase tracking-wider">
-                      Active Today
-                    </span>
-                    <h2 className="text-white text-[23px] font-black mt-1 leading-none">
-                      Priyel Bhatnagar, 27
-                    </h2>
-                    <p className="text-white/80 text-[13px] font-bold mt-2 leading-none">
-                      5' 2" · Kota · Kayastha - Bhatnagar
-                    </p>
-                    <p className="text-white/85 text-[12.5px] font-semibold mt-1.5 leading-none">
-                      Finance Professional · No Income
-                    </p>
-                    <p className="text-white/70 text-[12px] font-semibold mt-1.5 leading-none">
-                      MBA/PGDM
-                    </p>
-                  </div>
-
-                  {/* Managed By Strip */}
-                  <div className="relative z-10 bg-black/35 backdrop-blur-xs py-2 px-5 text-center text-white/85 text-[11px] font-semibold italic border-y border-white/10 select-none pointer-events-none">
-                    Profile managed by Sibling
-                  </div>
-
-                  {/* Action Circular Buttons (Chat, Contact, Cancel) */}
-                  <div className="relative z-10 py-4 px-4 flex justify-around items-center select-none bg-transparent">
-                    {/* Chat */}
-                    <button
-                      onClick={() => navigate('/member/chat/feed_priya')}
-                      className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
-                    >
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
-                        <MessageCircle size={20} />
+              <div className="space-y-6">
+                {mockProfilesIVisited.map((visited) => (
+                  <div key={visited.id} className="bg-white rounded-[32px] overflow-hidden border border-slate-200/40 shadow-md relative">
+                    <div className="relative aspect-[3/4.5] overflow-hidden bg-slate-900 cursor-pointer flex flex-col justify-end" style={{ minHeight: '480px' }}>
+                      
+                      {/* Dynamic background photo */}
+                      <img
+                        src={visited.avatar}
+                        alt={visited.name}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      
+                      <div className="absolute top-4 left-4 text-white text-[11.5px] font-extrabold tracking-wide text-left bg-black/30 backdrop-blur-xs px-2.5 py-1.5 rounded-lg z-10">
+                        Visited on {visited.visitedDate}
                       </div>
-                      <span className="text-[10px] font-bold text-white tracking-wide">Chat</span>
-                    </button>
 
-                    {/* Contact call details */}
-                    <button
-                      onClick={() => showToast('Opening contact phone information')}
-                      className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
-                    >
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
-                        <Phone size={20} />
+                      {/* Top Right Photo Count Badge */}
+                      <div className="absolute top-4 right-4 bg-black/45 backdrop-blur-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 pointer-events-none z-10">
+                        <Image size={12} className="text-white" />
+                        <span className="text-[10px] font-black text-white">{visited.photoCount}</span>
                       </div>
-                      <span className="text-[10px] font-bold text-white tracking-wide">Contact</span>
-                    </button>
 
-                    {/* Cancel/Delete cancel */}
-                    <button
-                      onClick={() => setCurrentSubView(null)}
-                      className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
-                    >
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
-                        <X size={20} />
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent pt-36 pb-26 px-5 z-5" />
+
+                      {/* Text details */}
+                      <div className="relative z-10 px-5 pb-3 pointer-events-none">
+                        <span className="text-[11px] text-white/80 font-bold uppercase tracking-wider">
+                          {visited.activeStatus}
+                        </span>
+                        <h2 className="text-white text-[23px] font-black mt-1 leading-none">
+                          {visited.name}, {visited.age}
+                        </h2>
+                        <p className="text-white/80 text-[13px] font-bold mt-2 leading-none">
+                          {visited.height} · {visited.city} · {visited.community}
+                        </p>
+                        <p className="text-white/85 text-[12.5px] font-semibold mt-1.5 leading-none">
+                          {visited.profession} · {visited.income}
+                        </p>
+                        <p className="text-white/70 text-[12px] font-semibold mt-1.5 leading-none">
+                          {visited.education}
+                        </p>
                       </div>
-                      <span className="text-[10px] font-bold text-white tracking-wide">Cancel</span>
-                    </button>
+
+                      {/* Managed By Strip */}
+                      <div className="relative z-10 bg-black/35 backdrop-blur-xs py-2 px-5 text-center text-white/85 text-[11px] font-semibold italic border-y border-white/10 select-none pointer-events-none">
+                        Profile managed by {visited.managedBy}
+                      </div>
+
+                      {/* Action Circular Buttons (Chat, Contact, Cancel) */}
+                      <div className="relative z-10 py-4 px-4 flex justify-around items-center select-none bg-transparent">
+                        {/* Chat */}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); navigate(`/member/chat/${visited.id}`); }}
+                          className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                        >
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                            <MessageCircle size={20} />
+                          </div>
+                          <span className="text-[10px] font-bold text-white tracking-wide">Chat</span>
+                        </button>
+
+                        {/* Contact details */}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); showToast(`Opening contact phone for ${visited.name}`); }}
+                          className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                        >
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                            <Phone size={20} />
+                          </div>
+                          <span className="text-[10px] font-bold text-white tracking-wide">Contact</span>
+                        </button>
+
+                        {/* Cancel visited */}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setCurrentSubView(null); }}
+                          className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                        >
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                            <X size={20} />
+                          </div>
+                          <span className="text-[10px] font-bold text-white tracking-wide">Cancel</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
             )}
           </div>
@@ -1968,7 +2099,7 @@ const MatrimonialHomePage = () => {
 
       {/* ─── BOTTOM NAVIGATION BAR (Matches reference exactly) ─── */}
       <div
-        className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-100 shadow-[0_-4px_16px_rgba(0,0,0,0.035)] z-40 pb-safe font-sans"
+        className="bg-white border-t border-slate-100 shadow-[0_-4px_16px_rgba(0,0,0,0.035)] z-40 pb-safe font-sans shrink-0"
         style={{ height: 'max(env(safe-area-inset-bottom, 0px) + 56px, 60px)' }}
       >
         <div className="flex items-center justify-around h-14">
@@ -1980,8 +2111,8 @@ const MatrimonialHomePage = () => {
             }`}
           >
             <div className="flex flex-col items-center">
-              <span className="text-[17px] font-black leading-none">Js</span>
-              <span className="text-[10px] mt-1 font-bold">Matches</span>
+              <Heart size={20} fill={activeBottomTab === 'matches' ? 'currentColor' : 'none'} className="stroke-[2.2]" />
+              <span className="text-[10px] mt-0.5 font-bold">Matches</span>
             </div>
             {activeBottomTab === 'matches' && <div className="absolute top-0 w-8 h-[3px] bg-rose-500 rounded-b-full" />}
           </button>

@@ -144,37 +144,8 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* Samaj Identity Content — bottom of hero */}
-        <div className="relative z-10 px-5 pt-10 pb-6 flex flex-col justify-end">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-white/20 shadow-sm">
-              {currentUser.city} {t('Chapter', language)}
-            </span>
-            <span className="bg-emerald-500/30 backdrop-blur-md text-emerald-100 text-[10px] font-bold px-3 py-1 rounded-full border border-emerald-400/30 shadow-sm">
-              ✓ {t('Verified', language)}
-            </span>
-          </div>
-          
-          <h2 className="text-[28px] font-serif font-extrabold text-white tracking-tight leading-tight drop-shadow-lg">
-            {currentUser.community}
-          </h2>
-          
-          <p className="text-white/80 text-[14px] italic font-medium mt-1 drop-shadow-sm">
-            "{t('One Family, One Community', language)}"
-          </p>
-
-          <div className="flex items-center gap-4 mt-3">
-            <div className="flex items-center gap-1.5">
-              <Users size={14} className="text-white/70" />
-              <span className="text-white/90 text-[13px] font-bold">1,247 {t('Members', language)}</span>
-            </div>
-            <div className="w-[1px] h-4 bg-white/30" />
-            <div className="flex items-center gap-1.5">
-              <Shield size={14} className="text-white/70" />
-              <span className="text-white/90 text-[13px] font-bold">{t('Verified', language)}</span>
-            </div>
-          </div>
-        </div>
+        {/* Samaj Identity Content — bottom of hero (text overlay removed) */}
+        <div className="relative z-10 px-5 pt-10 pb-4 flex flex-col justify-end" />
       </div>
 
       {/* User Welcome */}
@@ -233,34 +204,150 @@ const HomePage = () => {
         )}
       </motion.div>
 
-      {/* ─── CENSUS QUICK BANNER ─── */}
-      <div className="px-5 mt-5 relative z-10">
-        <div 
+      {/* ─── CENSUS DASHBOARD BANNER ─── */}
+      <div className="px-2 mt-5 relative z-10">
+        <div
           onClick={() => navigate('/member/census')}
-          className="w-full bg-gradient-to-r from-purple-700 via-indigo-700 to-indigo-600 rounded-[28px] p-5 shadow-lg border border-indigo-400/20 text-white relative overflow-hidden cursor-pointer press-scale group"
+          className="w-full bg-gradient-to-br from-[#3b2cc1] via-[#4f3dd6] to-[#2563eb] rounded-[28px] shadow-xl border border-indigo-400/20 text-white relative overflow-hidden cursor-pointer press-scale"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-white/10 to-transparent rounded-bl-[100px]" />
-          <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-white/5 rounded-full blur-xl" />
-          <div className="flex items-center justify-between relative z-10">
-            <div className="flex-1 min-w-0 pr-2">
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="bg-white/20 text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                  {language === 'en' ? 'Samaj Directory Analytics' : 'जनगणना & रिपोर्ट्स'}
-                </span>
-                <span className="bg-amber-400 text-slate-900 text-[8px] font-extrabold px-2 py-0.5 rounded-full uppercase flex items-center gap-0.5 shadow-sm">
-                  <Sparkles size={8} className="fill-slate-900" /> LIVE
+          {/* Decorative blobs */}
+          <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-400/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4 pointer-events-none" />
+
+          {/* ── Top section: label + icon + title + desc + CTA ── */}
+          <div className="relative z-10 p-4 pb-2 flex items-center justify-between gap-3">
+            {/* Left side content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="bg-white/20 text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-white/15">
+                  Community Census
                 </span>
               </div>
-              <h3 className="text-[19px] font-serif font-extrabold leading-tight">
-                {language === 'en' ? 'Community Census' : 'समाज की कुल जानकारी'}
+              <h3 className="text-[20px] font-black leading-tight tracking-tight">
+                Community Census Dashboard
               </h3>
-              <p className="text-white/80 text-[12.5px] mt-1 font-medium leading-snug">
-                {language === 'en' ? 'Explore demographics, family trees, active cities & download reports.' : 'हमारे समाज की एक विस्तृत झलक एवं रिपोर्ट्स देखें।'}
+              <p className="text-white/75 text-[11px] mt-1.5 font-medium leading-snug">
+                Detailed breakdown of total members, men, women &amp; children with percentage
               </p>
+              
+              {/* CTA Button */}
+              <button
+                onClick={(e) => { e.stopPropagation(); navigate('/member/census'); }}
+                className="mt-3 mb-1 px-4 py-1.5 bg-white/15 hover:bg-white/25 border border-white/25 rounded-xl text-white text-[11px] font-bold flex items-center gap-1.5 transition-colors"
+              >
+                View Details <ArrowRight size={12} />
+              </button>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner group-hover:bg-white/25 transition-colors shrink-0">
-              <ChevronRight size={22} className="text-white" />
+
+            {/* Right side premium clipboard illustration */}
+            <div className="relative w-[110px] h-[110px] shrink-0 flex items-center justify-center select-none pointer-events-none mr-1">
+              <svg viewBox="0 0 160 160" className="w-full h-full">
+                {/* Clipboard Background */}
+                <rect x="35" y="25" width="90" height="110" rx="8" fill="#ffffff" />
+                {/* Clipboard Clip */}
+                <path d="M65 25c0-4 3-7 7-7h26c4 0 7 3 7 7v4H65v-4z" fill="#cbd5e1" />
+                <rect x="73" y="15" width="14" height="6" rx="2" fill="#94a3b8" />
+                
+                {/* Pie Chart */}
+                <circle cx="70" cy="55" r="18" fill="#6366f1" />
+                <path d="M70 55 L70 37 A18 18 0 0 1 88 55 Z" fill="#eab308" />
+                <path d="M70 55 L88 55 A18 18 0 0 1 70 73 Z" fill="#10b981" />
+                <path d="M70 55 L70 73 A18 18 0 0 1 52 55 Z" fill="#a855f7" />
+                
+                {/* Tiny lines representing document text */}
+                <rect x="43" y="80" width="30" height="3" rx="1.5" fill="#e2e8f0" />
+                <rect x="43" y="87" width="20" height="3" rx="1.5" fill="#e2e8f0" />
+                
+                {/* Bar Chart (inside clipboard) */}
+                <rect x="97" y="65" width="5" height="25" rx="1" fill="#93c5fd" />
+                <rect x="105" y="55" width="5" height="35" rx="1" fill="#818cf8" />
+                <rect x="113" y="72" width="5" height="18" rx="1" fill="#c084fc" />
+                
+                {/* Magnifying Glass */}
+                <g transform="translate(10, 10)">
+                  {/* Handle */}
+                  <line x1="120" y1="120" x2="145" y2="145" stroke="#374151" strokeWidth="9" strokeLinecap="round" />
+                  {/* Glass Circle border */}
+                  <circle cx="105" cy="105" r="22" fill="#ffffff" stroke="#374151" strokeWidth="6" />
+                  {/* Glass interior highlight */}
+                  <circle cx="105" cy="105" r="19" fill="#f8fafc" />
+                  {/* Tiny Bars inside magnifying glass */}
+                  <rect x="95" y="105" width="4" height="12" rx="1" fill="#10b981" />
+                  <rect x="102" y="96" width="4" height="21" rx="1" fill="#f59e0b" />
+                  <rect x="109" y="101" width="4" height="16" rx="1" fill="#6366f1" />
+                </g>
+              </svg>
+              
+              {/* Overlapping colored silhouettes in front of the clipboard */}
+              <div className="absolute bottom-1 left-0 flex items-end">
+                {/* Blue silhouette */}
+                <svg viewBox="0 0 24 32" className="w-8 h-10 drop-shadow-md -mr-1.5">
+                  <circle cx="12" cy="7" r="6" fill="#3b82f6" />
+                  <path d="M2 28c0-6 4-11 10-11s10 5 10 11" fill="#3b82f6" />
+                </svg>
+                {/* Pink silhouette */}
+                <svg viewBox="0 0 24 32" className="w-8 h-10 drop-shadow-md z-10 -mr-1.5">
+                  <circle cx="12" cy="6" r="6" fill="#ec4899" />
+                  <path d="M4 30c0-7 3-12 8-12s8 5 8 12" fill="#ec4899" />
+                </svg>
+                {/* Green silhouette */}
+                <svg viewBox="0 0 24 32" className="w-6 h-8 drop-shadow-md">
+                  <circle cx="12" cy="6" r="5" fill="#10b981" />
+                  <path d="M4 28c0-5 3-9 8-9s8 4 8 9" fill="#10b981" />
+                </svg>
+              </div>
+
+              {/* Floating Purple Group Icon Badge */}
+              <div className="absolute top-1 right-1 w-7 h-7 rounded-full bg-purple-500/90 border border-white/20 flex items-center justify-center shadow-md">
+                <Users size={12} className="text-white" />
+              </div>
             </div>
+          </div>
+
+          {/* ── Stats Grid ── */}
+          <div className="relative z-10 mx-2 mb-2 bg-white/10 backdrop-blur-md rounded-2xl border border-white/15 grid grid-cols-4 divide-x divide-white/15">
+            {[
+              {
+                icon: <Users size={16} className="text-white" />,
+                iconBg: 'bg-purple-500/40', value: '100%', label: 'Total Members', sublabel: 'Total Count', bar: 'bg-purple-300', barW: 'w-full'
+              },
+              {
+                icon: <User size={16} className="text-white" />,
+                iconBg: 'bg-blue-500/40', value: '52%', label: 'Men', sublabel: '% of Total', bar: 'bg-blue-300', barW: 'w-[52%]'
+              },
+              {
+                icon: <User size={16} className="text-white" />,
+                iconBg: 'bg-pink-500/40', value: '38%', label: 'Women', sublabel: '% of Total', bar: 'bg-pink-300', barW: 'w-[38%]'
+              },
+              {
+                icon: <Smile size={16} className="text-white" />,
+                iconBg: 'bg-green-500/40', value: '10%', label: 'Children', sublabel: '(0-17 yrs)', bar: 'bg-green-300', barW: 'w-[10%]'
+              },
+            ].map((stat, i) => (
+              <div key={i} className="flex flex-col items-center py-2.5 px-1 gap-0.5">
+                <div className={`w-9 h-9 rounded-full ${stat.iconBg} flex items-center justify-center mb-0.5 border border-white/15 shadow-inner`}>
+                  {stat.icon}
+                </div>
+                <span className="text-[14px] font-black text-white leading-none">{stat.value}</span>
+                <span className="text-[8px] font-bold text-white/85 text-center leading-tight">{stat.label}</span>
+                <div className="w-full px-1 mt-0.5">
+                  <div className="h-[2.5px] w-full bg-white/15 rounded-full overflow-hidden">
+                    <div className={`h-full ${stat.bar} ${stat.barW} rounded-full`} />
+                  </div>
+                </div>
+                <span className="text-[7px] text-white/55 text-center leading-tight">{stat.sublabel}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Info footer ── */}
+          <div className="relative z-10 mx-2 mb-2 px-3 py-1.5 bg-white/8 border border-white/10 rounded-xl flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+              <span className="text-[9px] font-black text-white">i</span>
+            </div>
+            <p className="text-[10px] text-white/70 font-medium leading-tight">
+              View detailed community member count &amp; percentage breakdown in this dashboard.
+            </p>
           </div>
         </div>
       </div>
