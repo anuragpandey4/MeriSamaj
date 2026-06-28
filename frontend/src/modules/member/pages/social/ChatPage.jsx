@@ -4,10 +4,11 @@ import { ArrowLeft, Mic, Send, Paperclip, Clock, CheckCheck, User, Square } from
 import { Avatar } from '../../components/common/Avatar';
 import { useData } from '../../context/DataProvider';
 
-const ChatPage = () => {
-  const { memberId } = useParams();
+const ChatPage = ({ memberId: propMemberId }) => {
+  const { id } = useParams();
+  const memberId = propMemberId || id;
   const navigate = useNavigate();
-  const { members, currentUser } = useData();
+  const { members, currentUser, matrimonialProfiles } = useData();
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -19,7 +20,7 @@ const ChatPage = () => {
   const audioChunksRef = useRef([]);
   const timerRef = useRef(null);
 
-  const recipient = members.find(m => m.id === memberId) || { name: 'Member', initials: 'M' };
+  const recipient = members.find(m => m.id === memberId) || matrimonialProfiles.find(p => p.id === memberId) || { name: 'Member', initials: 'M' };
 
   // Track online/offline status for the queuing logic
   useEffect(() => {
@@ -116,7 +117,7 @@ const ChatPage = () => {
           <button onClick={() => navigate(-1)} className="p-1 -ml-1 press-scale">
             <ArrowLeft size={22} className="text-gray-700" />
           </button>
-          <Avatar initials={recipient.initials} size="sm" />
+          <Avatar src={recipient.avatar} initials={recipient.initials || recipient.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'M'} size="sm" />
           <div>
             <h1 className="text-[15px] font-bold text-gray-900 leading-tight">{recipient.name}</h1>
             <div className="flex items-center gap-1.5 mt-0.5">

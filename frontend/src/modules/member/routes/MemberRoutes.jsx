@@ -34,6 +34,10 @@ import SocialHubPage from '../pages/social/SocialHubPage';
 import MatrimonialProfilePage from '../pages/matrimonial/MatrimonialProfilePage';
 import MatrimonialSetupPage from '../pages/matrimonial/MatrimonialSetupPage';
 import InterestsPage from '../pages/matrimonial/InterestsPage';
+import MatrimonialSearchPage from '../pages/matrimonial/MatrimonialSearchPage';
+import MatrimonialShortlistPage from '../pages/matrimonial/MatrimonialShortlistPage';
+import MatrimonialSuccessStories from '../pages/matrimonial/MatrimonialSuccessStories';
+import { MatrimonialProvider } from '../pages/matrimonial/MatrimonialContext';
 import EditProfilePage from '../pages/profile/EditProfilePage';
 import FamilyPage from '../pages/profile/FamilyPage';
 import VerifyMembershipPage from '../pages/profile/VerifyMembershipPage';
@@ -52,9 +56,14 @@ import DonateSuccessPage from '../pages/donation/DonateSuccessPage';
 import MyDonationsPage from '../pages/donation/MyDonationsPage';
 import { DonationProvider } from '../pages/donation/DonationContext';
 
-// Feature: Om Shanti
+// Feature: Om Shanti (legacy)
 import ObituaryPage from '../pages/obituary/ObituaryPage';
 import CreateObituaryPage from '../pages/obituary/CreateObituaryPage';
+
+// Feature: Shradhanjali (enhanced)
+import ShradhanjaliHomePage from '../pages/obituary/ShradhanjaliHomePage';
+import ShradhanjaliDetailPage from '../pages/obituary/ShradhanjaliDetailPage';
+import CreateShradhanjaliPage from '../pages/obituary/CreateShradhanjaliPage';
 
 // Feature: Leadership
 import LeadershipPage from '../pages/leadership/LeadershipPage';
@@ -64,7 +73,7 @@ import { CensusPage } from '../pages/census/CensusPage';
 
 // Feature: Chat
 // import ChatListPage from '../pages/chat/ChatListPage';
-import ChatRoomPage from '../pages/chat/ChatRoomPage';
+import ChatRouteWrapper from '../pages/chat/ChatRouteWrapper';
 import CallScreen from '../pages/chat/CallScreen';
 
 export const MemberRoutes = () => {
@@ -84,7 +93,15 @@ export const MemberRoutes = () => {
           {/* Main Tabs */}
           <Route path="home" element={<AnimatedPage><HomePage /></AnimatedPage>} />
           <Route path="social" element={<AnimatedPage><SocialHubPage initialTab="feed" /></AnimatedPage>} />
-          <Route path="matrimonial" element={<AnimatedPage><MatrimonialHomePage /></AnimatedPage>} />
+          <Route path="matrimonial" element={<MatrimonialProvider />}>
+            <Route index element={<AnimatedPage><MatrimonialHomePage /></AnimatedPage>} />
+            <Route path="setup" element={<AnimatedPage><MatrimonialSetupPage /></AnimatedPage>} />
+            <Route path="interests" element={<AnimatedPage><InterestsPage /></AnimatedPage>} />
+            <Route path="search" element={<AnimatedPage><MatrimonialSearchPage /></AnimatedPage>} />
+            <Route path="shortlist" element={<AnimatedPage><MatrimonialShortlistPage /></AnimatedPage>} />
+            <Route path="stories" element={<AnimatedPage><MatrimonialSuccessStories /></AnimatedPage>} />
+            <Route path=":profileId" element={<AnimatedPage><MatrimonialProfilePage /></AnimatedPage>} />
+          </Route>
           <Route path="directory" element={<AnimatedPage><DirectoryPage /></AnimatedPage>} />
           <Route path="profile" element={<AnimatedPage><MyProfilePage /></AnimatedPage>} />
 
@@ -101,11 +118,8 @@ export const MemberRoutes = () => {
 
           <Route path="directory/list" element={<AnimatedPage><DirectoryListPage /></AnimatedPage>} />
           <Route path="directory/:memberId" element={<AnimatedPage><MemberDetailPage /></AnimatedPage>} />
-          <Route path="chat/:memberId" element={<AnimatedPage><ChatPage /></AnimatedPage>} />
+          <Route path="chat/:memberId" element={<AnimatedPage><ChatRouteWrapper /></AnimatedPage>} />
 
-          <Route path="matrimonial/setup" element={<AnimatedPage><MatrimonialSetupPage /></AnimatedPage>} />
-          <Route path="matrimonial/interests" element={<AnimatedPage><InterestsPage /></AnimatedPage>} />
-          <Route path="matrimonial/:profileId" element={<AnimatedPage><MatrimonialProfilePage /></AnimatedPage>} />
 
           <Route path="profile/edit" element={<AnimatedPage><EditProfilePage /></AnimatedPage>} />
           <Route path="profile/family" element={<AnimatedPage><FamilyPage /></AnimatedPage>} />
@@ -137,11 +151,16 @@ export const MemberRoutes = () => {
 
           {/* Chat base route mapped to SocialHub */}
           <Route path="chat" element={<AnimatedPage><SocialHubPage initialTab="chat" /></AnimatedPage>} />
-          <Route path="chat/:chatId" element={<AnimatedPage><ChatRoomPage /></AnimatedPage>} />
+          <Route path="chat/:chatId" element={<AnimatedPage><ChatRouteWrapper /></AnimatedPage>} />
           <Route path="chat/call/:chatId" element={<AnimatedPage><CallScreen /></AnimatedPage>} />
 
           <Route path="obituaries" element={<AnimatedPage><ObituaryPage /></AnimatedPage>} />
           <Route path="obituaries/create" element={<AnimatedPage><CreateObituaryPage /></AnimatedPage>} />
+
+          {/* Shradhanjali — Full-featured memorial module */}
+          <Route path="shradhanjali" element={<AnimatedPage><ShradhanjaliHomePage /></AnimatedPage>} />
+          <Route path="shradhanjali/create" element={<AnimatedPage><CreateShradhanjaliPage /></AnimatedPage>} />
+          <Route path="shradhanjali/:id" element={<AnimatedPage><ShradhanjaliDetailPage /></AnimatedPage>} />
 
           {/* Catch-all for missing phase B pages */}
           <Route path="*" element={<div className="flex flex-col items-center justify-center min-h-[60vh]"><p className="text-gray-400 text-sm">Feature coming soon (Phase B)</p></div>} />
