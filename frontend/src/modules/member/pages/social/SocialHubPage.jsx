@@ -44,56 +44,101 @@ const DiscoverContent = () => (
 );
 
 // Custom Tab Icons matching the requested design and React Icons
-const CityFeedIcon = ({ size = 22, isActive }) => (
+const CityFeedIcon = ({ size = 26, isActive }) => (
   <svg
     width={size}
     height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke={isActive ? '#1877F2' : '#828E9E'}
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="transition-colors duration-200"
+    viewBox="0 -960 960 960"
+    fill={isActive ? '#1877F2' : '#828E9E'}
+    className="transition-all duration-200"
   >
-    {/* User Outline */}
-    <path d="M14 19a5 5 0 0 0-10 0" />
-    <circle cx="9" cy="9" r="3" />
-    
-    {/* Broadcast/Feed Waves */}
-    <path d="M17 13a3 3 0 0 1 3-3" strokeWidth="1.8" />
-    <path d="M17 17a5 5 0 0 1 5-5" strokeWidth="1.8" />
-    <circle cx="17" cy="9" r="1" fill={isActive ? '#1877F2' : '#828E9E'} />
+    <path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z" />
   </svg>
 );
 
-const CommunityFeedIcon = ({ size = 22, isActive }) => (
-  <FiUsers size={size} className={`transition-colors duration-200 ${isActive ? 'text-[#1877F2]' : 'text-[#828E9E]'}`} />
-);
-
-const GroupsIcon = ({ size = 22, isActive }) => (
-  <MdOutlineGroupAdd size={size} className={`transition-colors duration-200 ${isActive ? 'text-[#1877F2]' : 'text-[#828E9E]'}`} />
-);
-
-const ChatIcon = ({ size = 22, isActive }) => (
-  <HiOutlineChatAlt size={size} className={`transition-colors duration-200 ${isActive ? 'text-[#1877F2]' : 'text-[#828E9E]'}`} />
-);
-
-const DiscoverIcon = ({ size = 22, isActive }) => (
+const CommunityFeedIcon = ({ size = 26, isActive }) => (
   <svg
     width={size}
     height={size}
     viewBox="0 0 24 24"
     fill="none"
     stroke={isActive ? '#1877F2' : '#828E9E'}
-    strokeWidth="1.8"
+    strokeWidth="2.2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="transition-colors duration-200"
+    className="transition-all duration-200"
+  >
+    {/* Connecting Ring */}
+    <circle cx="12" cy="12.5" r="7.5" opacity="0.6" />
+    
+    {/* Top Person */}
+    <circle cx="12" cy="5.5" r="1.5" />
+    <path d="M10 9a2.2 2.2 0 0 1 4 0" />
+
+    {/* Center Person */}
+    <circle cx="12" cy="12.5" r="1.5" />
+    <path d="M10 16a2.2 2.2 0 0 1 4 0" />
+
+    {/* Bottom Left Person */}
+    <circle cx="6" cy="15.5" r="1.5" />
+    <path d="M4 19a2.2 2.2 0 0 1 4 0" />
+
+    {/* Bottom Right Person */}
+    <circle cx="18" cy="15.5" r="1.5" />
+    <path d="M16 19a2.2 2.2 0 0 1 4 0" />
+  </svg>
+);
+
+const GroupsIcon = ({ size = 26, isActive }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={isActive ? '#1877F2' : '#828E9E'}
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="transition-all duration-200"
+  >
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <line x1="19" y1="8" x2="19" y2="14" strokeWidth="2.5" />
+    <line x1="16" y1="11" x2="22" y2="11" strokeWidth="2.5" />
+  </svg>
+);
+
+const ChatIcon = ({ size = 26, isActive }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={isActive ? '#1877F2' : '#828E9E'}
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="transition-all duration-200"
+  >
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+  </svg>
+);
+
+const DiscoverIcon = ({ size = 26, isActive }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={isActive ? '#1877F2' : '#828E9E'}
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="transition-all duration-200"
   >
     <circle cx="12" cy="12" r="9" />
-    <path d="M16.2 7.8L13.8 13.8L7.8 16.2L10.2 10.2Z" />
-    <path d="M7.8 16.2L16.2 7.8" opacity="0.6" />
+    <polygon points="16.2,7.8 13.8,13.8 7.8,16.2 10.2,10.2" fill={isActive ? '#1877F2' : 'none'} opacity={isActive ? '0.15' : '1'} />
+    <polygon points="16.2,7.8 13.8,13.8 7.8,16.2 10.2,10.2" />
   </svg>
 );
 
@@ -333,10 +378,9 @@ const SocialHubPage = ({ initialTab = 'city-feed' }) => {
               <button 
                 key={tab.id}
                 onClick={() => scrollToTab(idx)}
-                className={`flex-1 py-3 flex flex-col items-center gap-1 transition-colors ${isActive ? 'text-[#1877F2]' : 'text-text-secondary hover:text-gray-700'}`}
+                className={`flex-1 py-3.5 flex items-center justify-center transition-colors ${isActive ? 'text-[#1877F2]' : 'text-text-secondary hover:text-gray-700'}`}
               >
-                <Icon size={22} isActive={isActive} className={isActive ? 'drop-shadow-sm' : ''} />
-                <span className="text-[11px] font-bold tracking-wide uppercase">{tab.label}</span>
+                <Icon size={idx === 0 || idx === 1 ? 30 : 25} isActive={isActive} className={isActive ? 'drop-shadow-sm' : ''} />
               </button>
             );
           })}

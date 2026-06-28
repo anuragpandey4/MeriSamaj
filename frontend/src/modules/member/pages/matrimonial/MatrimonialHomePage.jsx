@@ -1,689 +1,1963 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Briefcase, GraduationCap, Heart, ShieldCheck, X, Star, SlidersHorizontal, MessageCircle, Bell, Camera, Sparkles, Clock, Crown, ChevronRight, ChevronLeft, Edit3, ArrowLeft, ArrowRight, Check, CheckCircle2, ShieldAlert, Mail, Home, Image, Lock, MoreVertical } from 'lucide-react';
+import {
+  Search, Heart, Bell, SlidersHorizontal, X, Star, Crown, ChevronRight,
+  ChevronLeft, Home, Mail, MessageCircle, Sparkles, ShieldCheck, MapPin,
+  Briefcase, GraduationCap, Clock, Check, Bookmark, BookmarkCheck,
+  Play, Pencil, User, Image, Lock, ShieldAlert, Award, EyeOff, ArrowLeft, Plus,
+  Phone, MailCheck, ShieldCheck as VerifiedIcon, Sparkles as SpotlightIcon,
+  PhoneCall, Users
+} from 'lucide-react';
 import { useData } from '../../context/DataProvider';
-import { Avatar } from '../../components/common/Avatar';
-import InterestsPage from './InterestsPage';
-import MatrimonialSetupPage from './MatrimonialSetupPage';
+import { useMatrimonial } from './MatrimonialContext';
 
-// ─── PREMIUM MATRIMONIAL UPGRADE PANEL ───
-const MatrimonialPremiumView = () => {
-  const [selectedPlan, setSelectedPlan] = useState('gold');
+// ─── 6 HIGH-QUALITY DUMMY PROFILES WITH MEMBERSHIP TIERS ───
+// ─── 6 HIGH-QUALITY DUMMY PROFILES WITH MEMBERSHIP TIERS ───
+const dummyMatrimonialFeed = [
+  {
+    id: 'mt5',
+    name: 'Ritu Dodiya',
+    age: 29,
+    gender: 'Female',
+    height: "5' 2\"",
+    city: 'Indore',
+    community: 'Mali',
+    gotra: 'Dodiya',
+    profession: 'Software Professional',
+    income: '₹5-7.5 Lacs p.a',
+    education: 'MCA',
+    managedBy: 'Self',
+    activeStatus: 'Active Today',
+    photoCount: 2,
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=800&q=80',
+    membershipTier: 'Pro Supreme',
+    about: 'I am an independent Software Professional currently working in Indore. I hold an MCA degree and value family, honesty, and continuous learning. Looking for a progressive life partner.',
+    familyType: 'Nuclear',
+    familyValues: 'Moderate',
+    fatherOccupation: 'Retired Engineer',
+    motherOccupation: 'Homemaker',
+    brothers: '1 (Unmarried)',
+    sisters: 'None',
+    diet: 'Vegetarian',
+    manglik: 'No',
+    star: 'Chitra',
+    rashi: 'Kanya',
+    partnerPrefs: 'Looking for a well-educated software professional with a positive outlook on life.'
+  },
+  {
+    id: 'mt6',
+    name: 'Ruchi Saini',
+    age: 26,
+    gender: 'Female',
+    height: "5' 2\"",
+    city: 'Indore',
+    community: 'Mali',
+    gotra: 'Saini',
+    profession: 'Customer Service',
+    income: '₹2-3 Lacs p.a',
+    education: 'MBA/PGDM',
+    managedBy: 'Self',
+    activeStatus: 'Active Today',
+    photoCount: 5,
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+    membershipTier: 'Pro',
+    about: 'I am a customer service professional, currently working in Indore. I hold an MBA degree and enjoy listening to music, traveling, and spending time with my family.',
+    familyType: 'Nuclear',
+    familyValues: 'Moderate',
+    fatherOccupation: 'Retired Government Employee',
+    motherOccupation: 'Homemaker',
+    brothers: '1 (Married)',
+    sisters: 'None',
+    diet: 'Vegetarian',
+    manglik: 'No',
+    star: 'Rohini',
+    rashi: 'Vrishabha',
+    partnerPrefs: 'Looking for a matching, well-educated professional from a respectable family.'
+  },
+  {
+    id: 'mt_khyati',
+    name: 'Khyati Sharma',
+    age: 24,
+    gender: 'Female',
+    height: "5' 6\"",
+    city: 'Delhi',
+    community: 'Agrawal',
+    gotra: 'Jatav',
+    profession: 'Software Developer',
+    income: '₹8-10 Lacs p.a',
+    education: 'B.Tech / MCA',
+    managedBy: 'Parents',
+    activeStatus: 'Online Now',
+    photoCount: 4,
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80',
+    membershipTier: 'Pro Max',
+    about: 'I run a fashion design studio in Delhi. I spend my time designing outfits and exploring new style trends. Seeking a life partner who shares creative ideas.',
+    familyType: 'Joint',
+    familyValues: 'Traditional',
+    fatherOccupation: 'Business Owner',
+    motherOccupation: 'Homemaker',
+    brothers: 'None',
+    sisters: '1 (Unmarried)',
+    diet: 'Vegetarian',
+    manglik: 'No',
+    star: 'Hasta',
+    rashi: 'Kanya',
+    partnerPrefs: 'Looking for a partner with similar values in Delhi/NCR.'
+  },
+  {
+    id: 'mt1',
+    name: 'Priya Agrawal',
+    age: 26,
+    gender: 'Female',
+    height: "5' 4\"",
+    city: 'Indore',
+    community: 'Agrawal',
+    gotra: 'Garg',
+    profession: 'Management Consultant',
+    income: '₹15-20 Lacs p.a',
+    education: 'MBA, IIM Indore',
+    managedBy: 'Self',
+    activeStatus: 'Active Yesterday',
+    photoCount: 3,
+    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80',
+    membershipTier: 'Pro',
+    photoVisibility: 'connections', // Lock photo by default
+    about: 'Working at a top consultancy in Indore. Family-oriented, loves reading and traveling. Looking for a well-educated partner with shared dreams.',
+    familyType: 'Nuclear',
+    familyValues: 'Moderate',
+    fatherOccupation: 'Retired Officer',
+    motherOccupation: 'Teacher',
+    brothers: '1 (Unmarried)',
+    sisters: '1 (Married)',
+    diet: 'Vegetarian',
+    manglik: 'No',
+    star: 'Ashwini',
+    rashi: 'Mesha',
+    partnerPrefs: 'Looking for an ambitious, supportive professional.'
+  },
+  {
+    id: 'mt2',
+    name: 'Sneha Gupta',
+    age: 25,
+    gender: 'Female',
+    height: "5' 3\"",
+    city: 'Bangalore',
+    community: 'Agrawal',
+    gotra: 'Mittal',
+    profession: 'Doctor',
+    income: '₹12-15 Lacs p.a',
+    education: 'MBBS, AIIMS Delhi',
+    managedBy: 'Brother',
+    activeStatus: 'Online Now',
+    photoCount: 4,
+    avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=800&q=80',
+    membershipTier: 'Normal',
+    about: 'Dedicated doctor with a passion for community service. Enjoys music and cooking in my free time. Looking for a partner who respects professional ambitions.',
+    familyType: 'Joint',
+    familyValues: 'Traditional',
+    fatherOccupation: 'Senior Doctor',
+    motherOccupation: 'Homemaker',
+    brothers: '1 (Unmarried)',
+    sisters: 'None',
+    diet: 'Vegetarian',
+    manglik: 'Yes',
+    star: 'Pushya',
+    rashi: 'Karka',
+    partnerPrefs: 'Looking for a doctor/engineer based in Bangalore or Delhi.'
+  },
+  {
+    id: 'mt4',
+    name: 'Ananya Verma',
+    age: 27,
+    gender: 'Female',
+    height: "5' 4\"",
+    city: 'Delhi',
+    community: 'Mali',
+    gotra: 'Garg',
+    profession: 'Clinical Psychologist',
+    income: '₹8-12 Lacs p.a',
+    education: 'M.Sc Psychology',
+    managedBy: 'Self',
+    activeStatus: 'Active Today',
+    photoCount: 3,
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80',
+    membershipTier: 'Pro Max',
+    about: 'A compassionate therapist who believes in mutual support and empathy. Outside of work, I enjoy painting and writing.',
+    familyType: 'Nuclear',
+    familyValues: 'Moderate',
+    fatherOccupation: 'Professor',
+    motherOccupation: 'Advocate',
+    brothers: '1 (Married)',
+    sisters: 'None',
+    diet: 'Vegetarian',
+    manglik: 'No',
+    star: 'Chitra',
+    rashi: 'Tula',
+    partnerPrefs: 'Looking for a mature, respectful life companion.'
+  }
+];
 
-  return (
-    <div className="bg-slate-900 text-white min-h-full px-5 py-6 overflow-y-auto pb-24">
-      <div className="text-center mb-6">
-        <div className="inline-flex p-3 bg-amber-500/10 rounded-full border border-amber-500/20 mb-3 animate-bounce">
-          <Crown size={36} className="text-amber-400" />
-        </div>
-        <h2 className="text-[20px] font-black text-white">Upgrade to Premium</h2>
-        <p className="text-[12.5px] text-white/50 mt-1 max-w-[260px] mx-auto leading-relaxed">
-          Connect with 10x more profiles, view verified contact numbers, and unlock private photo folders.
-        </p>
-      </div>
-
-      {/* Plans selector */}
-      <div className="space-y-3.5 mb-8">
-        {[
-          { id: 'gold', name: 'Gold Club', duration: '3 Months', price: '₹1,499', original: '₹4,299', discount: '65% OFF', popular: true },
-          { id: 'diamond', name: 'Diamond VIP', duration: '6 Months', price: '₹2,499', original: '₹7,199', discount: '65% OFF', popular: false },
-          { id: 'platinum', name: 'Platinum Royal', duration: '12 Months', price: '₹3,999', original: '₹11,499', discount: '65% OFF', popular: false }
-        ].map(plan => {
-          const isActive = selectedPlan === plan.id;
-          return (
-            <div 
-              key={plan.id}
-              onClick={() => setSelectedPlan(plan.id)}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${
-                isActive 
-                  ? 'border-amber-400 bg-white/5 shadow-lg shadow-amber-400/5' 
-                  : 'border-white/10 bg-white/2 hover:border-white/20'
-              }`}
-            >
-              {plan.popular && (
-                <span className="absolute -top-2.5 right-4 bg-amber-400 text-black text-[9px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                  Best Value
-                </span>
-              )}
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="text-[14px] font-black text-white">{plan.name} ({plan.duration})</h4>
-                  <p className="text-[11.5px] text-white/40 mt-0.5">Direct chat + verified contacts unlocked</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-[11px] line-through text-white/30 block leading-none">{plan.original}</span>
-                  <span className="text-[16px] font-black text-amber-400 block mt-0.5">{plan.price}</span>
-                  <span className="text-[9.5px] font-bold text-emerald-400 block mt-0.5">{plan.discount}</span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Feature list checkboxes */}
-      <div className="bg-white/5 rounded-2xl p-5 border border-white/5 space-y-3.5 mb-6">
-        {[
-          'Direct call and message matching profiles',
-          'Unlock premium verified badges and Gotra filter audits',
-          'Make your profile spotlight-featured on top matches lists',
-          'Control photo privacy settings dynamically'
-        ].map((feat, idx) => (
-          <div key={idx} className="flex gap-3">
-            <CheckCircle2 size={16} className="text-amber-400 shrink-0 mt-0.5" />
-            <span className="text-[12.5px] font-semibold text-white/80 leading-snug">{feat}</span>
-          </div>
-        ))}
-      </div>
-
-      <button className="w-full py-3.5 bg-amber-400 hover:bg-amber-500 text-black rounded-2xl text-[14px] font-extrabold shadow-lg shadow-amber-400/10 active:scale-95 transition-transform">
-        Get Premium Plan
-      </button>
-    </div>
-  );
+// Membership rank calculation helper
+const membershipRanks = {
+  'Normal': 0,
+  'Pro': 1,
+  'Pro Max': 2,
+  'Pro Supreme': 3
 };
 
-// ─── MATRIMONIAL CHATS VIEW ───
-const MatrimonialChatsView = ({ matches, navigate }) => {
-  const chatPartners = matches.filter(m => m.interests?.accepted);
-
-  return (
-    <div className="bg-slate-50 min-h-full px-5 py-6">
-      <div className="flex items-center justify-between mb-4.5">
-        <h2 className="text-[16px] font-black text-slate-800 tracking-tight">Connected Partners</h2>
-        <span className="bg-pink-100 text-pink-700 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">
-          Chat Hub
-        </span>
-      </div>
-
-      {chatPartners.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 px-6 text-center bg-white rounded-3xl border border-gray-150/50 shadow-sm">
-          <div className="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mb-4 border border-pink-100">
-            <MessageCircle size={32} className="text-pink-400" />
-          </div>
-          <h3 className="text-[15.5px] font-black text-slate-850 mb-1">No chats available</h3>
-          <p className="text-[12.5px] text-slate-400 max-w-[220px] leading-relaxed font-semibold">
-            Once you send or accept an interest and build a connection, you can chat directly here.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {chatPartners.map(partner => (
-            <div 
-              key={partner.id}
-              onClick={() => navigate(`/member/chat/${partner.id}`)}
-              className="p-4 bg-white rounded-2xl border border-slate-100/70 shadow-[0_2px_8px_rgba(0,0,0,0.01)] hover:border-pink-200 transition-all flex items-center justify-between cursor-pointer"
-            >
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-100">
-                  <img src={partner.avatar} alt={partner.name} className="w-full h-full object-cover" />
-                </div>
-                <div>
-                  <h4 className="text-[14.5px] font-bold text-slate-800 leading-none mb-1">{partner.name}</h4>
-                  <span className="text-[11.5px] text-emerald-500 font-semibold">Connected Match</span>
-                </div>
-              </div>
-              <ChevronRight size={18} className="text-slate-400" />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ─── CUSTOM DROPDOWN COMPONENT (FOR MOBILE VIEW RESETS) ───
-const CustomSelect = ({ value, onChange, options }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    const handleOutsideClick = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, []);
-
-  const selectedOption = options.find(opt => opt.value === value) || options[0];
-
-  return (
-    <div className="relative w-full" ref={containerRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-slate-100 border border-slate-200/50 rounded-2xl px-4 py-3.5 flex items-center justify-between text-[13px] font-bold text-slate-800 active:scale-[0.98] transition-transform select-none"
-      >
-        <span>{selectedOption ? selectedOption.label : value}</span>
-        <span className="text-[10px] text-slate-400">▼</span>
-      </button>
-
-      {isOpen && (
-        <div className="absolute left-0 right-0 mt-1.5 bg-white border border-slate-100 rounded-2xl shadow-xl z-50 py-1.5 max-h-48 overflow-y-auto">
-          {options.map(opt => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => {
-                onChange(opt.value);
-                setIsOpen(false);
-              }}
-              className={`w-full px-4 py-2.5 text-left text-[13px] font-semibold transition-all hover:bg-slate-50 ${
-                opt.value === value ? 'text-pink-500 bg-pink-50/20' : 'text-slate-700'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ─── MAIN HUB PAGE ───
 const MatrimonialHomePage = () => {
   const navigate = useNavigate();
-  const { matrimonialProfiles, currentUser, toggleMatrimonialInterest, updateMatrimonialBio } = useData();
-  const receivedCount = matrimonialProfiles.filter(p => p.interests?.received && !p.interests?.accepted).length;
+  const { currentUser, matrimonialProfiles, toggleMatrimonialInterest, handleMatrimonialInterestResponse } = useData();
+  const { shortlistedProfiles, toggleShortlist, isShortlisted } = useMatrimonial();
 
-  // Navigation Sub-Tab inside Matrimonial App: 'matches' | 'inbox' | 'setup' | 'chats' | 'premium'
-  const [activeSubTab, setActiveSubTab] = useState('matches');
+  const receivedCount = matrimonialProfiles.filter(p => p.interests?.received && !p.interests?.accepted && p.id !== 'mt1').length;
+  const acceptedCount = matrimonialProfiles.filter(p => p.interests?.accepted).length;
+  const sentCount = matrimonialProfiles.filter(p => p.interests?.sent && !p.interests?.accepted).length;
 
-  // Matching Feeds Filtering States
-  const [activeCategoryPill, setActiveCategoryPill] = useState('daily'); // 'daily' | 'new' | 'photo' | 'premium' | 'verified'
+  // ─── STATE MANAGEMENT ───
+  const [activityInterestTab, setActivityInterestTab] = useState('Received');
+
+  const activeList = useMemo(() => {
+    if (activityInterestTab === 'Received') {
+      return matrimonialProfiles.filter(p => p.interests?.received && !p.interests?.accepted && p.id !== 'mt1');
+    }
+    if (activityInterestTab === 'Accepted') {
+      return matrimonialProfiles.filter(p => p.interests?.accepted);
+    }
+    if (activityInterestTab === 'Sent') {
+      return matrimonialProfiles.filter(p => p.interests?.sent && !p.interests?.accepted);
+    }
+    return [];
+  }, [activityInterestTab, matrimonialProfiles]);
+  const [ignoredIds, setIgnoredIds] = useState([]);
+  const [expandedId, setExpandedId] = useState(null);
+  const [activeFilterPill, setActiveFilterPill] = useState('all'); // 'all' | 'verified' | 'joined' | 'nearby'
   const [searchText, setSearchText] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-  // Advanced Filters State
-  const [tempFilters, setTempFilters] = useState({
-    gotra: 'All',
-    manglik: 'All',
-    diet: 'All',
-    city: 'All',
-    maxAge: 35
-  });
-  const [appliedFilters, setAppliedFilters] = useState({
-    gotra: 'All',
-    manglik: 'All',
-    diet: 'All',
-    city: 'All',
-    maxAge: 35
-  });
-
-  // Current Card Carousel State
-  const [activeCardIndex, setActiveCardIndex] = useState(0);
-
-  // 3-dots Profile menu & Toast alert states
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [myPhotosCount, setMyPhotosCount] = useState(3);
+  const [myMatrimonialBio, setMyMatrimonialBio] = useState("Hi, I am Rajesh Agrawal. I work as a Senior software developer in Indore. Looking for a progressive, family-oriented partner who shares similar values and interest in traveling.");
+  const [myGotra, setMyGotra] = useState("Garg");
+  const [myDiet, setMyDiet] = useState("Vegetarian");
+  const [myIncome, setMyIncome] = useState("₹10-15 Lacs p.a");
+  const [activePickerSheet, setActivePickerSheet] = useState(null); // null | 'gotra' | 'diet' | 'income' | 'partner-gotra' | 'partner-diet'
+
+  // User's own membership level (Can be switched dynamically for testing)
+  const [userMembership, setUserMembership] = useState('Pro Max');
+  const [isMembershipPopupOpen, setIsMembershipPopupOpen] = useState(false);
+  const [selectedPlanToUpgrade, setSelectedPlanToUpgrade] = useState('Pro Supreme');
+
+  // Sub-navigation view inside activity hub
+  const [currentSubView, setCurrentSubView] = useState(null); // null (default bottom nav matches/activity) | 'visits' | 'shortlisted' | 'contacts'
+  const [visitsTab, setVisitsTab] = useState('visitors'); // 'visitors' | 'visited'
+  const [contactsTab, setContactsTab] = useState('viewed-my'); // 'viewed-my' | 'i-viewed'
+  const [shortlistTab, setShortlistTab] = useState('they-shortlisted'); // 'they-shortlisted' | 'i-shortlisted'
+  
+  // Messenger layout state
+  const [messengerTab, setMessengerTab] = useState('accepted'); // 'accepted' | 'interests'
+  const [onlyInterestsWithMsgs, setOnlyInterestsWithMsgs] = useState(false);
+  
+  // Advanced Filter state
+  const [ageRange, setAgeRange] = useState({ min: 18, max: 40 });
+  const [selectedGotra, setSelectedGotra] = useState('All');
+  const [selectedDiet, setSelectedDiet] = useState('All');
+
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const showToast = (msg) => {
     setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage('');
-    }, 2500);
+    setTimeout(() => setToastMessage(''), 2500);
   };
 
-  // Reset active profile card pointer when feed parameters shift
-  useEffect(() => {
-    setActiveCardIndex(0);
-  }, [activeCategoryPill, searchText, appliedFilters]);
+  const handleInterest = (profileId) => {
+    toggleMatrimonialInterest(profileId);
+    showToast('Interest Request Sent Successfully! 💕');
+  };
 
-  // Compute matched profiles list
-  const filteredProfiles = useMemo(() => {
-    return matrimonialProfiles.filter(p => {
-      // 1. Text Search Filter
+  const handleShortlist = (profileId) => {
+    toggleShortlist(profileId);
+    showToast(isShortlisted(profileId) ? 'Removed from shortlist' : 'Profile Added to Shortlist! ⭐');
+  };
+
+  const handleIgnore = (profileId) => {
+    setIgnoredIds(prev => [...prev, profileId]);
+    showToast('Profile Hidden/Ignored');
+  };
+
+  // Filter logic on dummy matrimonial feed
+  const filteredFeed = useMemo(() => {
+    return dummyMatrimonialFeed.filter(profile => {
+      // 1. Exclude ignored profiles
+      if (ignoredIds.includes(profile.id)) return false;
+
+      // 2. Search Text filter
       if (searchText.trim()) {
         const query = searchText.toLowerCase();
-        const matchesName = p.name.toLowerCase().includes(query);
-        const matchesGotra = p.gotra.toLowerCase().includes(query);
-        const matchesCity = p.city.toLowerCase().includes(query);
-        const matchesProfession = p.profession.toLowerCase().includes(query);
-        if (!matchesName && !matchesGotra && !matchesCity && !matchesProfession) return false;
+        const matchesName = profile.name.toLowerCase().includes(query);
+        const matchesCity = profile.city.toLowerCase().includes(query);
+        const matchesProfession = profile.profession.toLowerCase().includes(query);
+        const matchesGotra = profile.gotra.toLowerCase().includes(query);
+        if (!matchesName && !matchesCity && !matchesProfession && !matchesGotra) return false;
       }
 
-      // 2. Quick Pills Category Filter
-      if (activeCategoryPill === 'new' && !p.isNew) return false;
-      if (activeCategoryPill === 'photo' && p.photoVisibility !== 'all') return false;
-      if (activeCategoryPill === 'premium' && !p.premiumStatus) return false;
-      if (activeCategoryPill === 'verified' && !p.online) return false; // mockup verified matching online
+      // 3. Quick Pills filter
+      if (activeFilterPill === 'verified' && profile.id === 'feed_khyati') return false; // mockup verified filtering
+      if (activeFilterPill === 'joined' && profile.age > 26) return false; // mockup just joined
+      if (activeFilterPill === 'nearby' && profile.city !== 'Indore') return false; // mockup nearby
 
-      // 3. Advanced Drawer Filters
-      if (appliedFilters.gotra !== 'All' && p.gotra.toLowerCase() !== appliedFilters.gotra.toLowerCase()) return false;
-      if (appliedFilters.manglik !== 'All' && p.manglik !== appliedFilters.manglik) return false;
-      if (appliedFilters.diet !== 'All' && p.diet !== appliedFilters.diet) return false;
-      if (appliedFilters.city !== 'All' && p.city.toLowerCase() !== appliedFilters.city.toLowerCase()) return false;
-      if (p.age > appliedFilters.maxAge) return false;
+      // 4. Advanced Filters
+      if (profile.age < ageRange.min || profile.age > ageRange.max) return false;
+      if (selectedGotra !== 'All' && profile.gotra !== selectedGotra) return false;
+      if (selectedDiet !== 'All' && profile.diet !== selectedDiet) return false;
 
       return true;
     });
-  }, [matrimonialProfiles, searchText, activeCategoryPill, appliedFilters]);
+  }, [ignoredIds, activeFilterPill, searchText, ageRange, selectedGotra, selectedDiet]);
 
-  const activeProfile = filteredProfiles[activeCardIndex] || null;
+  // Active bottom tab
+  const [activeBottomTab, setActiveBottomTab] = useState('matches'); // 'matches' | 'activity' | 'messenger' | 'premium'
 
-  const handleNextCard = () => {
-    if (filteredProfiles.length > 1) {
-      setActiveCardIndex(prev => (prev + 1) % filteredProfiles.length);
-    }
-  };
+  // Reset Subviews on bottom tab change
+  useEffect(() => {
+    setCurrentSubView(null);
+  }, [activeBottomTab]);
 
-  const handlePrevCard = () => {
-    if (filteredProfiles.length > 1) {
-      setActiveCardIndex(prev => (prev - 1 + filteredProfiles.length) % filteredProfiles.length);
-    }
-  };
-
-
+  // Listener for simulated interest acceptance event
+  useEffect(() => {
+    const handleAccepted = (e) => {
+      showToast(`${e.detail.name} accepted your interest! Connection established. 💖`);
+    };
+    window.addEventListener('matrimonialInterestAccepted', handleAccepted);
+    return () => window.removeEventListener('matrimonialInterestAccepted', handleAccepted);
+  }, []);
 
   return (
     <div className="h-screen bg-slate-50 flex flex-col overflow-hidden relative select-none">
       
-      {/* ─── FIXED HEADER (Matches Screen Style) ─── */}
-      <div className="bg-white sticky top-0 z-40 border-b border-slate-100 flex-shrink-0">
-        <div className="flex items-center justify-between px-5 h-14">
-          {isSearchOpen ? (
-            <div className="flex-1 flex items-center gap-3 bg-slate-100 px-3.5 py-1.5 rounded-xl">
-              <Search size={18} className="text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search profiles..."
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                className="bg-transparent outline-none w-full text-[14.5px] text-slate-800 font-semibold"
-                autoFocus
-              />
-              <button onClick={() => {
-                setSearchText('');
-                setIsSearchOpen(false);
-              }} className="text-slate-400 hover:text-slate-600 p-0.5">
-                <X size={18} />
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="flex items-center gap-3">
-                <button 
-                  onClick={() => {
-                    if (activeSubTab !== 'matches') {
-                      setActiveSubTab('matches');
-                    } else {
-                      navigate('/member/home');
-                    }
-                  }}
-                  className="p-1 active:opacity-60 shrink-0 cursor-pointer text-slate-800"
-                >
-                  {activeSubTab === 'matches' ? (
-                    <div className="w-6 flex flex-col gap-[3.5px] cursor-pointer pl-0.5">
-                      <div className="h-[2.2px] w-4.5 bg-slate-800 rounded-full" />
-                      <div className="h-[2.2px] w-5 bg-slate-800 rounded-full" />
-                      <div className="h-[2.2px] w-3.5 bg-slate-800 rounded-full" />
+      {/* ─── MAIN MATCHES FEED VIEW ─── */}
+      {activeBottomTab === 'matches' && (
+        <>
+          {/* Header Bar */}
+          <div className="bg-white sticky top-0 z-45 border-b border-slate-100/80 shrink-0 px-4 h-15 flex items-center justify-between">
+            {isSearchOpen ? (
+              <div className="flex-1 flex items-center gap-3 bg-slate-100 px-3.5 py-2 rounded-xl">
+                <Search size={18} className="text-slate-450" />
+                <input
+                  type="text"
+                  placeholder="Search matches..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  className="bg-transparent outline-none w-full text-[14px] text-slate-800 font-semibold"
+                  autoFocus
+                />
+                <button onClick={() => { setSearchText(''); setIsSearchOpen(false); }} className="text-slate-400 p-0.5">
+                  <X size={18} />
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-3.5">
+                  <div 
+                    onClick={() => {
+                      setActiveBottomTab('my-profile');
+                      setCurrentSubView(null);
+                    }}
+                    className="w-10 h-10 rounded-full bg-slate-200 border-2 border-rose-500/30 flex items-center justify-center text-slate-500 cursor-pointer relative shadow-sm hover:scale-105 active:scale-95 transition-transform"
+                  >
+                    {currentUser?.avatar ? (
+                      <img src={currentUser.avatar} alt="Me" className="w-full h-full object-cover rounded-full" />
+                    ) : (
+                      <span className="text-[12.5px] font-black text-rose-500 uppercase">{currentUser?.initials || 'RA'}</span>
+                    )}
+                    <div className="absolute -bottom-1 -right-1 bg-rose-500 text-white rounded-full px-1 py-0.5 text-[7px] font-black border border-white uppercase tracking-tighter leading-none">
+                      {userMembership.split(' ').map(n=>n[0]).join('')}
                     </div>
-                  ) : (
-                    <ArrowLeft size={22} />
-                  )}
-                </button>
-                <h1 className="text-[19px] font-black text-slate-800 tracking-tight">
-                  {activeSubTab === 'matches' && 'Matches'}
-                  {activeSubTab === 'inbox' && 'Partner Inbox'}
-                  {activeSubTab === 'chats' && 'Chats'}
-                  {activeSubTab === 'setup' && 'Setup Profile'}
-                  {activeSubTab === 'premium' && 'Premium Partner'}
-                </h1>
-              </div>
-
-              <div className="flex items-center gap-4">
-                {activeSubTab === 'matches' && (
-                  <button className="text-slate-700 active:scale-95 transition-transform" onClick={() => setIsSearchOpen(true)}>
-                    <Search size={22} />
+                  </div>
+                  <div className="flex flex-col">
+                    <h1 className="text-[17px] font-black text-slate-800 tracking-tight leading-tight">My matches</h1>
+                    <p className="text-[11px] font-bold text-slate-400 mt-0.5 flex items-center gap-1">
+                      as per <span className="text-rose-500 font-extrabold">partner preferences</span>
+                      <Pencil size={10} className="text-slate-400 stroke-[2.5]" />
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <button
+                    className="text-slate-700 active:scale-95 transition-transform relative"
+                    onClick={() => navigate('/member/matrimonial/interests')}
+                  >
+                    <Bell size={22} className="stroke-[1.8]" />
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border border-white">
+                      3
+                    </span>
                   </button>
-                )}
-                <button className="relative text-slate-700 active:scale-95 transition-transform" onClick={() => setActiveSubTab('inbox')}>
-                  <Bell size={22} />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                    25
-                  </span>
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
+                  <button className="text-slate-700 active:scale-95 transition-transform" onClick={() => setIsSearchOpen(true)}>
+                    <Search size={22} className="stroke-[1.8]" />
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
 
-      {/* ─── CREATOR CONTENT VIEWPORT ─── */}
-      <div className="flex-1 overflow-y-auto pb-24 bg-slate-50 flex flex-col">
-        
-        {/* TAB 1: MATCHES FEED */}
-        {activeSubTab === 'matches' && (
-          <div className="flex flex-col flex-1 pb-16">
-            
-            {/* Quick Categories & Filter Horizontal Bar */}
-            <div className="px-5 py-3.5 bg-white border-b border-slate-100 flex items-center gap-2.5 overflow-x-auto scrollbar-hide shrink-0" data-swipe-block="true">
-              <button 
-                onClick={() => setIsFilterOpen(true)}
-                className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center shrink-0 text-slate-600 active:scale-95 transition-transform"
+          {/* Scrollable feed */}
+          <div className="flex-1 overflow-y-auto pb-24 bg-slate-50 flex flex-col">
+            <div className="px-4 py-3 bg-white border-b border-slate-100/80 flex items-center gap-2 overflow-x-auto scrollbar-hide shrink-0 font-sans">
+              <button
+                onClick={() => setIsFilterDrawerOpen(true)}
+                className="px-3.5 py-2 rounded-full border border-slate-200 bg-white text-slate-700 text-[12px] font-bold flex items-center gap-1.5 shrink-0 active:scale-95 transition-transform"
               >
-                <SlidersHorizontal size={16} />
+                <SlidersHorizontal size={13} className="text-slate-500" /> Filters
               </button>
               
-              {[
-                { id: 'daily', label: 'Daily (19)' },
-                { id: 'new', label: 'New (332)' },
-                { id: 'photo', label: 'With Photo' },
-                { id: 'premium', label: 'Premium' },
-                { id: 'verified', label: 'Online' }
-              ].map(pill => {
-                const isActive = activeCategoryPill === pill.id;
+              {['All matches', 'Verified', 'Just Joined', 'Nearby'].map((pillLabel, index) => {
+                const pillsKeys = ['all', 'verified', 'joined', 'nearby'];
+                const targetKey = pillsKeys[index];
                 return (
                   <button
-                    key={pill.id}
-                    onClick={() => setActiveCategoryPill(pill.id)}
-                    className={`px-4.5 py-2.5 rounded-full text-[12.5px] font-bold transition-all shrink-0 active:scale-95 ${
-                      isActive 
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'bg-slate-100 text-slate-500 hover:text-slate-700'
+                    key={targetKey}
+                    onClick={() => setActiveFilterPill(targetKey)}
+                    className={`px-4 py-2 rounded-full text-[12px] font-bold transition-all shrink-0 active:scale-95 border ${
+                      activeFilterPill === targetKey
+                        ? 'bg-rose-500 border-rose-500 text-white shadow-sm'
+                        : 'bg-white border-slate-200 text-slate-655'
                     }`}
                   >
-                    {pill.label}
+                    {pillLabel}
                   </button>
                 );
               })}
             </div>
 
-            {/* Profile Feed Card Module */}
-            {activeProfile ? (
-              <div className="p-4 flex-1 flex flex-col justify-start">
-                
-                {/* Visual Image container card */}
-                <div className="relative aspect-[3/4] w-full rounded-[28px] overflow-hidden bg-zinc-900 border border-slate-150/40 shadow-md">
-                  
-                  {/* Photo with privacy toggle condition */}
-                  <img 
-                    src={activeProfile.avatar} 
-                    alt={activeProfile.name} 
-                    className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ${
-                      activeProfile.photoVisibility === 'connections' && !activeProfile.interests?.accepted
-                        ? 'blur-2xl brightness-75 scale-105'
-                        : ''
-                    }`}
-                  />
-                  
-                  {/* Privacy overlay if not connected */}
-                  {activeProfile.photoVisibility === 'connections' && !activeProfile.interests?.accepted && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-black/45 backdrop-blur-xs select-none">
-                      <div className="relative mb-3.5 flex items-center justify-center">
-                        <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center border border-white/20">
-                          <Image size={24} className="text-white" />
+            <div className="p-4 space-y-5 flex-1 max-w-md mx-auto w-full">
+              {filteredFeed.length > 0 ? (
+                filteredFeed.map(profile => {
+                  const interestSent = matrimonialProfiles.find(p => p.id === profile.id || p.id === `mp_${profile.id}`)?.interests?.sent;
+                  const isShort = isShortlisted(profile.id);
+
+                  const userRank = membershipRanks[userMembership] || 0;
+                  const targetRank = membershipRanks[profile.membershipTier] || 0;
+                  const hasMembershipAccess = userRank >= targetRank;
+
+                  // Dynamic check from real context connection status
+                  const realProfile = matrimonialProfiles.find(p => p.id === profile.id || p.id === `mp_${profile.id}`) || profile;
+                  const isConnected = realProfile?.interests?.accepted;
+                  const isPhotoVisible = profile.photoVisibility !== 'connections' || isConnected;
+
+                  const hasAccess = hasMembershipAccess && isPhotoVisible;
+
+                  const handleCardClick = () => {
+                    if (!hasMembershipAccess) {
+                      setIsMembershipPopupOpen(true);
+                      setSelectedPlanToUpgrade(profile.membershipTier);
+                    } else {
+                      navigate(`/member/matrimonial/${profile.id}`);
+                    }
+                  };
+
+                  const getTierStyle = (tier) => {
+                    if (tier === 'Pro Supreme') return 'bg-[#E53E3E] text-white';
+                    if (tier === 'Pro Max') return 'bg-[#ED8936] text-white';
+                    if (tier === 'Pro') return 'bg-[#3182CE] text-white';
+                    return 'bg-slate-500 text-white';
+                  };
+
+                  return (
+                    <div
+                      key={profile.id}
+                      className="bg-white rounded-[32px] overflow-hidden border border-slate-250/20 shadow-[0_8px_24px_rgba(0,0,0,0.08)] flex flex-col font-sans relative"
+                    >
+                      <div
+                        className="relative aspect-[3/4.5] overflow-hidden bg-slate-900 cursor-pointer flex flex-col justify-end"
+                        style={{ minHeight: '520px' }}
+                        onClick={handleCardClick}
+                      >
+                        <img
+                          src={profile.avatar}
+                          alt={profile.name}
+                          className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ${
+                            !hasAccess ? 'blur-2xl brightness-75 scale-105' : ''
+                          }`}
+                        />
+                        
+                        <div className="absolute top-4 right-4 bg-black/45 backdrop-blur-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 pointer-events-none z-10">
+                          <Image size={12} className="text-white" />
+                          <span className="text-[10px] font-black text-white">
+                            {profile.photos?.length || profile.photoCount || 1}
+                          </span>
                         </div>
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm">
-                          <Lock size={12} className="text-slate-800" />
+
+                        {/* Membership Lock Overlay */}
+                        {!hasMembershipAccess && (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-black/35 backdrop-blur-xs z-15">
+                            <EyeOff size={28} className="text-white/90 mb-3" />
+                            <p className="text-white text-[13.5px] font-black leading-snug tracking-wide px-4">
+                              Photo visible to paid members only
+                            </p>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsMembershipPopupOpen(true);
+                                setSelectedPlanToUpgrade(profile.membershipTier);
+                              }}
+                              className="mt-4 px-5 py-2.5 bg-transparent hover:bg-white/10 text-white border-2 border-white rounded-full text-[12.5px] font-black tracking-wide transition-all active:scale-95"
+                            >
+                              Upgrade to view
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Connection Lock Overlay (Cloned from reference image) */}
+                        {hasMembershipAccess && !isPhotoVisible && (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-black/35 backdrop-blur-xs z-15">
+                            <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center border border-white/20 relative mb-3">
+                              <Image size={26} className="text-white/80" />
+                              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-md">
+                                <Lock size={12} className="text-slate-800 fill-slate-800" />
+                              </div>
+                            </div>
+                            <p className="text-white text-[13.5px] font-black leading-snug tracking-wide px-4">
+                              Photo visible only after connection is established
+                            </p>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleInterest(profile.id);
+                              }}
+                              className="mt-4 px-5 py-2.5 bg-transparent hover:bg-white/10 text-white border-2 border-white rounded-full text-[12.5px] font-black tracking-wide transition-all active:scale-95 animate-pulse"
+                            >
+                              {interestSent ? 'Interest Sent' : 'Express Interest'}
+                            </button>
+                          </div>
+                        )}
+
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent pt-36 pb-26 px-5 pointer-events-none z-5" />
+
+                        <div className="relative z-10 px-5 pb-3 pointer-events-none flex flex-col justify-end">
+                          <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full w-fit mb-2.5 shadow-sm ${getTierStyle(profile.membershipTier)}`}>
+                            {profile.membershipTier}
+                          </span>
+
+                          <span className="text-[11px] text-white/80 font-bold uppercase tracking-wider">
+                            {profile.activeStatus}
+                          </span>
+                          
+                          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                            <h2 className="text-white text-[24px] font-black tracking-tight leading-none">
+                              {profile.name}, {profile.age}
+                            </h2>
+                            {profile.membershipTier !== 'Normal' && (
+                              <Award size={18} className="text-amber-400 fill-amber-400 shadow-sm shrink-0" />
+                            )}
+                          </div>
+                          
+                          <p className="text-white/85 text-[13.5px] font-bold mt-2.5 leading-none">
+                            {profile.height} · {profile.city} · {profile.community}
+                          </p>
+                          
+                          <p className="text-white/80 text-[12.5px] font-semibold mt-1.5 leading-none">
+                            {profile.profession} · Earns {profile.income}
+                          </p>
+                          
+                          <p className="text-white/70 text-[12px] font-semibold mt-1.5 leading-none">
+                            {profile.education}
+                          </p>
+                        </div>
+
+                        <div className="relative z-10 py-4 px-4 flex justify-around items-center select-none bg-transparent">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleInterest(profile.id); }}
+                            className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                          >
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                              interestSent ? 'bg-emerald-600 text-white' : 'bg-[#9E2045] text-white hover:bg-[#B82B55]'
+                        }`}>
+                              {interestSent ? <Check size={20} strokeWidth={2.5} /> : <Mail size={20} />}
+                            </div>
+                            <span className="text-[10px] font-bold text-white tracking-wide">Interest</span>
+                          </button>
+
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleShortlist(profile.id); }}
+                            className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                          >
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all`}>
+                              <Star size={20} className={isShort ? 'text-amber-400 fill-amber-400' : 'text-white'} />
+                            </div>
+                            <span className="text-[10px] font-bold text-white tracking-wide">Shortlist</span>
+                          </button>
+
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleIgnore(profile.id); }}
+                            className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                          >
+                            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                              <X size={20} />
+                            </div>
+                            <span className="text-[10px] font-bold text-white tracking-wide">Ignore</span>
+                          </button>
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isConnected) {
+                                navigate(`/member/chat/${profile.id}`);
+                              } else {
+                                showToast("Connection pending. You can message once they accept your interest!");
+                              }
+                            }}
+                            className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                          >
+                            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                              <MessageCircle size={20} />
+                            </div>
+                            <span className="text-[10px] font-bold text-white tracking-wide">Chat</span>
+                          </button>
                         </div>
                       </div>
-                      <p className="text-[13px] text-white/90 font-bold px-4 leading-relaxed max-w-[280px] italic">
-                        {activeProfile.name} has chosen to show her Photo only to Members she is connected to
-                      </p>
                     </div>
-                  )}
-
-                  {/* Gradient bottom overlays */}
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/45 to-transparent pt-32 pb-6 px-5 flex flex-col justify-end pointer-events-none">
-                    
-                    {/* Username & Age line */}
-                    <h2 className="text-white text-[24px] font-black tracking-tight leading-none">
-                      {activeProfile.name}, {activeProfile.age}
-                    </h2>
-
-                    {/* Sub statistics descriptions */}
-                    <p className="text-white/80 text-[13.5px] font-bold mt-2.5 leading-none">
-                      {activeProfile.height} · {activeProfile.gotra} · {activeProfile.profession}
-                    </p>
-                    <p className="text-white/70 text-[12.5px] font-semibold mt-1.5 leading-none">
-                      {activeProfile.city}, Delhi-NCR
-                    </p>
-
-                    {/* Online status indicator & Compatibility Tag */}
-                    <div className="flex items-center gap-2 mt-3.5">
-                      <div className="flex items-center gap-1.5 bg-emerald-500/10 backdrop-blur-sm border border-emerald-400/20 px-2.5 py-1 rounded-full">
-                        <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
-                        <span className="text-[10px] text-emerald-400 font-extrabold tracking-wide uppercase">{activeProfile.lastActive}</span>
-                      </div>
-                      
-                      {activeProfile.compatibilityTag && (
-                        <div className="bg-white/10 border border-white/20 px-3 py-1 rounded-full text-white text-[10px] font-extrabold tracking-wide uppercase">
-                          {activeProfile.compatibilityTag}
-                        </div>
-                      )}
-                    </div>
+                  );
+                })
+              ) : (
+                <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
+                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-400 font-sans">
+                    <ShieldAlert size={28} />
                   </div>
-
-                  {/* Top-Right Premium crown badge and options menu */}
-                  <div className="absolute top-4.5 right-4.5 flex flex-col items-center gap-2.5 z-10">
-                    {activeProfile.premiumStatus && (
-                      <div className="w-8 h-8 rounded-full bg-[#EA4335] text-white flex items-center justify-center shadow-lg">
-                        <Crown size={15} />
-                      </div>
-                    )}
-                    <button 
-                      onClick={() => setIsMenuOpen(true)}
-                      className="w-8 h-8 rounded-full bg-black/55 flex items-center justify-center text-white active:scale-90"
-                    >
-                      <MoreVertical size={16} />
-                    </button>
-                  </div>
-
-                  {/* Carousel Left tap trigger (semi-circle on edge) */}
-                  {filteredProfiles.length > 1 && activeCardIndex > 0 && (
-                    <button 
-                      onClick={handlePrevCard}
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-7 h-14 bg-black/40 hover:bg-black/60 rounded-r-full flex items-center justify-center pr-1 text-white active:scale-90 z-20"
-                    >
-                      <ChevronLeft size={18} />
-                    </button>
-                  )}
-
-                  {/* Carousel Right tap trigger (semi-circle on edge) */}
-                  {filteredProfiles.length > 1 && (
-                    <button 
-                      onClick={handleNextCard}
-                      className="absolute right-0 top-1/2 -translate-y-1/2 w-7 h-14 bg-black/40 hover:bg-black/60 rounded-l-full flex items-center justify-center pl-1 text-white active:scale-90 z-20"
-                    >
-                      <ChevronRight size={18} />
-                    </button>
-                  )}
-                </div>
-
-                {/* About Profile Content Section */}
-                <div className="bg-white rounded-2xl border border-slate-100 p-4.5 mt-4 shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
-                  <h4 className="text-[12.5px] font-extrabold text-slate-800 uppercase tracking-wider mb-2">
-                    About {activeProfile.name}
-                  </h4>
-                  <p className="text-[13.5px] text-slate-500 leading-relaxed font-semibold">
-                    "{activeProfile.about || 'Looking for a matching life partner with shared family values.'}"
+                  <h3 className="text-[15px] font-black text-slate-800">No matching profiles left</h3>
+                  <p className="text-[12px] text-slate-400 max-w-[200px] mt-1 font-semibold leading-relaxed">
+                    Try resetting active filter parameters or check back later for new profiles.
                   </p>
                 </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
-                {/* Bottom connect button trigger */}
-                <div className="mt-4 shrink-0 px-2">
-                  <button 
-                    onClick={() => toggleMatrimonialInterest(activeProfile.id)}
-                    className={`w-full py-4 rounded-2xl text-[14px] font-extrabold flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all ${
-                      activeProfile.interests?.sent
-                        ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                        : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/10'
+      {/* ─── ACTIVITY HUB VIEW (Matches reference Image 2) ─── */}
+      {activeBottomTab === 'activity' && currentSubView === null && (
+        <div className="flex-1 flex flex-col overflow-hidden bg-slate-50">
+          {/* Header */}
+          <div className="bg-white sticky top-0 z-40 border-b border-slate-100/80 px-4 h-15 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-3">
+              <div 
+                onClick={() => { setActiveBottomTab('my-profile'); setCurrentSubView(null); }}
+                className="w-9 h-9 rounded-full bg-slate-200 border-2 border-slate-100 flex items-center justify-center text-slate-500 cursor-pointer hover:opacity-85 shadow-sm active:scale-95 transition-all"
+              >
+                <User size={18} />
+              </div>
+              <h1 className="text-[18px] font-black text-slate-800 tracking-tight leading-none">Activity</h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <button className="text-slate-700 relative" onClick={() => navigate('/member/matrimonial/interests')}>
+                <Bell size={21} />
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border border-white">
+                  3
+                </span>
+              </button>
+              <button className="text-slate-700" onClick={() => setIsSearchOpen(true)}>
+                <Search size={21} />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+            {/* Stat Cards (Cloned from Image 2) */}
+            <div className="flex gap-2.5">
+              {/* Profile Visits Card */}
+              <div 
+                onClick={() => setCurrentSubView('visits')}
+                className="flex-1 bg-white rounded-2xl p-3.5 border border-slate-200/50 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-center cursor-pointer active:scale-95 transition-all"
+              >
+                <span className="text-[26px] font-black text-indigo-600 block leading-none">13</span>
+                <span className="text-[11.5px] font-bold text-slate-650 mt-1.5 block leading-tight">Profile<br/>Visits</span>
+              </div>
+
+              {/* Shortlisted Profiles Card */}
+              <div 
+                onClick={() => setCurrentSubView('shortlisted')}
+                className="flex-1 bg-white rounded-2xl p-3.5 border border-slate-200/50 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-center cursor-pointer active:scale-95 transition-all"
+              >
+                <span className="text-[26px] font-black text-amber-500 block leading-none">{shortlistedProfiles.length}</span>
+                <span className="text-[11.5px] font-bold text-slate-650 mt-1.5 block leading-tight">Shortlisted<br/>Profiles</span>
+              </div>
+
+              {/* Contact Views Card */}
+              <div 
+                onClick={() => setCurrentSubView('contacts')}
+                className="flex-1 bg-white rounded-2xl p-3.5 border border-slate-200/50 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-center cursor-pointer active:scale-95 transition-all"
+              >
+                <span className="text-[26px] font-black text-emerald-600 block leading-none">0</span>
+                <span className="text-[11.5px] font-bold text-slate-650 mt-1.5 block leading-tight">Contact<br/>Views</span>
+              </div>
+            </div>
+
+            {/* Interests Section */}
+            <div>
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-[15px] font-black text-slate-800">Interests</h3>
+                <button 
+                  onClick={() => navigate('/member/matrimonial/interests')}
+                  className="text-[12px] font-extrabold text-rose-500 hover:text-rose-600"
+                >
+                  View All
+                </button>
+              </div>
+
+              {/* Horizontal Pill subtabs */}
+              <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide" data-swipe-block="true">
+                {[
+                  { key: 'Received', label: `Received (${receivedCount})` },
+                  { key: 'Accepted', label: `Accepted (${acceptedCount})` },
+                  { key: 'Sent', label: `Sent (${sentCount})` }
+                ].map(tab => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActivityInterestTab(tab.key)}
+                    className={`px-4.5 py-2 rounded-full border text-[12px] font-bold shrink-0 transition-all ${
+                      activityInterestTab === tab.key
+                        ? 'border-rose-500 bg-rose-50 text-rose-600 shadow-xs'
+                        : 'border-slate-200 bg-white text-slate-650 hover:border-slate-350'
                     }`}
                   >
-                    {activeProfile.interests?.sent ? (
-                      <>
-                        <Check size={16} strokeWidth={3} /> Invitation Sent
-                      </>
-                    ) : (
-                      <>
-                        <Check size={16} strokeWidth={3} /> Connect Now
-                      </>
-                    )}
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Dynamic list rendering or Spotlight fallback */}
+              {activeList.length > 0 ? (
+                <div className="space-y-3">
+                  {activeList.map(item => {
+                    const realProfile = matrimonialProfiles.find(p => p.id === item.id) || item;
+                    const isConnected = realProfile?.interests?.accepted;
+                    const isPhotoVisible = item.photoVisibility !== 'connections' || isConnected;
+                    
+                    return (
+                      <div 
+                        key={item.id} 
+                        onClick={() => navigate(`/member/matrimonial/${item.id}`)}
+                        className="bg-white rounded-2.5xl border border-slate-200/55 p-3.5 flex gap-3.5 items-center cursor-pointer hover:bg-slate-50/50 active:bg-slate-50 transition-all shadow-[0_2px_8px_rgba(0,0,0,0.02)]"
+                      >
+                        {/* Avatar Column */}
+                        <div className="relative shrink-0">
+                          <img 
+                            src={item.avatar} 
+                            alt={item.name} 
+                            className={`w-13 h-16 rounded-xl object-cover border border-slate-100/80 shadow-xs transition-all duration-300 ${
+                              !isPhotoVisible ? 'blur-md brightness-90' : ''
+                            }`} 
+                          />
+                          {item.online && (
+                            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
+                          )}
+                        </div>
+
+                        {/* Text Parameters Column */}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[13.5px] font-black text-indigo-950 truncate">{item.name}, {item.age}</h4>
+                          <p className="text-[11px] text-slate-500 font-bold truncate mt-0.5">
+                            {item.height} · {item.gotra} · {item.city}
+                          </p>
+                          <p className="text-[10px] text-slate-400 font-bold truncate mt-0.5">
+                            {item.profession}
+                          </p>
+                        </div>
+
+                        {/* Actions Column */}
+                        <div className="shrink-0 flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                          {activityInterestTab === 'Received' && (
+                            <div className="flex items-center gap-1.5">
+                              <button 
+                                onClick={() => {
+                                  handleMatrimonialInterestResponse(item.id, 'accept');
+                                  showToast(`You accepted ${item.name}'s interest! 💕`);
+                                }}
+                                className="bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-black px-3.5 py-1.5 rounded-lg active:scale-95 transition-transform shadow-xs uppercase tracking-wider"
+                              >
+                                Accept
+                              </button>
+                              <button 
+                                onClick={() => {
+                                  handleMatrimonialInterestResponse(item.id, 'decline');
+                                  showToast('Request declined.');
+                                }}
+                                className="bg-slate-100 hover:bg-slate-200 text-slate-550 text-[10px] font-black px-3 py-1.5 rounded-lg active:scale-95 transition-transform uppercase tracking-wider"
+                              >
+                                Decline
+                              </button>
+                            </div>
+                          )}
+
+                          {activityInterestTab === 'Accepted' && (
+                            <button 
+                              onClick={() => navigate(`/member/chat/${item.id}`)}
+                              className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10.5px] font-extrabold px-4 py-1.5 rounded-lg active:scale-95 transition-transform flex items-center gap-1 shadow-sm"
+                            >
+                              <MessageCircle size={13} /> Chat
+                            </button>
+                          )}
+
+                          {activityInterestTab === 'Sent' && (
+                            <button 
+                              onClick={() => {
+                                toggleMatrimonialInterest(item.id);
+                                showToast('Interest request cancelled.');
+                              }}
+                              className="border border-slate-200 hover:bg-slate-50 text-slate-500 text-[10px] font-bold px-3 py-1.5 rounded-lg active:scale-95 transition-transform"
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* Spotlight empty state card box (Cloned from Image 2) */
+                <div className="bg-white rounded-3xl border border-slate-200/50 p-6 text-center shadow-[0_4px_16px_rgba(0,0,0,0.03)]">
+                  {/* Illustration cards mock stack */}
+                  <div className="flex justify-center items-center gap-1.5 mb-5 select-none pointer-events-none">
+                    <div className="w-10 h-14 bg-rose-50 border border-rose-100 rounded-lg transform -rotate-12 opacity-60 flex items-center justify-center text-rose-350">
+                      <User size={16} />
+                    </div>
+                    <div className="w-12 h-16 bg-rose-100/50 border-2 border-rose-200 rounded-xl shadow-md z-10 flex flex-col justify-end p-1">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full mb-1 border border-white" />
+                    </div>
+                    <div className="w-10 h-14 bg-rose-50 border border-rose-100 rounded-lg transform rotate-12 opacity-60 flex items-center justify-center text-rose-350">
+                      <User size={16} />
+                    </div>
+                  </div>
+
+                  <h4 className="text-[14.5px] font-black text-slate-800">
+                    Receive interest with Spotlight!
+                  </h4>
+                  
+                  <p className="text-[12px] text-slate-500 font-semibold mt-1.5 leading-relaxed max-w-[260px] mx-auto">
+                    Remain on top of the list and increase your chances of receiving more interests
+                  </p>
+
+                  <button 
+                    onClick={() => {
+                      setIsMembershipPopupOpen(true);
+                      setSelectedPlanToUpgrade('Pro Supreme');
+                    }}
+                    className="mt-4 text-[12.5px] font-black text-rose-500 hover:text-rose-600 select-none block mx-auto active:scale-95"
+                  >
+                    Tell me more
                   </button>
                 </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
-              </div>
-            ) : (
-              <div className="flex-1 flex flex-col items-center justify-center px-8 py-20 text-center">
-                <div className="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mb-4 border border-pink-100">
-                  <Sparkles size={32} className="text-pink-400" />
+      {/* ─── SUBVIEW 1: PROFILE VISITS PAGE (Cloned from Images 1 & 3) ─── */}
+      {currentSubView === 'visits' && (
+        <div className="flex-1 flex flex-col bg-slate-50 overflow-hidden font-sans">
+          {/* Header */}
+          <div className="bg-white border-b border-slate-100 px-4 h-14 flex items-center gap-3 sticky top-0 z-35 shrink-0 shadow-sm">
+            <button onClick={() => setCurrentSubView(null)} className="p-1 active:opacity-60 text-slate-800">
+              <ArrowLeft size={22} />
+            </button>
+            <h1 className="text-[17px] font-black text-slate-800">Profile Visits</h1>
+          </div>
+
+          {/* Sub-tabs */}
+          <div className="flex border-b border-slate-100 bg-white shrink-0">
+            <button
+              onClick={() => setVisitsTab('visitors')}
+              className={`flex-1 py-3.5 text-center text-[12px] font-extrabold tracking-wider uppercase relative ${
+                visitsTab === 'visitors' ? 'text-slate-800' : 'text-slate-400'
+              }`}
+            >
+              Profile Visitors (13)
+              {visitsTab === 'visitors' && <div className="absolute bottom-0 inset-x-0 h-0.5 bg-rose-500" />}
+            </button>
+            <button
+              onClick={() => setVisitsTab('visited')}
+              className={`flex-1 py-3.5 text-center text-[12px] font-extrabold tracking-wider uppercase relative ${
+                visitsTab === 'visited' ? 'text-slate-800' : 'text-slate-400'
+              }`}
+            >
+              Profiles I Visited
+              {visitsTab === 'visited' && <div className="absolute bottom-0 inset-x-0 h-0.5 bg-rose-500" />}
+            </button>
+          </div>
+
+          {/* List Scroll Area */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {visitsTab === 'visitors' ? (
+              <>
+                {/* Blurred Visitor Profile Card (Cloned from Image 1) */}
+                <div className="bg-white rounded-[32px] overflow-hidden border border-slate-200/40 shadow-md relative">
+                  <div className="relative aspect-[3/4.5] overflow-hidden bg-slate-900 cursor-pointer flex flex-col justify-end" style={{ minHeight: '480px' }}>
+                    
+                    {/* Blurred Photo Base */}
+                    <div className="absolute inset-0 bg-slate-800/80 backdrop-blur-3xl z-0" />
+                    
+                    {/* Blur Overlays */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-15">
+                      <Lock size={26} className="text-white/80 mb-3" />
+                      <p className="text-white text-[13.5px] font-black leading-snug tracking-wide">
+                        Photo visible to paid members only
+                      </p>
+                      <button
+                        onClick={() => setIsMembershipPopupOpen(true)}
+                        className="mt-4 px-5 py-2.5 bg-transparent text-white border-2 border-white rounded-full text-[12.5px] font-black active:scale-95"
+                      >
+                        Upgrade to view
+                      </button>
+                    </div>
+
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent pt-36 pb-26 px-5 z-5" />
+
+                    {/* Text parameters on top of the image */}
+                    <div className="relative z-10 px-5 pb-3 pointer-events-none">
+                      <span className="text-[11px] text-white/80 font-bold uppercase tracking-wider">
+                        Active Today
+                      </span>
+                      <h2 className="text-white text-[23px] font-black mt-1 leading-none">
+                        XXXXX, 24
+                      </h2>
+                      <p className="text-white/80 text-[13px] font-bold mt-2 leading-none">
+                        5' 6" · Bangalore · Saini
+                      </p>
+                      <p className="text-white/85 text-[12.5px] font-semibold mt-1.5 leading-none">
+                        Finance Professional · No Income
+                      </p>
+                      <p className="text-white/70 text-[12px] font-semibold mt-1.5 leading-none">
+                        B.Com
+                      </p>
+                    </div>
+
+                    {/* Translucent Managed-By Strip */}
+                    <div className="relative z-10 bg-black/35 backdrop-blur-xs py-2 px-5 text-center text-white/85 text-[11px] font-semibold italic border-y border-white/10 select-none pointer-events-none">
+                      Profile managed by Parent
+                    </div>
+
+                    {/* Action Circle overlays */}
+                    <div className="relative z-10 py-4 px-4 flex justify-around items-center select-none bg-transparent">
+                      <button className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#9E2045] text-white">
+                          <Mail size={20} />
+                        </div>
+                        <span className="text-[10px] font-bold text-white tracking-wide">Interest</span>
+                      </button>
+                      <button className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white">
+                          <Star size={20} />
+                        </div>
+                        <span className="text-[10px] font-bold text-white tracking-wide">Shortlist</span>
+                      </button>
+                      <button className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white">
+                          <X size={20} />
+                        </div>
+                        <span className="text-[10px] font-bold text-white tracking-wide">Ignore</span>
+                      </button>
+                      <button className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white">
+                          <MessageCircle size={20} />
+                        </div>
+                        <span className="text-[10px] font-bold text-white tracking-wide">Chat</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-slate-800 text-[16px] font-black">No partners found</h3>
-                <p className="text-slate-400 text-[13px] mt-2 max-w-[240px] leading-relaxed font-semibold">
-                  Adjust your search keyword or advanced filter criteria to find matching profiles.
+
+                {/* Visitor Card 2: Placeholder with Request Photo (Cloned from Image 1) */}
+                <div className="bg-[#1A2536] rounded-[32px] p-6 text-center border border-white/5 relative overflow-hidden flex flex-col justify-end h-80 shadow-md">
+                  <div className="absolute top-4 left-4 text-white/70 text-[11px] font-semibold text-left">
+                    They visited<br/>on 26 Jun 26
+                  </div>
+                  
+                  {/* Face outline mock */}
+                  <div className="w-28 h-28 bg-[#2C384C] rounded-full mx-auto mb-4 border border-white/10 flex items-center justify-center text-white/10">
+                    <User size={64} />
+                  </div>
+
+                  <button
+                    onClick={() => showToast('Photo Request Sent successfully!')}
+                    className="w-full py-3 bg-transparent text-white border-2 border-white rounded-full text-[12.5px] font-black active:scale-95 transition-all shadow-md mt-auto"
+                  >
+                    Request photo
+                  </button>
+                </div>
+              </>
+            ) : (
+              /* Profiles I Visited list (Cloned from Image 3) */
+              <div className="bg-white rounded-[32px] overflow-hidden border border-slate-200/40 shadow-md relative">
+                <div className="relative aspect-[3/4.5] overflow-hidden bg-slate-900 cursor-pointer flex flex-col justify-end" style={{ minHeight: '480px' }}>
+                  
+                  {/* Dynamic background photo */}
+                  <img
+                    src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80"
+                    alt="Priyel Bhatnagar"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  
+                  <div className="absolute top-4 left-4 text-white text-[11.5px] font-extrabold tracking-wide text-left bg-black/30 backdrop-blur-xs px-2.5 py-1.5 rounded-lg z-10">
+                    I visited<br/>on 26 Jun 26
+                  </div>
+
+                  {/* Top Right Photo Count Badge */}
+                  <div className="absolute top-4 right-4 bg-black/45 backdrop-blur-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 pointer-events-none z-10">
+                    <Image size={12} className="text-white" />
+                    <span className="text-[10px] font-black text-white">1</span>
+                  </div>
+
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent pt-36 pb-26 px-5 z-5" />
+
+                  {/* Text details */}
+                  <div className="relative z-10 px-5 pb-3 pointer-events-none">
+                    <span className="text-[11px] text-white/80 font-bold uppercase tracking-wider">
+                      Active Today
+                    </span>
+                    <h2 className="text-white text-[23px] font-black mt-1 leading-none">
+                      Priyel Bhatnagar, 27
+                    </h2>
+                    <p className="text-white/80 text-[13px] font-bold mt-2 leading-none">
+                      5' 2" · Kota · Kayastha - Bhatnagar
+                    </p>
+                    <p className="text-white/85 text-[12.5px] font-semibold mt-1.5 leading-none">
+                      Finance Professional · No Income
+                    </p>
+                    <p className="text-white/70 text-[12px] font-semibold mt-1.5 leading-none">
+                      MBA/PGDM
+                    </p>
+                  </div>
+
+                  {/* Managed By Strip */}
+                  <div className="relative z-10 bg-black/35 backdrop-blur-xs py-2 px-5 text-center text-white/85 text-[11px] font-semibold italic border-y border-white/10 select-none pointer-events-none">
+                    Profile managed by Sibling
+                  </div>
+
+                  {/* Action Circular Buttons (Chat, Contact, Cancel) */}
+                  <div className="relative z-10 py-4 px-4 flex justify-around items-center select-none bg-transparent">
+                    {/* Chat */}
+                    <button
+                      onClick={() => navigate('/member/chat/feed_priya')}
+                      className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                    >
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                        <MessageCircle size={20} />
+                      </div>
+                      <span className="text-[10px] font-bold text-white tracking-wide">Chat</span>
+                    </button>
+
+                    {/* Contact call details */}
+                    <button
+                      onClick={() => showToast('Opening contact phone information')}
+                      className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                    >
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                        <Phone size={20} />
+                      </div>
+                      <span className="text-[10px] font-bold text-white tracking-wide">Contact</span>
+                    </button>
+
+                    {/* Cancel/Delete cancel */}
+                    <button
+                      onClick={() => setCurrentSubView(null)}
+                      className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                    >
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                        <X size={20} />
+                      </div>
+                      <span className="text-[10px] font-bold text-white tracking-wide">Cancel</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ─── SUBVIEW 2: CONTACT VIEWS PAGE (Cloned from Image 4) ─── */}
+      {currentSubView === 'contacts' && (
+        <div className="flex-1 flex flex-col bg-slate-50 overflow-hidden font-sans">
+          {/* Header */}
+          <div className="bg-white border-b border-slate-100 px-4 h-14 flex items-center gap-3 sticky top-0 z-35 shrink-0 shadow-sm">
+            <button onClick={() => setCurrentSubView(null)} className="p-1 active:opacity-60 text-slate-800">
+              <ArrowLeft size={22} />
+            </button>
+            <h1 className="text-[17px] font-black text-slate-800">Contact Views</h1>
+          </div>
+
+          {/* Subtabs */}
+          <div className="flex border-b border-slate-100 bg-white shrink-0">
+            <button
+              onClick={() => setContactsTab('contacts-i-viewed')}
+              className={`flex-1 py-3.5 text-center text-[12px] font-extrabold tracking-wider uppercase relative ${
+                contactsTab === 'contacts-i-viewed' ? 'text-slate-800' : 'text-slate-400'
+              }`}
+            >
+              Contacts I Viewed
+              {contactsTab === 'contacts-i-viewed' && <div className="absolute bottom-0 inset-x-0 h-0.5 bg-rose-500" />}
+            </button>
+            <button
+              onClick={() => setContactsTab('viewed-my')}
+              className={`flex-1 py-3.5 text-center text-[12px] font-extrabold tracking-wider uppercase relative ${
+                contactsTab === 'viewed-my' ? 'text-slate-800' : 'text-slate-400'
+              }`}
+            >
+              Viewed My Contact
+              {contactsTab === 'viewed-my' && <div className="absolute bottom-0 inset-x-0 h-0.5 bg-rose-500" />}
+            </button>
+          </div>
+
+          {/* Pink Alert Banner & Empty state layout (Cloned from Image 4) */}
+          <div className="flex-1 bg-white p-4 flex flex-col overflow-y-auto">
+            {contactsTab === 'viewed-my' && (
+              <div className="bg-rose-50/70 border border-rose-100/60 rounded-xl p-4 flex items-center justify-between text-left gap-3 mb-6">
+                <p className="text-[12px] text-rose-700 leading-relaxed font-extrabold">
+                  Upgrade to a paid membership to view the matches who visited your profile!
                 </p>
+                <div className="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center text-rose-500 shrink-0 select-none">
+                  <Lock size={18} />
+                </div>
               </div>
             )}
 
+            {/* Empty state illustration block */}
+            <div className="flex-1 flex flex-col items-center justify-center py-8 text-center">
+              <div className="w-20 h-20 bg-rose-50/50 rounded-full flex items-center justify-center mb-6 relative">
+                <div className="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-500 shadow-sm">
+                  <PhoneCall size={24} />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-md">
+                  <Search size={14} className="text-slate-700 stroke-[3]" />
+                </div>
+              </div>
+
+              <h4 className="text-[15px] font-black text-slate-850">
+                Find out who viewed your contact
+              </h4>
+              
+              <p className="text-[12px] text-slate-400 font-semibold mt-2 leading-relaxed max-w-[260px] mx-auto">
+                Discover & connect with matches who looked up your contact details
+              </p>
+
+              <button
+                onClick={() => setIsMembershipPopupOpen(true)}
+                className="mt-6 text-[13px] font-black text-rose-500 hover:text-rose-600 block active:scale-95"
+              >
+                Upgrade Membership
+              </button>
+            </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* TAB 2: INBOX ACTIVITIES */}
-        {activeSubTab === 'inbox' && (
-          <InterestsPage isHub={true} />
-        )}
+      {/* ─── SUBVIEW 3: SHORTLISTED LISTS (Cloned from Image 5) ─── */}
+      {currentSubView === 'shortlisted' && (
+        <div className="flex-1 flex flex-col bg-slate-50 overflow-hidden font-sans">
+          {/* Header */}
+          <div className="bg-white border-b border-slate-100 px-4 h-14 flex items-center gap-3 sticky top-0 z-35 shrink-0 shadow-sm">
+            <button onClick={() => setCurrentSubView(null)} className="p-1 active:opacity-60 text-slate-800">
+              <ArrowLeft size={22} />
+            </button>
+            <h1 className="text-[17px] font-black text-slate-800">Shortlisted</h1>
+          </div>
 
-        {/* TAB 3: CHAT VIEW */}
-        {activeSubTab === 'chats' && (
-          <MatrimonialChatsView matches={matrimonialProfiles} navigate={navigate} />
-        )}
+          {/* Subtabs */}
+          <div className="flex border-b border-slate-100 bg-white shrink-0">
+            <button
+              onClick={() => setShortlistTab('they-shortlisted')}
+              className={`flex-1 py-3.5 text-center text-[12px] font-extrabold tracking-wider uppercase relative ${
+                shortlistTab === 'they-shortlisted' ? 'text-slate-800' : 'text-slate-400'
+              }`}
+            >
+              They Shortlisted
+              {shortlistTab === 'they-shortlisted' && <div className="absolute bottom-0 inset-x-0 h-0.5 bg-rose-500" />}
+            </button>
+            <button
+              onClick={() => setShortlistTab('i-shortlisted')}
+              className={`flex-1 py-3.5 text-center text-[12px] font-extrabold tracking-wider uppercase relative ${
+                shortlistTab === 'i-shortlisted' ? 'text-slate-800' : 'text-slate-400'
+              }`}
+            >
+              I Shortlisted
+              {shortlistTab === 'i-shortlisted' && <div className="absolute bottom-0 inset-x-0 h-0.5 bg-rose-500" />}
+            </button>
+          </div>
 
-        {/* TAB 4: SETUP PROFILE */}
-        {activeSubTab === 'setup' && (
-          <MatrimonialSetupPage isHub={true} onPublish={() => setActiveSubTab('matches')} />
-        )}
+          {/* List or Empty states */}
+          <div className="flex-1 bg-white p-4 flex flex-col overflow-y-auto">
+            {shortlistTab === 'they-shortlisted' ? (
+              /* Empty state (Cloned from Image 5) */
+              <div className="flex-1 flex flex-col items-center justify-center py-12 text-center">
+                <div className="w-20 h-20 bg-rose-50/50 rounded-full flex items-center justify-center mb-6 relative">
+                  <div className="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-500 shadow-sm">
+                    <Star size={24} fill="currentColor" />
+                  </div>
+                </div>
 
-        {/* TAB 5: PREMIUM UPGRADE */}
-        {activeSubTab === 'premium' && (
-          <MatrimonialPremiumView />
-        )}
+                <h4 className="text-[15px] font-black text-slate-850">
+                  Get noticed by the right people!
+                </h4>
+                
+                <p className="text-[12px] text-slate-400 font-semibold mt-2 leading-relaxed max-w-[260px] mx-auto">
+                  Boost the possibility of getting shortlisted by ensuring that your profile is updated
+                </p>
 
-      </div>
+                <button
+                  onClick={() => navigate('/member/matrimonial/setup')}
+                  className="mt-6 text-[13px] font-black text-rose-500 hover:text-rose-600 block active:scale-95"
+                >
+                  Update profile
+                </button>
+              </div>
+            ) : (
+              /* Dynamic list of shortlisted profiles from Context */
+              <div className="space-y-3">
+                {shortlistedProfiles.length > 0 ? (
+                  shortlistedProfiles.map(p => (
+                    <div key={p.id} className="bg-slate-50 rounded-2xl border border-slate-100 p-3.5 flex gap-3.5 items-center">
+                      <img src={p.avatar} alt={p.name} className="w-14 h-16 rounded-xl object-cover" />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-[13.5px] font-extrabold text-slate-800 truncate">{p.name}, {p.age}</h4>
+                        <p className="text-[11px] text-slate-500 font-semibold mt-0.5">{p.height} · {p.city}</p>
+                      </div>
+                      <button
+                        onClick={() => toggleShortlist(p.id)}
+                        className="p-2 text-slate-400 hover:text-red-500 active:scale-90"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-slate-400 text-center py-10 font-semibold text-[13px]">You haven't shortlisted any matches yet.</p>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
+      {/* ─── MESSENGER VIEW (Cloned from Images 1 & 2) ─── */}
+      {activeBottomTab === 'messenger' && (
+        <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 font-sans">
+          {/* Header */}
+          <div className="bg-white sticky top-0 z-40 border-b border-slate-100/80 px-4 h-15 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-3">
+              <div 
+                onClick={() => { setActiveBottomTab('my-profile'); setCurrentSubView(null); }}
+                className="w-9 h-9 rounded-full bg-slate-200 border-2 border-slate-100 flex items-center justify-center text-slate-500 cursor-pointer hover:opacity-85 shadow-sm active:scale-95 transition-all"
+              >
+                <User size={18} />
+              </div>
+              <h1 className="text-[18px] font-black text-slate-800 tracking-tight leading-none">Messenger</h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <button className="text-slate-700 relative" onClick={() => navigate('/member/matrimonial/interests')}>
+                <Bell size={21} />
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border border-white">
+                  3
+                </span>
+              </button>
+              <button className="text-slate-700" onClick={() => setIsSearchOpen(true)}>
+                <Search size={21} />
+              </button>
+            </div>
+          </div>
 
-
-      {/* ─── ADVANCED FILTER DRAWER MODAL ─── */}
-      {isFilterOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center animate-fade-in" data-swipe-block="true">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" onClick={() => setIsFilterOpen(false)} />
-          <div className="bg-white text-slate-800 w-full rounded-t-[28px] p-5 pb-safe z-10 shadow-2xl max-w-md animate-slide-up overflow-y-auto max-h-[85vh]">
-            <div className="w-12 h-1 bg-slate-250 rounded-full mx-auto mb-4" />
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
             
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-[16px] font-black text-slate-800">Advanced Match Filters</h3>
+            {/* Online Matches Section (Image 1) */}
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-[15px] font-black text-slate-800">Online Matches</h3>
+                  <span className="text-[12px] font-bold text-slate-400">114</span>
+                </div>
+                <button 
+                  onClick={() => showToast('Showing all online matches')}
+                  className="text-[12px] font-extrabold text-rose-500 hover:text-rose-600"
+                >
+                  View All
+                </button>
+              </div>
+              <p className="text-[11px] text-slate-400 font-semibold mb-4 leading-none">
+                Initiate a chat with your matches to get faster response
+              </p>
+
+              {/* Horizontal Scroll list */}
+              <div className="flex gap-4 overflow-x-auto scrollbar-hide py-2" data-swipe-block="true">
+                {[
+                  { name: 'S verma', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80' },
+                  { name: 'Rani', avatar: '' },
+                  { name: 'Jagriti Gupta', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80' },
+                  { name: 'Jaiswal Pragati', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80' },
+                  { name: 'Priyel Bhatnagar', avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=150&q=80' }
+                ].map((user, idx) => (
+                  <div 
+                    key={idx} 
+                    onClick={() => navigate('/member/chat/feed_priya')}
+                    className="flex flex-col items-center gap-1.5 cursor-pointer shrink-0 active:scale-95 transition-transform"
+                  >
+                    <div className="w-13 h-13 rounded-full bg-slate-200 border-2 border-slate-100 flex items-center justify-center text-slate-500 relative shadow-sm">
+                      {user.avatar ? (
+                        <img src={user.avatar} alt={user.name} className="w-full h-full rounded-full object-cover" />
+                      ) : (
+                        <User size={22} />
+                      )}
+                      <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white shadow-xs" />
+                    </div>
+                    <span className="text-[10.5px] font-bold text-slate-700 max-w-[70px] truncate text-center">
+                      {user.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* My Conversations Section */}
+            <div>
+              <h3 className="text-[15.5px] font-black text-slate-800 mb-3">My Conversations</h3>
+
+              {/* Sub tabs Accepted / Interests */}
+              <div className="flex border-b border-slate-100 bg-white mb-4">
+                <button
+                  onClick={() => setMessengerTab('accepted')}
+                  className={`flex-1 py-3.5 text-center text-[12.5px] font-extrabold tracking-wide relative ${
+                    messengerTab === 'accepted' ? 'text-slate-800' : 'text-slate-450'
+                  }`}
+                >
+                  Accepted (1)
+                  {messengerTab === 'accepted' && <div className="absolute bottom-0 inset-x-0 h-0.5 bg-rose-500" />}
+                </button>
+                <button
+                  onClick={() => setMessengerTab('interests')}
+                  className={`flex-1 py-3.5 text-center text-[12.5px] font-extrabold tracking-wide relative ${
+                    messengerTab === 'interests' ? 'text-slate-800' : 'text-slate-450'
+                  }`}
+                >
+                  Interests
+                  {messengerTab === 'interests' && <div className="absolute bottom-0 inset-x-0 h-0.5 bg-rose-500" />}
+                </button>
+              </div>
+
+              {/* Accepted list container (Image 1) */}
+              {messengerTab === 'accepted' && (
+                <div className="divide-y divide-slate-100 bg-white rounded-3xl border border-slate-200/50 shadow-sm p-2">
+                  {[
+                    { id: 'feed_priya', name: 'Priyel Bhatnagar', date: '26-Jun-26', msg: 'They accepted your interest', unread: 1, avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80' },
+                    { id: 'feed_ruchi', name: 'Aakanksha Saini', date: '25-Jun-26', msg: 'You accepted their interest', unread: 0, avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80' }
+                  ].map((conv) => (
+                    <div
+                      key={conv.id}
+                      onClick={() => navigate(`/member/chat/${conv.id}`)}
+                      className="p-3.5 flex gap-3.5 items-center cursor-pointer hover:bg-slate-50/50 active:bg-slate-50 transition-colors first:rounded-t-3xl last:rounded-b-3xl"
+                    >
+                      <img src={conv.avatar} alt={conv.name} className="w-12 h-12 rounded-full object-cover border border-slate-100 shadow-xs" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-baseline">
+                          <h4 className="text-[13.5px] font-black text-slate-850 truncate">{conv.name}</h4>
+                          <span className="text-[10px] font-bold text-slate-400">{conv.date}</span>
+                        </div>
+                        <div className="flex justify-between items-center mt-1">
+                          <p className="text-[11.5px] font-semibold text-slate-500 truncate">{conv.msg}</p>
+                          {conv.unread > 0 && (
+                            <span className="w-4 h-4 bg-rose-500 text-white text-[9px] font-black rounded-full flex items-center justify-center">
+                              {conv.unread}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Interests list container (Image 2) */}
+              {messengerTab === 'interests' && (
+                <div className="space-y-3">
+                  {/* Toggle filter bar */}
+                  <div className="flex items-center justify-between bg-slate-100 rounded-xl px-4 py-2 mb-3">
+                    <span className="text-[11px] font-extrabold text-slate-500">Only Interests with messages</span>
+                    <label className="relative inline-flex items-center cursor-pointer select-none">
+                      <input 
+                        type="checkbox" 
+                        checked={onlyInterestsWithMsgs} 
+                        onChange={() => setOnlyInterestsWithMsgs(prev => !prev)}
+                        className="sr-only peer" 
+                      />
+                      <div className="w-9 h-5 bg-slate-350 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500" />
+                    </label>
+                  </div>
+
+                  <div className="divide-y divide-slate-100 bg-white rounded-3xl border border-slate-200/50 shadow-sm p-2">
+                    {[
+                      { id: 'txar8899', name: 'TXAR8899', age: 29, height: "5' 0\"", job: 'Marketing Professional', community: 'Mali', lang: 'Hindi-Rajasthan', income: 'Rs. 15 - 20 Lakh Never Married', avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=200&q=80' },
+                      { id: 'aanchal', name: 'Aanchal Parheta', age: 25, height: "5' 5\"", job: 'Software Professional', community: 'Koshti', lang: 'Hindi-MP/CG', income: 'Rs. 7.5 - 10 Lakh Never Married', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80' }
+                    ].map((interest) => (
+                      <div
+                        key={interest.id}
+                        onClick={() => navigate('/member/chat/feed_priya')}
+                        className="p-3.5 flex gap-3.5 items-center cursor-pointer hover:bg-slate-50/50 active:bg-slate-50 transition-colors first:rounded-t-3xl last:rounded-b-3xl"
+                      >
+                        <img src={interest.avatar} alt={interest.name} className="w-13 h-15 rounded-xl object-cover border border-slate-100 shadow-xs" />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[13.5px] font-black text-indigo-950">{interest.name}</h4>
+                          <p className="text-[11px] text-slate-500 font-bold mt-1 leading-relaxed">
+                            {interest.age}Years, {interest.height}, {interest.job}<br/>
+                            {interest.community}, {interest.lang}<br/>
+                            {interest.income}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ─── PREMIUM PLANS Upgrade popup modal (Simulated from images) ─── */}
+      {isMembershipPopupOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center animate-fade-in" data-swipe-block="true">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" onClick={() => setIsMembershipPopupOpen(false)} />
+          <div className="bg-white text-slate-800 w-full rounded-t-[32px] p-5 pb-safe z-10 shadow-2xl max-w-md animate-slide-up flex flex-col font-sans max-h-[85vh] overflow-y-auto">
+            <div className="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-4 shrink-0" />
+            
+            <div className="text-center mb-4">
+              <h3 className="text-[17px] font-black text-slate-800">Upgrade Membership</h3>
+              <p className="text-[12px] text-slate-400 mt-0.5">Unlock all premium match features</p>
+            </div>
+
+            {/* Comparison Table */}
+            <div className="border border-slate-100 rounded-2xl overflow-hidden mb-4 shrink-0">
+              <table className="w-full text-left border-collapse text-[11px]">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-100">
+                    <th className="p-2.5 font-bold text-slate-400 uppercase tracking-wider">Benefit</th>
+                    <th className="p-2.5 font-bold text-center text-slate-800">Pro</th>
+                    <th className="p-2.5 font-bold text-center text-[#ED8936]">Pro Max</th>
+                    <th className="p-2.5 font-bold text-center text-[#E53E3E]">Pro Supreme</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-[11.5px] font-semibold text-slate-700">
+                  <tr>
+                    <td className="p-2.5">Contact Sharing</td>
+                    <td className="p-2.5 text-center text-emerald-500">✓</td>
+                    <td className="p-2.5 text-center text-emerald-500">✓</td>
+                    <td className="p-2.5 text-center text-emerald-500">✓</td>
+                  </tr>
+                  <tr className="bg-slate-50/50">
+                    <td className="p-2.5">Engage+</td>
+                    <td className="p-2.5 text-center text-emerald-500">✓</td>
+                    <td className="p-2.5 text-center text-emerald-500">✓</td>
+                    <td className="p-2.5 text-center text-emerald-500">✓</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5">Contact Details</td>
+                    <td className="p-2.5 text-center font-bold">25</td>
+                    <td className="p-2.5 text-center font-bold">50</td>
+                    <td className="p-2.5 text-center font-bold">80</td>
+                  </tr>
+                  <tr className="bg-slate-50/50">
+                    <td className="p-2.5">Super Interest</td>
+                    <td className="p-2.5 text-center font-bold text-slate-400">0</td>
+                    <td className="p-2.5 text-center font-bold">50</td>
+                    <td className="p-2.5 text-center font-bold">80</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5">Spotlights</td>
+                    <td className="p-2.5 text-center font-bold text-slate-400">0</td>
+                    <td className="p-2.5 text-center font-bold">1</td>
+                    <td className="p-2.5 text-center font-bold">3</td>
+                  </tr>
+                  <tr className="bg-slate-50/50">
+                    <td className="p-2.5">Gold Badge</td>
+                    <td className="p-2.5 text-center text-emerald-500">✓</td>
+                    <td className="p-2.5 text-center text-emerald-500">✓</td>
+                    <td className="p-2.5 text-center text-emerald-500">✓</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className="bg-rose-50 border border-rose-100 rounded-xl py-2 px-4 text-center mb-4 shrink-0">
+              <span className="text-[12px] font-black text-rose-600 uppercase tracking-widest">
+                FLAT 70% OFF ON ALL PLANS
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-2 mt-auto shrink-0">
+              <button
+                onClick={() => {
+                  setUserMembership(selectedPlanToUpgrade);
+                  setIsMembershipPopupOpen(false);
+                  showToast(`Upgraded to ${selectedPlanToUpgrade} Successfully! 👑`);
+                }}
+                className="w-full py-3.5 bg-rose-500 text-white rounded-2xl text-[13.5px] font-extrabold shadow-md active:scale-95 transition-transform"
+              >
+                Upgrade to {selectedPlanToUpgrade} Now
+              </button>
+              <button
+                onClick={() => setIsMembershipPopupOpen(false)}
+                className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-xl text-[12.5px] font-bold active:scale-95 transition-transform"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── MY PROFILE VIEW (New Profile Section) ─── */}
+      {activeBottomTab === 'my-profile' && (
+        <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 font-sans">
+          {/* Header */}
+          <div className="bg-white sticky top-0 z-40 border-b border-slate-100/80 px-4 h-15 flex items-center gap-3 shrink-0">
+            <button 
+              onClick={() => setActiveBottomTab('matches')} 
+              className="p-1 active:opacity-60 text-slate-800"
+            >
+              <ArrowLeft size={22} />
+            </button>
+            <h1 className="text-[17px] font-black text-slate-800 tracking-tight leading-none">My Matrimonial Profile</h1>
+          </div>
+
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-24">
+            
+            {/* Quick Summary Card */}
+            <div className="bg-white rounded-3xl border border-slate-200/50 p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col items-center text-center">
+              <div className="relative mb-3">
+                <div className="w-20 h-20 rounded-full bg-slate-200 border-4 border-rose-500/20 flex items-center justify-center text-slate-500 text-[26px] font-black shadow-md overflow-hidden">
+                  {currentUser?.avatar ? (
+                    <img src={currentUser.avatar} alt="Me" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-[22px] font-black text-rose-500">{currentUser?.initials || 'RA'}</span>
+                  )}
+                </div>
+                <div className="absolute -bottom-1.5 -right-1.5 bg-rose-500 text-white rounded-full px-2 py-0.5 text-[8px] font-black border-2 border-white uppercase tracking-wider shadow-sm">
+                  {userMembership}
+                </div>
+              </div>
+              
+              <h3 className="text-[16px] font-black text-indigo-950">{currentUser?.name || 'Rajesh Agrawal'}</h3>
+              <p className="text-[12px] text-slate-400 font-bold mt-0.5">
+                {currentUser?.city || 'Indore'} · {currentUser?.gender || 'Male'} · {currentUser?.age || 28} Years
+              </p>
+
+              {/* Dynamic status pill markers */}
+              <p className="text-[10px] text-slate-450 font-semibold mt-2.5 flex flex-wrap justify-center gap-x-2">
+                <span>Gotra: <strong className="text-slate-700">{myGotra}</strong></span>
+                <span>•</span>
+                <span>Diet: <strong className="text-slate-700">{myDiet}</strong></span>
+                <span>•</span>
+                <span>Income: <strong className="text-slate-700">{myIncome}</strong></span>
+              </p>
+              
+              {/* Switch Membership levels helper for interactive testing inside Profile section */}
+              <div className="mt-4 bg-slate-50 border border-slate-200/50 rounded-2xl p-3 w-full">
+                <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Change Membership Tier (Testing):</p>
+                <div className="grid grid-cols-4 gap-1.5 mt-2">
+                  {['Normal', 'Pro', 'Pro Max', 'Pro Supreme'].map(tier => (
+                    <button
+                      key={tier}
+                      onClick={() => {
+                        setUserMembership(tier);
+                        showToast(`Switched membership level to ${tier} 👑`);
+                      }}
+                      className={`py-1 text-[9px] font-black rounded-lg transition-all border ${
+                        userMembership === tier
+                          ? 'bg-rose-500 text-white border-rose-500 shadow-xs'
+                          : 'bg-white border-slate-200 text-slate-500 hover:border-slate-350'
+                      }`}
+                    >
+                      {tier}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Photo Upload Manager Simulation */}
+            <div className="bg-white rounded-3xl border border-slate-200/50 p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+              <h4 className="text-[13.5px] font-black text-slate-800 mb-3 uppercase tracking-wider flex items-center gap-1.5">
+                <Image size={15} className="text-rose-500" /> Manage My Photos
+              </h4>
+              <div className="grid grid-cols-4 gap-2 mb-4">
+                {/* Simulated photo slots */}
+                <div className="aspect-[3/4] bg-slate-100 rounded-xl overflow-hidden relative border border-slate-200/50 flex items-center justify-center">
+                  <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150" alt="Self" className="w-full h-full object-cover" />
+                </div>
+                {Array.from({ length: Math.min(3, Math.max(0, myPhotosCount - 1)) }).map((_, i) => (
+                  <div key={i} className="aspect-[3/4] bg-slate-100 rounded-xl overflow-hidden relative border border-slate-200/50 flex items-center justify-center animate-fade-in">
+                    <img src={`https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&q=80`} alt="Uploaded" className="w-full h-full object-cover" />
+                    <button 
+                      onClick={() => {
+                        setMyPhotosCount(prev => Math.max(1, prev - 1));
+                        showToast('Photo removed.');
+                      }}
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
+                    >
+                      <X size={10} />
+                    </button>
+                  </div>
+                ))}
+                {myPhotosCount < 4 && (
+                  <button 
+                    onClick={() => {
+                      setMyPhotosCount(prev => Math.min(4, prev + 1));
+                      showToast('Photo uploaded successfully! 📸');
+                    }}
+                    className="aspect-[3/4] border-2 border-dashed border-slate-200 hover:border-rose-400 rounded-xl flex flex-col items-center justify-center text-slate-400 active:scale-95 transition-transform"
+                  >
+                    <Plus size={16} />
+                    <span className="text-[9px] font-bold mt-1">Add Photo</span>
+                  </button>
+                )}
+              </div>
+              <p className="text-[10px] text-slate-400 font-medium">Currently showing {myPhotosCount} profile photos. Uploaded photos are visible to matched members.</p>
+            </div>
+
+            {/* Profile Bio Config */}
+            <div className="bg-white rounded-3xl border border-slate-200/50 p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+              <h4 className="text-[13.5px] font-black text-slate-800 mb-3 uppercase tracking-wider">About Me & Bio</h4>
+              <textarea
+                value={myMatrimonialBio}
+                onChange={(e) => setMyMatrimonialBio(e.target.value)}
+                placeholder="Describe your personality, hobbies, family background, and partner expectations..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-[13px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-500/20 font-bold min-h-[100px]"
+              />
               <button 
                 onClick={() => {
-                  setTempFilters({ gotra: 'All', manglik: 'All', diet: 'All', city: 'All', maxAge: 35 });
+                  showToast('Matrimonial Bio Saved successfully! 💕');
                 }}
-                className="text-[12px] font-bold text-pink-500"
+                className="mt-3 w-full py-2.5 bg-rose-500 text-white rounded-xl text-[12px] font-black shadow-xs active:scale-95 transition-transform uppercase tracking-wider"
               >
-                Reset All
+                Save Bio Description
               </button>
             </div>
 
-            <div className="space-y-4 mb-6">
-              {/* Gotra Filter */}
-              <div>
-                <label className="text-[11.5px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Gotra</label>
-                <CustomSelect
-                  value={tempFilters.gotra}
-                  onChange={(val) => setTempFilters({ ...tempFilters, gotra: val })}
-                  options={[
-                    { value: 'All', label: 'All Gotras' },
-                    { value: 'Garg', label: 'Garg' },
-                    { value: 'Goyal', label: 'Goyal' },
-                    { value: 'Bansal', label: 'Bansal' },
-                    { value: 'Mittal', label: 'Mittal' },
-                    { value: 'Jatav', label: 'Jatav' },
-                    { value: 'Jindal', label: 'Jindal' },
-                    { value: 'Bharadwaj', label: 'Bharadwaj' }
-                  ]}
-                />
-              </div>
-
-              {/* Manglik Filter */}
-              <div>
-                <label className="text-[11.5px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Manglik Status</label>
-                <CustomSelect
-                  value={tempFilters.manglik}
-                  onChange={(val) => setTempFilters({ ...tempFilters, manglik: val })}
-                  options={[
-                    { value: 'All', label: 'Show All' },
-                    { value: 'Yes', label: 'Yes' },
-                    { value: 'No', label: 'No' },
-                    { value: "Don't Know", label: "Don't Know" }
-                  ]}
-                />
-              </div>
-
-              {/* Diet Filter */}
-              <div>
-                <label className="text-[11.5px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Diet Type</label>
-                <CustomSelect
-                  value={tempFilters.diet}
-                  onChange={(val) => setTempFilters({ ...tempFilters, diet: val })}
-                  options={[
-                    { value: 'All', label: 'Show All' },
-                    { value: 'Vegetarian', label: 'Vegetarian Only' },
-                    { value: 'Non-Vegetarian', label: 'Non-Vegetarian' },
-                    { value: 'Eggetarian', label: 'Eggetarian' }
-                  ]}
-                />
-              </div>
-
-              {/* City Filter */}
-              <div>
-                <label className="text-[11.5px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Location/City</label>
-                <CustomSelect
-                  value={tempFilters.city}
-                  onChange={(val) => setTempFilters({ ...tempFilters, city: val })}
-                  options={[
-                    { value: 'All', label: 'All Cities' },
-                    { value: 'Indore', label: 'Indore' },
-                    { value: 'Delhi', label: 'Delhi' },
-                    { value: 'Bangalore', label: 'Bangalore' },
-                    { value: 'Mumbai', label: 'Mumbai' },
-                    { value: 'Pune', label: 'Pune' },
-                    { value: 'Surat', label: 'Surat' }
-                  ]}
-                />
-              </div>
-
-              {/* Max Age Slider */}
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="text-[11.5px] font-bold text-slate-400 uppercase tracking-wider block">Maximum Age</label>
-                  <span className="text-[12.5px] font-extrabold text-slate-800">{tempFilters.maxAge} Years</span>
+            {/* Detailed Parameters Config */}
+            <div className="bg-white rounded-3xl border border-slate-200/50 p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+              <h4 className="text-[13.5px] font-black text-slate-800 mb-4 uppercase tracking-wider">Matrimonial Details</h4>
+              <div className="space-y-3.5">
+                <div>
+                  <label className="text-[10.5px] text-slate-400 font-extrabold uppercase tracking-wide">Gotra</label>
+                  <button 
+                    onClick={() => setActivePickerSheet('gotra')}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-[12.5px] font-bold text-slate-750 flex items-center justify-between hover:bg-slate-100/30 active:scale-99 transition-all"
+                  >
+                    <span>{myGotra}</span>
+                    <ChevronRight size={14} className="text-slate-400 rotate-90" />
+                  </button>
                 </div>
-                <input 
-                  type="range" 
-                  min="20" 
-                  max="45"
-                  value={tempFilters.maxAge}
-                  onChange={(e) => setTempFilters({ ...tempFilters, maxAge: parseInt(e.target.value) })}
-                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
-                />
+
+                <div>
+                  <label className="text-[10.5px] text-slate-400 font-extrabold uppercase tracking-wide">Diet</label>
+                  <button 
+                    onClick={() => setActivePickerSheet('diet')}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-[12.5px] font-bold text-slate-750 flex items-center justify-between hover:bg-slate-100/30 active:scale-99 transition-all"
+                  >
+                    <span>{myDiet}</span>
+                    <ChevronRight size={14} className="text-slate-400 rotate-90" />
+                  </button>
+                </div>
+
+                <div>
+                  <label className="text-[10.5px] text-slate-400 font-extrabold uppercase tracking-wide">Annual Income Range</label>
+                  <button 
+                    onClick={() => setActivePickerSheet('income')}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-[12.5px] font-bold text-slate-750 flex items-center justify-between hover:bg-slate-100/30 active:scale-99 transition-all"
+                  >
+                    <span>{myIncome}</span>
+                    <ChevronRight size={14} className="text-slate-400 rotate-90" />
+                  </button>
+                </div>
               </div>
+              <button 
+                onClick={() => {
+                  showToast('Profile Parameters Saved successfully! ⭐');
+                }}
+                className="mt-4 w-full py-2.5 bg-rose-500 text-white rounded-xl text-[12px] font-black shadow-xs active:scale-95 transition-transform uppercase tracking-wider"
+              >
+                Save Details
+              </button>
             </div>
 
-            <div className="flex gap-2">
+            {/* Dynamic Partner Preferences Filter Config */}
+            <div className="bg-white rounded-3xl border border-slate-200/50 p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+              <h4 className="text-[13.5px] font-black text-slate-800 mb-4 uppercase tracking-wider flex items-center gap-1.5">
+                <Heart size={15} className="text-rose-500 fill-rose-500" /> Partner Preferences
+              </h4>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-[10.5px] text-slate-400 font-extrabold uppercase tracking-wide">Matches Gotra Filter</label>
+                    <span className="text-[10.5px] font-black text-rose-500">{selectedGotra === 'All' ? 'All Gotras' : selectedGotra}</span>
+                  </div>
+                  <button 
+                    onClick={() => setActivePickerSheet('partner-gotra')}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-[12.5px] font-bold text-slate-750 flex items-center justify-between hover:bg-slate-100/30 active:scale-99 transition-all"
+                  >
+                    <span>{selectedGotra === 'All' ? 'Show All Gotras' : selectedGotra}</span>
+                    <ChevronRight size={14} className="text-slate-400 rotate-90" />
+                  </button>
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-[10.5px] text-slate-400 font-extrabold uppercase tracking-wide">Matches Diet Filter</label>
+                    <span className="text-[10.5px] font-black text-rose-500">{selectedDiet === 'All' ? 'All Diets' : `${selectedDiet} Only`}</span>
+                  </div>
+                  <button 
+                    onClick={() => setActivePickerSheet('partner-diet')}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-[12.5px] font-bold text-slate-750 flex items-center justify-between hover:bg-slate-100/30 active:scale-99 transition-all"
+                  >
+                    <span>{selectedDiet === 'All' ? 'Show All Diets' : `${selectedDiet} Only`}</span>
+                    <ChevronRight size={14} className="text-slate-400 rotate-90" />
+                  </button>
+                </div>
+              </div>
               <button 
-                onClick={() => setIsFilterOpen(false)}
-                className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl text-[13px] font-bold active:scale-95 transition-transform"
+                onClick={() => {
+                  showToast('Preferences Saved! Feed matches updated. 💕');
+                  setActiveBottomTab('matches');
+                }}
+                className="mt-5 w-full py-3 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl text-[12.5px] font-black shadow-md active:scale-95 transition-transform uppercase tracking-wider"
+              >
+                Apply Preferences & Search Matches
+              </button>
+            </div>
+            
+          </div>
+        </div>
+      )}
+
+      {/* Custom Slide-Up Bottom Sheet Picker for Dropdowns on Mobile */}
+      {activePickerSheet && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[80] flex items-end justify-center animate-fade-in font-sans" onClick={() => setActivePickerSheet(null)}>
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="w-full bg-white rounded-t-3xl max-h-[70vh] flex flex-col shadow-2xl animate-slide-up border-t border-slate-100"
+          >
+            {/* Handle bar */}
+            <div className="w-12 h-1.2 bg-slate-250 rounded-full mx-auto my-3.5 shrink-0" />
+            
+            {/* Header */}
+            <div className="px-5 pb-3 border-b border-slate-100 flex items-center justify-between shrink-0">
+              <h3 className="text-[13.5px] font-black text-slate-800 uppercase tracking-wider">
+                {activePickerSheet === 'gotra' && 'Select Your Gotra'}
+                {activePickerSheet === 'diet' && 'Select Your Diet'}
+                {activePickerSheet === 'income' && 'Select Annual Income'}
+                {activePickerSheet === 'partner-gotra' && 'Preferred Gotra Filter'}
+                {activePickerSheet === 'partner-diet' && 'Preferred Diet Filter'}
+              </h3>
+              <button 
+                onClick={() => setActivePickerSheet(null)}
+                className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 active:bg-slate-200"
+              >
+                <X size={15} />
+              </button>
+            </div>
+            
+            {/* Options list */}
+            <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-1.5">
+              {activePickerSheet === 'gotra' && ['Garg', 'Bansal', 'Mittal', 'Goyal', 'Jindal', 'Singhal', 'Kansal'].map(g => (
+                <button
+                  key={g}
+                  onClick={() => { setMyGotra(g); setActivePickerSheet(null); showToast(`Selected Gotra: ${g}`); }}
+                  className={`w-full text-left px-4 py-3 rounded-xl text-[13.5px] font-extrabold transition-all border ${
+                    myGotra === g ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-white border-slate-150 text-slate-650 hover:bg-slate-50'
+                  }`}
+                >
+                  {g}
+                </button>
+              ))}
+
+              {activePickerSheet === 'diet' && ['Vegetarian', 'Non-Vegetarian', 'Eggetarian'].map(d => (
+                <button
+                  key={d}
+                  onClick={() => { setMyDiet(d); setActivePickerSheet(null); showToast(`Selected Diet: ${d}`); }}
+                  className={`w-full text-left px-4 py-3 rounded-xl text-[13.5px] font-extrabold transition-all border ${
+                    myDiet === d ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-white border-slate-150 text-slate-650 hover:bg-slate-50'
+                  }`}
+                >
+                  {d}
+                </button>
+              ))}
+
+              {activePickerSheet === 'income' && ['₹5-7.5 Lacs p.a', '₹7.5-10 Lacs p.a', '₹10-15 Lacs p.a', '₹15-20 Lacs p.a', '₹20+ Lacs p.a'].map(inc => (
+                <button
+                  key={inc}
+                  onClick={() => { setMyIncome(inc); setActivePickerSheet(null); showToast(`Selected Income: ${inc}`); }}
+                  className={`w-full text-left px-4 py-3 rounded-xl text-[13.5px] font-extrabold transition-all border ${
+                    myIncome === inc ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-white border-slate-150 text-slate-650 hover:bg-slate-50'
+                  }`}
+                >
+                  {inc}
+                </button>
+              ))}
+
+              {activePickerSheet === 'partner-gotra' && ['All', 'Garg', 'Bansal', 'Mittal', 'Goyal', 'Jindal', 'Dodiya', 'Saini', 'Jatav'].map(g => (
+                <button
+                  key={g}
+                  onClick={() => { setSelectedGotra(g); setActivePickerSheet(null); showToast(`Partner Gotra filter set to: ${g}`); }}
+                  className={`w-full text-left px-4 py-3 rounded-xl text-[13.5px] font-extrabold transition-all border ${
+                    selectedGotra === g ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-white border-slate-150 text-slate-650 hover:bg-slate-50'
+                  }`}
+                >
+                  {g === 'All' ? 'Show All Gotras' : g}
+                </button>
+              ))}
+
+              {activePickerSheet === 'partner-diet' && ['All', 'Vegetarian', 'Non-Vegetarian'].map(d => (
+                <button
+                  key={d}
+                  onClick={() => { setSelectedDiet(d); setActivePickerSheet(null); showToast(`Partner Diet filter set to: ${d}`); }}
+                  className={`w-full text-left px-4 py-3 rounded-xl text-[13.5px] font-extrabold transition-all border ${
+                    selectedDiet === d ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-white border-slate-150 text-slate-650 hover:bg-slate-50'
+                  }`}
+                >
+                  {d === 'All' ? 'Show All Diets' : `${d} Only`}
+                </button>
+              ))}
+            </div>
+            
+            {/* Close */}
+            <div className="p-4 border-t border-slate-100 bg-slate-50">
+              <button 
+                onClick={() => setActivePickerSheet(null)}
+                className="w-full py-3 bg-white border border-slate-200 rounded-xl text-[13px] font-black text-slate-500 uppercase tracking-wider active:scale-95 transition-transform"
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── FILTERS DRAWER / SLIDE-UP MODAL ─── */}
+      {isFilterDrawerOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[80] flex items-end justify-center animate-fade-in font-sans" onClick={() => setIsFilterDrawerOpen(false)}>
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="w-full bg-white rounded-t-3xl max-h-[85vh] flex flex-col shadow-2xl animate-slide-up border-t border-slate-100 max-w-md pb-safe"
+          >
+            {/* Handle bar */}
+            <div className="w-12 h-1 bg-slate-200 rounded-full mx-auto my-3 shrink-0" />
+            
+            {/* Header */}
+            <div className="px-5 pb-3 border-b border-slate-100 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal size={18} className="text-rose-500" />
+                <h3 className="text-[15px] font-black text-slate-800 uppercase tracking-wider">Refine Matches</h3>
+              </div>
+              <button 
+                onClick={() => setIsFilterDrawerOpen(false)}
+                className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-450 hover:bg-slate-200"
+              >
+                <X size={15} />
+              </button>
+            </div>
+            
+            {/* Scrollable Filters Content */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-5">
+              
+              {/* Age Range Slider Selection */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-[11px] text-slate-400 font-extrabold uppercase tracking-wide">Age Range</label>
+                  <span className="text-[12px] font-black text-rose-500">{ageRange.min} - {ageRange.max} Years</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input 
+                    type="range" 
+                    min="18" 
+                    max="45" 
+                    value={ageRange.min}
+                    onChange={(e) => setAgeRange(prev => ({ ...prev, min: parseInt(e.target.value) }))}
+                    className="w-full h-1 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-rose-500"
+                  />
+                  <input 
+                    type="range" 
+                    min="18" 
+                    max="45" 
+                    value={ageRange.max}
+                    onChange={(e) => setAgeRange(prev => ({ ...prev, max: parseInt(e.target.value) }))}
+                    className="w-full h-1 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-rose-500"
+                  />
+                </div>
+                <div className="flex justify-between text-[9.5px] text-slate-400 font-bold mt-1.5 uppercase">
+                  <span>Min: {ageRange.min} yrs</span>
+                  <span>Max: {ageRange.max} yrs</span>
+                </div>
+              </div>
+
+              {/* Gotra Selection */}
+              <div>
+                <label className="text-[11px] text-slate-400 font-extrabold uppercase tracking-wide block mb-2">Gotra Preference</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {['All', 'Garg', 'Bansal', 'Mittal', 'Goyal', 'Jindal', 'Dodiya', 'Saini', 'Jatav'].map(g => (
+                    <button
+                      key={g}
+                      onClick={() => setSelectedGotra(g)}
+                      className={`py-2 text-[11px] font-extrabold rounded-xl border transition-all ${
+                        selectedGotra === g 
+                          ? 'bg-rose-50 border-rose-350 text-rose-600 shadow-xs' 
+                          : 'bg-white border-slate-200 text-slate-655 hover:bg-slate-50'
+                      }`}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Diet Selection */}
+              <div>
+                <label className="text-[11px] text-slate-400 font-extrabold uppercase tracking-wide block mb-2">Diet Preference</label>
+                <div className="flex gap-2">
+                  {['All', 'Vegetarian', 'Non-Vegetarian'].map(d => (
+                    <button
+                      key={d}
+                      onClick={() => setSelectedDiet(d)}
+                      className={`flex-1 py-2 text-[11px] font-extrabold rounded-xl border transition-all ${
+                        selectedDiet === d 
+                          ? 'bg-rose-50 border-rose-350 text-rose-600 shadow-xs' 
+                          : 'bg-white border-slate-200 text-slate-655 hover:bg-slate-50'
+                      }`}
+                    >
+                      {d}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="p-4 border-t border-slate-100 bg-slate-50 flex gap-3">
               <button 
                 onClick={() => {
-                  setAppliedFilters({ ...tempFilters });
-                  setIsFilterOpen(false);
+                  setAgeRange({ min: 18, max: 40 });
+                  setSelectedGotra('All');
+                  setSelectedDiet('All');
+                  showToast('Filters reset to default.');
                 }}
-                className="flex-1 py-3 bg-[#0095F6] text-white rounded-xl text-[13px] font-bold active:scale-95 transition-transform"
+                className="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[12.5px] font-black text-slate-500 uppercase tracking-wider active:scale-95 transition-transform"
+              >
+                Reset
+              </button>
+              <button 
+                onClick={() => {
+                  setIsFilterDrawerOpen(false);
+                  showToast('Filters applied successfully! 🔍');
+                }}
+                className="flex-1 py-3 bg-rose-500 text-white rounded-xl text-[12.5px] font-black uppercase tracking-wider active:scale-95 transition-transform shadow-md shadow-rose-500/10"
               >
                 Apply Filters
               </button>
@@ -692,106 +1966,69 @@ const MatrimonialHomePage = () => {
         </div>
       )}
 
-      {/* ─── DEDICATED SUB-APP BOTTOM NAVIGATION ─── */}
-      <div 
-        className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-100 shadow-[0_-4px_16px_rgba(0,0,0,0.03)] z-40 pb-safe"
+      {/* ─── BOTTOM NAVIGATION BAR (Matches reference exactly) ─── */}
+      <div
+        className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-100 shadow-[0_-4px_16px_rgba(0,0,0,0.035)] z-40 pb-safe font-sans"
         style={{ height: 'max(env(safe-area-inset-bottom, 0px) + 56px, 60px)' }}
-        data-swipe-block="true"
       >
         <div className="flex items-center justify-around h-14">
-          {[
-            { id: 'home', label: 'Home', icon: Home, exit: true },
-            { id: 'matches', label: 'Matches', icon: Heart },
-            { id: 'inbox', label: 'Inbox', icon: Mail, badge: receivedCount > 0 ? receivedCount : null },
-            { id: 'chats', label: 'Chat', icon: MessageCircle },
-            { id: 'premium', label: 'Premium', icon: Crown, label2: '65% OFF' }
-          ].map(tab => {
-            const isActive = activeSubTab === tab.id;
-            const Icon = tab.icon;
-            
-            return (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  if (tab.exit) {
-                    navigate('/member/home');
-                  } else {
-                    setActiveSubTab(tab.id);
-                  }
-                }}
-                className={`flex flex-col items-center justify-center flex-1 h-full relative transition-all active:scale-95 ${
-                  isActive ? 'text-pink-500 font-bold' : 'text-slate-400 hover:text-slate-600'
-                }`}
-              >
-                <div className="relative">
-                  <Icon size={20} fill={isActive && tab.icon === Heart ? 'currentColor' : 'none'} />
-                  {tab.badge && (
-                    <span className="absolute -top-1.5 -right-2 w-4 h-4 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border border-white">
-                      {tab.badge}
-                    </span>
-                  )}
-                </div>
-                <span className="text-[10px] mt-1 tracking-tight font-bold">
-                  {tab.id === 'premium' ? tab.label2 : tab.label}
-                </span>
-                {isActive && (
-                  <div className="absolute top-0 w-8 h-[3px] bg-pink-500 rounded-b-full" />
-                )}
-              </button>
-            );
-          })}
+          {/* Matches Tab */}
+          <button
+            onClick={() => { setActiveBottomTab('matches'); setCurrentSubView(null); }}
+            className={`flex flex-col items-center justify-center flex-1 h-full relative transition-all ${
+              activeBottomTab === 'matches' ? 'text-rose-500 font-bold' : 'text-slate-400'
+            }`}
+          >
+            <div className="flex flex-col items-center">
+              <span className="text-[17px] font-black leading-none">Js</span>
+              <span className="text-[10px] mt-1 font-bold">Matches</span>
+            </div>
+            {activeBottomTab === 'matches' && <div className="absolute top-0 w-8 h-[3px] bg-rose-500 rounded-b-full" />}
+          </button>
+
+          {/* Activity Tab (Clock icon - Cloned from Images 2 & 3) */}
+          <button
+            onClick={() => { setActiveBottomTab('activity'); setCurrentSubView(null); }}
+            className={`flex flex-col items-center justify-center flex-1 h-full relative transition-all ${
+              activeBottomTab === 'activity' ? 'text-rose-500 font-bold' : 'text-slate-400'
+            }`}
+          >
+            <Clock size={20} />
+            <span className="text-[10px] mt-1 font-bold">Activity</span>
+            {activeBottomTab === 'activity' && <div className="absolute top-0 w-8 h-[3px] bg-rose-500 rounded-b-full" />}
+          </button>
+
+          {/* Messenger Tab */}
+          <button
+            onClick={() => { setActiveBottomTab('messenger'); setCurrentSubView(null); }}
+            className={`flex flex-col items-center justify-center flex-1 h-full relative transition-all ${
+              activeBottomTab === 'messenger' ? 'text-rose-500 font-bold' : 'text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            <MessageCircle size={20} />
+            <span className="absolute top-1.5 right-6 w-4 h-4 bg-rose-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center border border-white">
+              2
+            </span>
+            <span className="text-[10px] mt-1 font-bold">Messenger</span>
+            {activeBottomTab === 'messenger' && <div className="absolute top-0 w-8 h-[3px] bg-rose-500 rounded-b-full" />}
+          </button>
+
+          {/* Upgrade Tab */}
+          <div className="flex-1 h-full flex items-center justify-center">
+            <div 
+              onClick={() => navigate('/member/profile/upgrade')}
+              className="bg-amber-100/50 hover:bg-amber-100 border border-amber-200/60 rounded-xl px-2.5 py-1.5 flex flex-col items-center justify-center cursor-pointer select-none active:scale-95 transition-transform"
+            >
+              <span className="text-[9px] font-extrabold text-amber-700 bg-amber-250 px-1 rounded uppercase tracking-wider leading-none">70% OFF</span>
+              <span className="text-[9.5px] mt-0.5 font-bold text-amber-800 leading-none">Upgrade</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ─── 3 DOTS MENU BOTTOM SHEET ─── */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center animate-fade-in" data-swipe-block="true">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" onClick={() => setIsMenuOpen(false)} />
-          <div className="bg-white text-slate-800 w-full rounded-t-[28px] p-5 pb-safe z-50 shadow-2xl max-w-md animate-slide-up">
-            <div className="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-4" />
-            <h3 className="text-[15.5px] font-black text-slate-800 text-center mb-5">Profile Options</h3>
-            <div className="space-y-3.5 mb-5">
-              <button 
-                onClick={() => {
-                  showToast('Profile Shortlisted successfully!');
-                  setIsMenuOpen(false);
-                }}
-                className="w-full py-3 bg-slate-50 text-slate-700 hover:bg-slate-100 rounded-xl text-[13.5px] font-bold"
-              >
-                Shortlist Profile
-              </button>
-              <button 
-                onClick={() => {
-                  showToast('Profile blocked successfully.');
-                  setIsMenuOpen(false);
-                }}
-                className="w-full py-3 bg-slate-50 text-red-500 hover:bg-slate-100 rounded-xl text-[13.5px] font-bold"
-              >
-                Block Profile
-              </button>
-              <button 
-                onClick={() => {
-                  showToast('Profile reported successfully.');
-                  setIsMenuOpen(false);
-                }}
-                className="w-full py-3 bg-slate-50 text-red-500 hover:bg-slate-100 rounded-xl text-[13.5px] font-bold"
-              >
-                Report Abuse / Fake Profile
-              </button>
-            </div>
-            <button 
-              onClick={() => setIsMenuOpen(false)}
-              className="w-full py-3.5 bg-slate-900 text-white rounded-xl text-[13.5px] font-bold active:scale-95 transition-transform"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* ─── TOAST NOTIFICATION ─── */}
       {toastMessage && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-sm text-white text-[12.5px] font-black px-5 py-3 rounded-full shadow-lg z-50 animate-bounce border border-white/10">
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-sm text-white text-[12.5px] font-black px-5 py-3 rounded-full shadow-lg z-[60] animate-bounce-in border border-white/10">
           {toastMessage}
         </div>
       )}

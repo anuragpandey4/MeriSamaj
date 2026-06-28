@@ -658,18 +658,51 @@ export const DataProvider = ({ children }) => {
   };
 
   const toggleMatrimonialInterest = (profileId) => {
-    setMatrimonialProfiles(prev => prev.map(p => {
-      if (p.id === profileId) {
-        return {
-          ...p,
-          interests: {
-            ...p.interests,
-            sent: !p.interests.sent
-          }
-        };
+    setMatrimonialProfiles(prev => {
+      const updated = prev.map(p => {
+        if (p.id === profileId) {
+          const newSent = !p.interests.sent;
+          return {
+            ...p,
+            interests: {
+              ...p.interests,
+              sent: newSent,
+              // If withdrawing, reset accepted status
+              accepted: newSent ? p.interests.accepted : false
+            }
+          };
+        }
+        return p;
+      });
+
+      // Find if we just sent a request
+      const target = updated.find(p => p.id === profileId);
+      if (target && target.interests?.sent && !target.interests?.accepted) {
+        // Trigger auto acceptance after 5 seconds to simulate target response
+        setTimeout(() => {
+          setMatrimonialProfiles(current => current.map(item => {
+            if (item.id === profileId) {
+              return {
+                ...item,
+                interests: {
+                  ...item.interests,
+                  accepted: true
+                }
+              };
+            }
+            return item;
+          }));
+
+          // Trigger a global custom event so active pages can show a toast
+          const event = new CustomEvent('matrimonialInterestAccepted', {
+            detail: { profileId, name: target.name }
+          });
+          window.dispatchEvent(event);
+        }, 5000);
       }
-      return p;
-    }));
+
+      return updated;
+    });
   };
 
   const handleMatrimonialInterestResponse = (profileId, status) => {
@@ -715,27 +748,132 @@ export const DataProvider = ({ children }) => {
   };
 
   const toggleObituaryShraddhanjali = (obId) => {
-    setObituaries(obituaries.map(ob => {
+    setObituaries(prev => prev.map(ob => {
       if (ob.id === obId) {
         return {
           ...ob,
           hasOfferedShraddhanjali: !ob.hasOfferedShraddhanjali,
-          shraddhanjaliCount: ob.hasOfferedShraddhanjali ? ob.shraddhanjaliCount - 1 : ob.shraddhanjaliCount + 1
+          shraddhanjaliCount: ob.hasOfferedShraddhanjali ? ob.shraddhanjaliCount - 1 : ob.shraddhanjaliCount + 1,
+          userHasHaathJode: !ob.userHasHaathJode,
+          haathJodeCount: ob.userHasHaathJode ? (ob.haathJodeCount || 0) - 1 : (ob.haathJodeCount || 0) + 1
         };
       }
       return ob;
     }));
   };
 
+  // New Shradhanjali interaction functions
+  const toggleHaathJode = (obId) => {
+    setObituaries(prev => prev.map(ob => {
+      if (ob.id === obId) {
+        return {
+          ...ob,
+          userHasHaathJode: !ob.userHasHaathJode,
+          haathJodeCount: ob.userHasHaathJode ? (ob.haathJodeCount || 0) - 1 : (ob.haathJodeCount || 0) + 1,
+          // Legacy sync
+          hasOfferedShraddhanjali: !ob.userHasHaathJode,
+          shraddhanjaliCount: ob.userHasHaathJode ? (ob.shraddhanjaliCount || 0) - 1 : (ob.shraddhanjaliCount || 0) + 1
+        };
+      }
+      return ob;
+    }));
+  };
+
+  const toggleMalaArpan = (obId) => {
+    setObituaries(prev => prev.map(ob => {
+      if (ob.id === obId) {
+        return {
+          ...ob,
+          userHasMalaArpan: !ob.userHasMalaArpan,
+          malaArpanCount: ob.userHasMalaArpan ? Math.max(0, (ob.malaArpanCount || 0) - 1) : (ob.malaArpanCount || 0) + 1
+        };
+      }
+      return ob;
+    }));
+  };
+
+  const incrementMalaArpan = (obId, delta) => {
+    setObituaries(prev => prev.map(ob => {
+      if (ob.id === obId) {
+        return {
+          ...ob,
+          malaArpanCount: Math.max(0, (ob.malaArpanCount || 0) + delta),
+          userHasMalaArpan: true
+        };
+      }
+      return ob;
+    }));
+  };
+
+  const saveShradhanjali = (obId) => {
+    setObituaries(prev => prev.map(ob => {
+      if (ob.id === obId) {
+        return {
+          ...ob,
+          isSaved: !ob.isSaved,
+          saves: ob.isSaved ? Math.max(0, (ob.saves || 0) - 1) : (ob.saves || 0) + 1
+        };
+      }
+      return ob;
+    }));
+  };
+
+  const shareShradhanjali = (obId) => {
+    setObituaries(prev => prev.map(ob => {
+      if (ob.id === obId) {
+        return { ...ob, shares: (ob.shares || 0) + 1 };
+      }
+      return ob;
+    }));
+  };
+
+  const incrementObituaryViews = (obId) => {
+    setObituaries(prev => prev.map(ob => {
+      if (ob.id === obId) {
+        return { ...ob, views: (ob.views || 0) + 1 };
+      }
+      return ob;
+    }));
+  };
+
   const addObituaryComment = (obId, commentText) => {
-    setObituaries(obituaries.map(ob => {
+    setObituaries(prev => prev.map(ob => {
       if (ob.id === obId) {
         return {
           ...ob,
           comments: [
             ...(ob.comments || []),
-            { id: `c${Date.now()}`, name: currentUser.name, text: commentText, timestamp: 'Just now' }
+            { 
+              id: `c${Date.now()}`, 
+              name: currentUser.name, 
+              initials: currentUser.initials,
+              text: commentText, 
+              timestamp: 'अभी', 
+              likes: 0,
+              isLiked: false
+            }
           ]
+        };
+      }
+      return ob;
+    }));
+  };
+
+  const likeObituaryComment = (obId, commentId) => {
+    setObituaries(prev => prev.map(ob => {
+      if (ob.id === obId) {
+        return {
+          ...ob,
+          comments: (ob.comments || []).map(c => {
+            if (c.id === commentId) {
+              return {
+                ...c,
+                isLiked: !c.isLiked,
+                likes: c.isLiked ? Math.max(0, (c.likes || 0) - 1) : (c.likes || 0) + 1
+              };
+            }
+            return c;
+          })
         };
       }
       return ob;
@@ -957,6 +1095,13 @@ export const DataProvider = ({ children }) => {
     addObituary,
     toggleObituaryShraddhanjali,
     addObituaryComment,
+    toggleHaathJode,
+    toggleMalaArpan,
+    incrementMalaArpan,
+    saveShradhanjali,
+    shareShradhanjali,
+    incrementObituaryViews,
+    likeObituaryComment,
     resetAllData,
     language,
     setLanguage,
