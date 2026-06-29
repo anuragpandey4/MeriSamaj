@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import {
   ArrowLeft, Search, Star, CheckCircle, X,
-  SlidersHorizontal, MapPin, AlertCircle, Loader2
+  SlidersHorizontal, MapPin, AlertCircle, Loader2,
+  Phone, MessageCircle, Share2
 } from 'lucide-react';
 import { useData } from '../../context/DataProvider';
 import useProfessionalDirectory from '../../hooks/useProfessionalDirectory';
@@ -45,6 +47,7 @@ const ProfessionalDirectoryPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedCity, setSelectedCity] = useState('सभी शहर');
   const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const [activeProfessional, setActiveProfessional] = useState(null);
 
   // Temp state inside filter panel (apply only on button click)
   const [tempCategory, setTempCategory] = useState('All');
@@ -252,7 +255,8 @@ const ProfessionalDirectoryPage = () => {
                 filteredListings.map(biz => (
                   <div
                     key={biz.id}
-                    className="bg-card rounded-2xl p-4 border border-gray-100 flex items-center justify-between shadow-sm"
+                    onClick={() => setActiveProfessional(biz)}
+                    className="bg-card rounded-2xl p-4 border border-gray-100 hover:border-indigo-200 transition-all flex items-center justify-between shadow-sm cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
                       {/* Logo or initials */}
@@ -291,6 +295,7 @@ const ProfessionalDirectoryPage = () => {
 
                     <a
                       href={`tel:${biz.phone}`}
+                      onClick={(e) => e.stopPropagation()}
                       className="px-4 py-2 border border-indigo-150 text-indigo-700 font-bold text-[10px] rounded-full press-scale hover:bg-indigo-50/50 shrink-0"
                     >
                       संपर्क करें
@@ -405,6 +410,127 @@ const ProfessionalDirectoryPage = () => {
                 className="w-full py-3.5 bg-indigo-600 text-white rounded-2xl text-[14px] font-bold shadow-lg shadow-indigo-600/20 press-scale"
               >
                 फ़िल्टर लगाएं {(tempCategory !== 'All' || tempCity !== 'सभी शहर') ? `(${(tempCategory !== 'All' ? 1 : 0) + (tempCity !== 'सभी शहर' ? 1 : 0)})` : ''}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ─── PROFESSIONAL DETAILS DRAWER ─────────────────────────────────────── */}
+      {activeProfessional && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end justify-center animate-fade-in"
+          onClick={() => setActiveProfessional(null)}
+        >
+          <div
+            className="bg-white rounded-t-[32px] max-w-lg w-full shadow-2xl animate-slide-up flex flex-col font-sans max-h-[85vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mt-4 shrink-0" />
+
+            <div className="px-5 pt-4 pb-3 flex justify-between items-start shrink-0">
+              <div className="flex items-center gap-3">
+                {activeProfessional.logo ? (
+                  <img
+                    src={activeProfessional.logo}
+                    alt={activeProfessional.title}
+                    className="w-14 h-14 rounded-2xl object-cover border border-gray-100 shadow-sm"
+                  />
+                ) : (
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg shadow-sm ${activeProfessional.color}`}>
+                    {activeProfessional.initials}
+                  </div>
+                )}
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-[17px] font-black text-gray-900 leading-tight">{activeProfessional.title}</h3>
+                    {activeProfessional.verified && (
+                      <CheckCircle size={15} className="text-emerald-500 fill-emerald-50 shrink-0" />
+                    )}
+                  </div>
+                  <p className="text-[11px] font-bold text-indigo-600 mt-1">
+                    {activeProfessional.category} · {activeProfessional.city}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setActiveProfessional(null)}
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center active:scale-90 transition-transform"
+              >
+                <X size={15} className="text-gray-500" />
+              </button>
+            </div>
+
+            <div className="px-5 py-4 space-y-4 flex-1">
+              {/* Rating Section */}
+              <div className="flex items-center gap-1.5 bg-amber-50/50 border border-amber-100/50 rounded-2xl p-3">
+                <div className="flex items-center gap-0.5 text-amber-500">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star
+                      key={s}
+                      size={14}
+                      fill={s <= Math.floor(activeProfessional.rating) ? 'currentColor' : 'none'}
+                      className={s <= Math.floor(activeProfessional.rating) ? 'text-amber-500' : 'text-amber-200'}
+                    />
+                  ))}
+                </div>
+                <span className="text-[12px] font-bold text-gray-700">{activeProfessional.rating} / 5.0</span>
+                <span className="text-[10px] text-gray-400 font-semibold">(24 समीक्षाएं)</span>
+              </div>
+
+              {/* Description */}
+              {activeProfessional.description && (
+                <div className="space-y-1">
+                  <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-wider">व्यवसाय विवरण</h4>
+                  <p className="text-[13px] text-gray-700 leading-relaxed font-medium bg-gray-50/50 p-3 rounded-2xl border border-gray-100/50">
+                    {activeProfessional.description}
+                  </p>
+                </div>
+              )}
+
+              {/* Working Hours & Address */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="border border-gray-100 rounded-2xl p-3 space-y-1">
+                  <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-wider">कार्य समय</h4>
+                  <p className="text-[12.5px] font-bold text-gray-800">09:00 AM - 08:00 PM</p>
+                  <p className="text-[10px] text-emerald-500 font-bold">खुला है</p>
+                </div>
+                <div className="border border-gray-100 rounded-2xl p-3 space-y-1">
+                  <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-wider">पता / स्थान</h4>
+                  <p className="text-[12.5px] font-bold text-gray-800 leading-snug truncate">{activeProfessional.city || 'इंदौर'}, मध्य प्रदेश</p>
+                  <p className="text-[10px] text-gray-400 font-semibold">1.2 किमी दूर</p>
+                </div>
+              </div>
+
+              {/* Mobile Number Info */}
+              <div className="border border-gray-100 rounded-2xl p-3 flex items-center justify-between">
+                <div>
+                  <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-wider">संपर्क नंबर</h4>
+                  <p className="text-[14px] font-black text-gray-800 mt-0.5">{activeProfessional.phone}</p>
+                </div>
+                <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">
+                  सत्यापित
+                </span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="px-5 py-4 border-t border-gray-100 bg-gray-50/50 flex gap-3 pb-safe">
+              <a
+                href={`tel:${activeProfessional.phone}`}
+                className="flex-1 py-3.5 bg-indigo-600 text-white rounded-2xl text-[13.5px] font-black text-center shadow-lg shadow-indigo-600/10 active:scale-95 transition-transform flex items-center justify-center gap-1.5"
+              >
+                <Phone size={15} />
+                कॉल करें
+              </a>
+              <button
+                onClick={() => {
+                  setActiveProfessional(null);
+                  navigate(`/member/chat/${activeProfessional.id}`);
+                }}
+                className="flex-1 py-3.5 bg-white text-indigo-700 border border-indigo-200 rounded-2xl text-[13.5px] font-black hover:bg-indigo-50 active:scale-95 transition-transform flex items-center justify-center gap-1.5"
+              >
+                <MessageCircle size={15} />
+                मैसेज भेजें
               </button>
             </div>
           </div>

@@ -123,7 +123,7 @@ const InterestCard = ({ profile, type, navigate, onAccept, onDecline, onCancel, 
       {type === 'Accepted' && (
         <div className="flex gap-2.5 px-4 pb-4">
           <button
-            onClick={() => navigate(`/member/chat/${profile.id}`)}
+            onClick={() => navigate(`/member/matrimonial/chat/${profile.id}`)}
             className="flex-1 py-2.5 bg-gradient-to-r from-blue-500 to-blue-400 text-white rounded-xl text-[12.5px] font-bold flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-transform"
           >
             <MessageCircle size={15} /> Chat Now

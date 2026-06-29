@@ -25,7 +25,7 @@ const groupColors = {
   Religious: 'bg-orange-100 text-orange-700'
 };
 
-const GroupsPage = ({ isHub = false }) => {
+const GroupsPage = ({ isHub = false, triggerCreateGroup, onGroupCreateTriggered }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { groups, groupMessages, members, createGroup, toggleGroupMute, joinGroup } = useData();
@@ -39,6 +39,15 @@ const GroupsPage = ({ isHub = false }) => {
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location, navigate]);
+
+  useEffect(() => {
+    if (triggerCreateGroup) {
+      setIsCreating(true);
+      if (onGroupCreateTriggered) {
+        onGroupCreateTriggered();
+      }
+    }
+  }, [triggerCreateGroup, onGroupCreateTriggered]);
   
   // Create Group Flow State
   const [isCreating, setIsCreating] = useState(false);

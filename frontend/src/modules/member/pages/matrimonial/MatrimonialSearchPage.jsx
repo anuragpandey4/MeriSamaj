@@ -5,7 +5,7 @@ import { useMatrimonial } from './MatrimonialContext';
 
 const MatrimonialSearchPage = () => {
   const navigate = useNavigate();
-  const { setActiveDiscoveryTab } = useMatrimonial();
+  const { setActiveDiscoveryTab, setSearchFilters } = useMatrimonial();
 
   const [filters, setFilters] = useState({
     lookingFor: 'Female',
@@ -29,7 +29,7 @@ const MatrimonialSearchPage = () => {
   ]);
 
   const handleApply = () => {
-    // Navigate back to matrimonial home and pass filters or set them in context
+    setSearchFilters(filters);
     navigate('/member/matrimonial');
   };
 

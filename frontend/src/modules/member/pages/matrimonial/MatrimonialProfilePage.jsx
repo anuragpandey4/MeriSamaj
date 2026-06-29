@@ -341,7 +341,7 @@ const MatrimonialProfilePage = () => {
           <button
             onClick={() => {
               if (isConnected) {
-                navigate(`/member/chat/${profile.id}`);
+                navigate(`/member/matrimonial/chat/${profile.id}`);
               } else {
                 toggleMatrimonialInterest(profile.id);
                 showToast(interested ? 'Interest withdrawn' : 'Interest sent! 💕');

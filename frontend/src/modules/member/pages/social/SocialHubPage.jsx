@@ -145,12 +145,13 @@ const DiscoverIcon = ({ size = 26, isActive }) => (
 const SocialHubPage = ({ initialTab = 'city-feed' }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentUser } = useData();
+  const { currentUser, setMobileMenuOpen } = useData();
   const [activeTab, setActiveTab] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const scrollContainerRef = useRef(null);
   const isTransitioningRef = useRef(false);
+  const [triggerCreateGroup, setTriggerCreateGroup] = useState(false);
   const touchStartXRef = useRef(0);
   const touchStartYRef = useRef(0);
   const touchTriggeredRef = useRef(false);
@@ -311,7 +312,7 @@ const SocialHubPage = ({ initialTab = 'city-feed' }) => {
     }
     if (activeTab === 2) { // Groups (now index 2)
       return (
-        <button className="responsive-fixed-fab w-14 h-14 bg-[#1877F2] text-white rounded-full shadow-lg flex items-center justify-center press-scale hover:bg-blue-600 transition-colors absolute bottom-6 right-5 z-50">
+        <button onClick={() => setTriggerCreateGroup(true)} className="responsive-fixed-fab w-14 h-14 bg-[#1877F2] text-white rounded-full shadow-lg flex items-center justify-center press-scale hover:bg-blue-600 transition-colors absolute bottom-6 right-5 z-50">
           <Users size={24} />
         </button>
       );
@@ -346,7 +347,7 @@ const SocialHubPage = ({ initialTab = 'city-feed' }) => {
           ) : (
             <>
               <div className="flex items-center gap-4">
-                <button className="text-text-primary">
+                <button className="text-text-primary" onClick={() => setMobileMenuOpen(true)}>
                   <Menu size={24} />
                 </button>
                 <h1 className="text-[20px] font-semibold text-text-primary tracking-tight">Social Hub</h1>
@@ -403,9 +404,13 @@ const SocialHubPage = ({ initialTab = 'city-feed' }) => {
         {tabs.map((tab) => {
           const Component = tab.component;
           const extraProps = tab.feedProps || {};
+          const groupsProps = tab.id === 'groups' ? {
+            triggerCreateGroup,
+            onGroupCreateTriggered: () => setTriggerCreateGroup(false)
+          } : {};
           return (
             <div key={tab.id} className="w-full h-full flex-shrink-0 overflow-y-auto pb-28">
-              <Component isHub={true} {...extraProps} searchQuery={searchQuery} />
+              <Component isHub={true} {...extraProps} {...groupsProps} searchQuery={searchQuery} />
             </div>
           );
         })}

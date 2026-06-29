@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useData } from '../../context/DataProvider';
 import { 
   Search, 
   MapPin, 
@@ -20,6 +21,7 @@ import { useDraggableScroll } from '../../../../hooks/useDraggableScroll';
 
 const DirectoryPage = () => {
   const navigate = useNavigate();
+  const { setMobileMenuOpen } = useData();
   const [searchQuery, setSearchQuery] = useState('');
   const scrollRef = useDraggableScroll();
 
@@ -46,7 +48,7 @@ const DirectoryPage = () => {
       {/* 1. Header Bar */}
       <div className="bg-card border-b border-gray-100 flex items-center justify-between px-4 h-14 sticky top-0 z-30">
         <div className="flex items-center gap-3">
-          <button className="p-1 -ml-1 press-scale">
+          <button onClick={() => setMobileMenuOpen(true)} className="p-1 -ml-1 press-scale">
             <Menu size={22} className="text-text-primary" />
           </button>
           <h1 className="text-base font-bold text-text-primary">डायरेक्टरी</h1>

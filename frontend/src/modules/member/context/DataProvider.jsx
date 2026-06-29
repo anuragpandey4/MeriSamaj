@@ -6,6 +6,7 @@ import { mockPosts as initialPosts } from '../data/mockPosts';
 import { mockEvents as initialEvents } from '../data/mockEvents';
 import { mockMatrimonialProfiles as initialMatrimonial } from '../data/mockMatrimonial';
 import { mockObituaries as initialObituaries } from '../data/mockObituaries';
+import { mockChats as initialChats, mockMessages as initialMessages } from '../data/mockChats';
 
 const getCommunitySurname = (community) => {
   if (!community) return 'Agrawal';
@@ -221,10 +222,13 @@ const defaultProfilePrivacy = {
 const defaultBlockedUsers = [];
 
 const defaultGranularPrivacy = {
-  phone: 'followers',
-  email: 'followers',
-  familyTree: 'followers',
-  gallery: 'followers'
+  u1: { phone: 'followers', email: 'followers', familyTree: 'followers', gallery: 'followers' },
+  m1: { phone: 'public', email: 'public', familyTree: 'public', gallery: 'public' },
+  m2: { phone: 'followers', email: 'followers', familyTree: 'followers', gallery: 'followers' },
+  m3: { phone: 'private', email: 'private', familyTree: 'private', gallery: 'private' },
+  m4: { phone: 'followers', email: 'followers', familyTree: 'followers', gallery: 'followers' },
+  m5: { phone: 'public', email: 'public', familyTree: 'public', gallery: 'public' },
+  m6: { phone: 'private', email: 'private', familyTree: 'private', gallery: 'private' }
 };
 
 const DataContext = createContext(null);
@@ -352,6 +356,13 @@ export const DataProvider = ({ children }) => {
   // Survey Responses State: { [surveyId]: { [questionId]: answer } }
   const [surveyResponses, setSurveyResponses] = useState(() => loadState('surveyResponses', {}));
 
+  // Mobile Menu Navigation Drawer State
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Direct Message Chats & Messages States
+  const [chats, setChats] = useState(() => loadState('chats', initialChats));
+  const [chatMessages, setChatMessages] = useState(() => loadState('chatMessages', initialMessages));
+
   // Follow System & Privacy States
   const [profilePrivacy, setProfilePrivacy] = useState(() => loadState('profilePrivacy', defaultProfilePrivacy));
   const [followRelations, setFollowRelations] = useState(() => loadState('followRelations', defaultFollowRelations));
@@ -374,6 +385,8 @@ export const DataProvider = ({ children }) => {
   useEffect(() => saveState('eventReminders', eventReminders), [eventReminders]);
   useEffect(() => saveState('eventRegistrations', eventRegistrations), [eventRegistrations]);
   useEffect(() => saveState('surveyResponses', surveyResponses), [surveyResponses]);
+  useEffect(() => saveState('chats', chats), [chats]);
+  useEffect(() => saveState('chatMessages', chatMessages), [chatMessages]);
   
   // Follow System Syncs
   useEffect(() => saveState('profilePrivacy', profilePrivacy), [profilePrivacy]);
@@ -455,10 +468,27 @@ export const DataProvider = ({ children }) => {
   };
 
   const updateGranularPrivacy = (field, setting) => {
-    setGranularPrivacy(prev => ({
-      ...prev,
-      [field]: setting
-    }));
+    setGranularPrivacy(prev => {
+      // Check if it's already a dictionary style or flat style
+      if (prev && prev.u1) {
+        return {
+          ...prev,
+          u1: {
+            ...prev.u1,
+            [field]: setting
+          }
+        };
+      } else {
+        // If it was flat, convert to dictionary style and save
+        return {
+          ...prev,
+          u1: {
+            ...prev,
+            [field]: setting
+          }
+        };
+      }
+    });
   };
 
   const blockUser = (targetUserId) => {
@@ -726,6 +756,123 @@ export const DataProvider = ({ children }) => {
       ...prev,
       matrimonialBio: newBio
     }));
+  };
+
+  const getOrCreateChat = (memberId) => {
+    const existing = chats.find(c => !c.isGroup && c.participants.includes(memberId) && c.participants.includes('u1'));
+    if (existing) {
+      return existing.id;
+    }
+
+    const recipient = members.find(m => m.id === memberId) || 
+                      matrimonialProfiles.find(p => p.id === memberId) || 
+                      { name: 'Samaj Member', initials: 'SM' };
+
+    const newChatId = `c_dm_${memberId}`;
+    const newChat = {
+      id: newChatId,
+      isGroup: false,
+      participants: ['u1', memberId],
+      name: recipient.name,
+      avatar: recipient.avatar || null,
+      initials: recipient.initials || recipient.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
+      lastMessage: {
+        text: 'No messages yet',
+        timestamp: new Date().toISOString(),
+        senderId: memberId,
+        isRead: true
+      },
+      unreadCount: 0,
+      online: recipient.online || false
+    };
+
+    setChats(prev => [newChat, ...prev]);
+    setChatMessages(prev => ({
+      ...prev,
+      [newChatId]: []
+    }));
+
+    return newChatId;
+  };
+
+  const sendChatMessage = (chatId, text) => {
+    const newMsg = {
+      id: `m_${Date.now()}`,
+      text,
+      timestamp: new Date().toISOString(),
+      senderId: 'u1',
+      senderName: currentUser?.name?.split(' ')[0] || 'You'
+    };
+
+    setChatMessages(prev => {
+      const currentMsgs = prev[chatId] || [];
+      return {
+        ...prev,
+        [chatId]: [...currentMsgs, newMsg]
+      };
+    });
+
+    setChats(prev => {
+      const target = prev.find(c => c.id === chatId);
+      if (!target) return prev;
+      const updatedTarget = {
+        ...target,
+        lastMessage: {
+          text,
+          timestamp: new Date().toISOString(),
+          senderId: 'u1',
+          isRead: true
+        }
+      };
+      return [updatedTarget, ...prev.filter(c => c.id !== chatId)];
+    });
+
+    // Simulate Reply for DM Chats
+    const targetChat = chats.find(c => c.id === chatId);
+    if (targetChat && !targetChat.isGroup) {
+      setTimeout(() => {
+        const autoText = [
+          'हाँ, बिल्कुल! 😊',
+          'ठीक है, मैं देख लूंगा।',
+          'धन्यवाद! बताता हूँ।',
+          'अच्छा, समझ गया।',
+          'जी हाँ, कल मिलते हैं।',
+          'Sure! Will get back to you.',
+        ][Math.floor(Math.random() * 6)];
+
+        const replyMsg = {
+          id: `m_${Date.now()}_reply`,
+          text: autoText,
+          timestamp: new Date().toISOString(),
+          senderId: targetChat.participants.find(p => p !== 'u1') || 'member',
+          senderName: targetChat.name.split(' ')[0] || 'Member'
+        };
+
+        setChatMessages(current => {
+          const currentMsgs = current[chatId] || [];
+          return {
+            ...current,
+            [chatId]: [...currentMsgs, replyMsg]
+          };
+        });
+
+        setChats(current => {
+          const target = current.find(c => c.id === chatId);
+          if (!target) return current;
+          const updatedTarget = {
+            ...target,
+            lastMessage: {
+              text: autoText,
+              timestamp: new Date().toISOString(),
+              senderId: replyMsg.senderId,
+              isRead: false
+            },
+            unreadCount: (target.unreadCount || 0) + 1
+          };
+          return [updatedTarget, ...current.filter(c => c.id !== chatId)];
+        });
+      }, 1500);
+    }
   };
 
   const addObituary = (obituary) => {
@@ -1091,6 +1238,10 @@ export const DataProvider = ({ children }) => {
     toggleMatrimonialInterest,
     handleMatrimonialInterestResponse,
     updateMatrimonialBio,
+    chats,
+    chatMessages,
+    getOrCreateChat,
+    sendChatMessage,
     obituaries,
     addObituary,
     toggleObituaryShraddhanjali,
@@ -1175,6 +1326,10 @@ export const DataProvider = ({ children }) => {
         [surveyId]: { ...answersMap, submittedAt: new Date().toISOString() }
       }));
     },
+
+    // Mobile Menu
+    isMobileMenuOpen,
+    setMobileMenuOpen,
   };
 
   return (
