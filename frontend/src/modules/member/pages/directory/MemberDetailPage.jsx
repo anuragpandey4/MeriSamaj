@@ -61,7 +61,8 @@ const MemberDetailPage = () => {
     cancelFollowRequest,
     unfollowUser,
     blockUser,
-    unblockUser
+    unblockUser,
+    granularPrivacy
   } = useData();
 
   // Find member in either members or admins list
@@ -121,6 +122,24 @@ const MemberDetailPage = () => {
   const isPrivate = privacy === 'private';
   const canAccess = member.id === 'u1' || !isPrivate || isFollowing;
 
+  // Get privacy settings for this member
+  const memberGranular = granularPrivacy?.[member.id] || 
+                         (member.id === 'u1' ? (granularPrivacy?.u1 || granularPrivacy) : null) || 
+                         { phone: 'followers', email: 'followers', familyTree: 'followers' };
+
+  const isMe = member.id === 'u1';
+  
+  const isFieldVisible = (fieldSetting) => {
+    if (isMe) return true;
+    if (fieldSetting === 'public') return true;
+    if (fieldSetting === 'followers') return isFollowing;
+    return false; // 'private' or 'only me'
+  };
+
+  const showPhone = isFieldVisible(memberGranular.phone);
+  const showEmail = isFieldVisible(memberGranular.email);
+  const showFamily = isFieldVisible(memberGranular.familyTree);
+
   return (
     <div className="min-h-screen bg-surface pb-12">
       {/* Header */}
@@ -128,7 +147,7 @@ const MemberDetailPage = () => {
         <button onClick={() => navigate(-1)} className="p-1 -ml-1 press-scale">
           <ArrowLeft size={22} className="text-text-primary" />
         </button>
-        <h1 className="text-base font-bold text-text-primary">सदस्य प्रोफ़ाइल</h1>
+        <h1 className="text-base font-bold text-text-primary">Member Profile</h1>
       </div>
 
       <div className="max-w-4xl mx-auto space-y-4 pt-4 px-4">
@@ -209,20 +228,30 @@ const MemberDetailPage = () => {
                 onClick={() => navigate(`/member/chat/${member.id}`)}
                 className="py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale shadow-sm shadow-indigo-100"
               >
-                <MessageCircle size={14} /> संपर्क करें
+                <MessageCircle size={14} /> Contact
               </button>
               <button 
                 onClick={() => navigate(`/member/chat/${member.id}`)}
                 className="py-3 bg-card border border-gray-200 text-text-primary rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale hover:bg-gray-50"
               >
-                <Mail size={14} /> मैसेज करें
+                <Mail size={14} /> Message
               </button>
-              <a 
-                href={`tel:${phoneNum}`}
-                className="py-3 bg-card border border-gray-200 text-text-primary rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale hover:bg-gray-50 text-center"
-              >
-                <Phone size={14} /> कॉल करें
-              </a>
+              {showPhone ? (
+                <a 
+                  href={`tel:${phoneNum}`}
+                  className="py-3 bg-card border border-gray-200 text-text-primary rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 press-scale hover:bg-gray-50 text-center"
+                >
+                  <Phone size={14} /> Call
+                </a>
+              ) : (
+                <button 
+                  disabled
+                  className="py-3 bg-gray-50 border border-gray-150 text-slate-400 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 opacity-60 cursor-not-allowed text-center"
+                  title="Phone visibility is restricted"
+                >
+                  <Phone size={14} /> Call
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -233,9 +262,9 @@ const MemberDetailPage = () => {
             <div className="w-16 h-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center mb-4">
               <span className="text-3xl">🚫</span>
             </div>
-            <h3 className="text-[15px] font-bold text-text-primary">सदस्य अवरुद्ध (Blocked) है</h3>
+            <h3 className="text-[15px] font-bold text-text-primary">Member is Blocked</h3>
             <p className="text-xs text-text-secondary mt-2 max-w-xs leading-relaxed">
-              आपने इस सदस्य को ब्लॉक किया हुआ है। उनके विवरण देखने के लिए पहले उन्हें अनब्लॉक करें।
+              You have blocked this member. Unblock them first to view their profile details.
             </p>
           </div>
         ) : !canAccess ? (
@@ -243,69 +272,78 @@ const MemberDetailPage = () => {
             <div className="w-16 h-16 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4">
               <span className="text-3xl">🔒</span>
             </div>
-            <h3 className="text-[15px] font-bold text-text-primary">यह प्रोफ़ाइल निजी (Private) है</h3>
+            <h3 className="text-[15px] font-bold text-text-primary">This Profile is Private</h3>
             <p className="text-xs text-text-secondary mt-2 max-w-xs leading-relaxed">
-              केवल स्वीकृत फ़ॉलोअर्स ही इस सदस्य की व्यक्तिगत जानकारी, संपर्क विवरण और पारिवारिक वृक्ष (Family Tree) देख सकते हैं।
+              Only accepted followers can view this member's personal info, contact details, and Family Tree.
             </p>
             {!hasRequested && (
               <button
                 onClick={() => sendFollowRequest(member.id)}
                 className="mt-5 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-bold text-xs press-scale shadow-sm"
               >
-                फ़ॉलो करने के लिए अनुरोध भेजें
+                Send Follow Request
               </button>
             )}
           </div>
         ) : (
           <>
-            {/* Section 1: व्यक्तिगत जानकारी */}
+            {/* Section 1: Personal Information */}
             <div className="space-y-2">
-              <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">व्यक्तिगत जानकारी</h3>
+              <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">Personal Information</h3>
               <div className="bg-card rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50 overflow-hidden">
-                <InfoField label="सदस्य ID" value={memberIdCode} />
-                <InfoField label="जन्म तिथि" value={dobStr} />
-                <InfoField label="मोबाइल नंबर" value={phoneNum} />
-                <InfoField label="ईमेल" value={emailAddr} />
-                <InfoField label="शहर" value={hindiCity} />
+                <InfoField label="Member ID" value={memberIdCode} />
+                <InfoField label="Date of Birth" value={dobStr} />
+                <InfoField label="Mobile Number" value={showPhone ? phoneNum : (memberGranular.phone === 'private' ? '🔒 Private' : '🔒 Followers Only')} />
+                <InfoField label="Email" value={showEmail ? emailAddr : (memberGranular.email === 'private' ? '🔒 Private' : '🔒 Followers Only')} />
+                <InfoField label="City" value={hindiCity} />
               </div>
             </div>
 
-            {/* Section 2: व्यवसाय जानकारी */}
+            {/* Section 2: Professional Information */}
             <div className="space-y-2">
-              <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">व्यवसाय जानकारी</h3>
+              <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">Professional Information</h3>
               <div className="bg-card rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50 overflow-hidden">
-                <InfoField label="पेशा" value={hindiProfession} />
-                <InfoField label="कंपनी" value={companyName} />
-                <InfoField label="व्यवसाय" value={businessSector} />
-                <InfoField label="स्थापना वर्ष" value={estYear.toString()} />
+                <InfoField label="Profession" value={hindiProfession} />
+                <InfoField label="Company" value={companyName} />
+                <InfoField label="Business" value={businessSector} />
+                <InfoField label="Est. Year" value={estYear.toString()} />
               </div>
             </div>
 
-            {/* Section 3: पता */}
+            {/* Section 3: Address */}
             <div className="space-y-2">
-              <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">पता</h3>
+              <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">Address</h3>
               <div className="bg-card rounded-2xl p-4 border border-gray-100 shadow-sm">
                 <div className="flex gap-2.5 items-start">
                   <MapPin size={16} className="text-text-secondary mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">पूर्ण पता</p>
+                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Full Address</p>
                     <p className="text-xs font-semibold text-text-primary mt-1 leading-relaxed">{fullAddress}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Section 4: पारिवारिक वृक्ष (Family Tree) */}
+            {/* Section 4: Family Details (Family Tree) */}
             <div className="space-y-2">
-              <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">पारिवारिक विवरण (फ़ैमिली ट्री)</h3>
-              <div className="bg-card rounded-2xl border border-gray-100 shadow-sm overflow-hidden p-2">
-                <div className="w-full overflow-hidden relative rounded-xl border border-gray-50">
-                  <BranchingFamilyTree 
-                    primaryMember={member} 
-                    familyMembers={familyMembers} 
-                  />
+              <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider pl-1">Family Details (Family Tree)</h3>
+              {showFamily ? (
+                <div className="bg-card rounded-2xl border border-gray-100 shadow-sm overflow-hidden p-2">
+                  <div className="w-full overflow-hidden relative rounded-xl border border-gray-50">
+                    <BranchingFamilyTree 
+                      primaryMember={member} 
+                      familyMembers={familyMembers} 
+                    />
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-card rounded-2xl p-6 border border-gray-100 shadow-sm flex flex-col items-center text-center">
+                  <span className="text-xl">🔒</span>
+                  <p className="text-xs font-semibold text-text-secondary mt-2">
+                    {memberGranular.familyTree === 'private' ? 'Family details are set to Private' : 'Follow this member to view their Family Tree'}
+                  </p>
+                </div>
+              )}
             </div>
           </>
         )}

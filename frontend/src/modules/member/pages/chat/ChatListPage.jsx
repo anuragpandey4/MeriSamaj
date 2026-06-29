@@ -66,13 +66,13 @@ const DoubleCheckIcon = ({ read }) => (
 // ─── Main Component ───────────────────────────────────────────
 const ChatListPage = ({ isHub = false }) => {
   const navigate = useNavigate();
-  const { language } = useData();
+  const { language, chats } = useData();
   const [activeTab, setActiveTab] = useState('chats');
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredChats = useMemo(() =>
-    mockChats.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [searchQuery]
+    chats.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [searchQuery, chats]
   );
 
   const filteredCalls = useMemo(() =>
@@ -80,7 +80,7 @@ const ChatListPage = ({ isHub = false }) => {
     [searchQuery]
   );
 
-  const totalUnread = mockChats.reduce((acc, c) => acc + (c.unreadCount || 0), 0);
+  const totalUnread = chats.reduce((acc, c) => acc + (c.unreadCount || 0), 0);
 
   return (
     <div className={`flex flex-col bg-gray-50 ${isHub ? 'h-full' : 'min-h-screen pb-20'}`}>

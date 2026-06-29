@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MoreVertical, Send, Paperclip, Image as ImageIcon, X, FileText, Phone, Info, Users, Bell, BellOff, Settings, Search, Check, Shield, Mic, Plus, LogOut, Star, ChevronRight, Video, Trash, Camera, Edit } from 'lucide-react';
+import { ArrowLeft, MoreVertical, Send, Paperclip, Image as ImageIcon, X, FileText, Phone, Info, Users, Bell, BellOff, Settings, Search, Check, CheckCheck, Shield, Mic, Plus, LogOut, Star, ChevronRight, Video, Trash, Camera, Edit } from 'lucide-react';
 import { Avatar } from '../../components/common/Avatar';
 import { useData } from '../../context/DataProvider';
 
@@ -39,6 +39,7 @@ const GroupDetailPage = () => {
   const [isSearchingChat, setIsSearchingChat] = useState(false);
   const [chatSearchQuery, setChatSearchQuery] = useState('');
   const [activeReactionMsgId, setActiveReactionMsgId] = useState(null);
+  const [isGroupTyping, setIsGroupTyping] = useState(false);
 
   // Edit Group Info Modal state
   const [isEditingInfo, setIsEditingInfo] = useState(false);
@@ -178,6 +179,8 @@ const GroupDetailPage = () => {
     sendGroupMessage(groupId, newMessage, pendingAttachment);
     setNewMessage('');
     setPendingAttachment(null);
+    setIsGroupTyping(true);
+    setTimeout(() => setIsGroupTyping(false), 1500);
   };
 
   return (
@@ -202,8 +205,12 @@ const GroupDetailPage = () => {
                 <Avatar initials={group.initials} src={group.avatarUrl} size="md" color={groupColors[group.category] || 'bg-gray-100 text-gray-700'} />
                 <div className="min-w-0">
                   <h1 className="text-gray-900 font-extrabold text-[14.5px] leading-tight truncate">{group.name}</h1>
-                  <p className="text-gray-400 text-[11px] font-medium truncate mt-0.5">
-                    {displayMemberCount} members {group.online ? `· ${group.online} online` : ''}
+                  <p className="text-gray-400 text-[11px] font-medium truncate mt-0.5 animate-fade-in">
+                    {isGroupTyping ? (
+                      <span className="text-emerald-600 font-extrabold animate-pulse">Vikas Jain is typing...</span>
+                    ) : (
+                      `${displayMemberCount} members ${group.online ? `· ${group.online} online` : ''}`
+                    )}
                   </p>
                 </div>
               </div>
@@ -366,8 +373,8 @@ const GroupDetailPage = () => {
 
                       <div className="relative">
                         {showAvatar && (
-                          <p className="text-[10px] text-gray-500 font-bold ml-1 mb-0.5">
-                            {msg.senderName} <span className="text-brand-primary">({msg.role || 'Member'})</span>
+                          <p className={`text-[10px] font-bold ml-1 mb-0.5 ${msg.role === 'Admin' ? 'text-orange-500' : 'text-indigo-600'}`}>
+                            {msg.senderName} <span className="opacity-75">({msg.role || 'Member'})</span>
                           </p>
                         )}
                         
@@ -412,7 +419,7 @@ const GroupDetailPage = () => {
                           <div className="flex items-center justify-end gap-1 mt-1">
                             <p className="text-[9px] text-gray-400 font-semibold">{msg.time}</p>
                             {msg.isMe && (
-                              <span className="text-[10px] text-brand-primary font-bold">✓✓</span>
+                              <CheckCheck size={13} className="text-[#53bdeb]" />
                             )}
                           </div>
 

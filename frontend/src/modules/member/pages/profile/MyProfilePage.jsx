@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, ChevronRight, Camera, LogOut, Globe, Lock, Check, ArrowLeft, Sparkles, ShieldCheck, User, Briefcase, Package } from 'lucide-react';
 import { useData } from '../../context/DataProvider';
@@ -36,10 +36,23 @@ const MyProfilePage = () => {
 
   // Privacy Settings Modal State
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  
+  const userGranular = granularPrivacy?.u1 || granularPrivacy || {};
   const [myPrivacySetting, setMyPrivacySetting] = useState(profilePrivacy?.u1 || 'public');
-  const [myPhoneSetting, setMyPhoneSetting] = useState(granularPrivacy?.phone || 'followers');
-  const [myEmailSetting, setMyEmailSetting] = useState(granularPrivacy?.email || 'followers');
-  const [myFamilySetting, setMyFamilySetting] = useState(granularPrivacy?.familyTree || 'followers');
+  const [myPhoneSetting, setMyPhoneSetting] = useState(userGranular.phone || 'followers');
+  const [myEmailSetting, setMyEmailSetting] = useState(userGranular.email || 'followers');
+  const [myFamilySetting, setMyFamilySetting] = useState(userGranular.familyTree || 'followers');
+
+  // Sync form state when modal opens
+  useEffect(() => {
+    if (showPrivacyModal) {
+      setMyPrivacySetting(profilePrivacy?.u1 || 'public');
+      const latestGranular = granularPrivacy?.u1 || granularPrivacy || {};
+      setMyPhoneSetting(latestGranular.phone || 'followers');
+      setMyEmailSetting(latestGranular.email || 'followers');
+      setMyFamilySetting(latestGranular.familyTree || 'followers');
+    }
+  }, [showPrivacyModal, profilePrivacy, granularPrivacy]);
 
   // Members lists Modal State (Followers/Following)
   const [membersListModalType, setMembersListModalType] = useState(null); // 'followers', 'following', or null
@@ -80,7 +93,7 @@ const MyProfilePage = () => {
           <button onClick={() => navigate(-1)} className="p-1 -ml-1 press-scale">
             <ArrowLeft size={22} className="text-text-primary" />
           </button>
-          <h1 className="text-base font-bold text-text-primary">मेरा प्रोफ़ाइल</h1>
+          <h1 className="text-base font-bold text-text-primary">My Profile</h1>
         </div>
       </div>
 
@@ -166,7 +179,7 @@ const MyProfilePage = () => {
                 </span>
               )}
             </div>
-            <p className="text-xs font-bold text-text-secondary mt-1">{currentUser.profession || 'सदस्य'}</p>
+            <p className="text-xs font-bold text-text-secondary mt-1">{currentUser.profession || 'Member'}</p>
 
             {/* Followers and Following Counters */}
             <div className="flex gap-6 mt-4 text-center bg-slate-50 border rounded-2xl px-5 py-2">
@@ -225,7 +238,7 @@ const MyProfilePage = () => {
           <div className="px-4">
             <div className="bg-amber-50/70 border border-amber-100 rounded-3xl p-4">
               <h3 className="text-xs font-black text-amber-800 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                <span>👋</span> फ़ॉलो अनुरोध (Follow Requests - {pendingRequests.length})
+                <span>👋</span> Follow Requests ({pendingRequests.length})
               </h3>
               <div className="space-y-2.5">
                 {pendingRequests.map(reqUser => (
@@ -240,15 +253,15 @@ const MyProfilePage = () => {
                     <div className="flex gap-1.5">
                       <button 
                         onClick={() => acceptFollowRequest(reqUser.id)}
-                        className="px-3.5 py-1.5 bg-indigo-650 text-white rounded-xl text-[11px] font-bold shadow-sm hover:bg-indigo-750 press-scale"
+                        className="px-3.5 py-1.5 bg-indigo-600 text-white rounded-xl text-[11px] font-bold shadow-sm hover:bg-indigo-700 press-scale"
                       >
-                        स्वीकार करें
+                        Accept
                       </button>
                       <button 
                         onClick={() => rejectFollowRequest(reqUser.id)}
-                        className="px-3.5 py-1.5 bg-slate-100 text-slate-650 rounded-xl text-[11px] font-bold hover:bg-slate-200 press-scale"
+                        className="px-3.5 py-1.5 bg-slate-100 text-slate-600 rounded-xl text-[11px] font-bold hover:bg-slate-200 press-scale"
                       >
-                        रद्द करें
+                        Decline
                       </button>
                     </div>
                   </div>
@@ -261,7 +274,7 @@ const MyProfilePage = () => {
         {/* Profile Menu Actions List */}
         <div className="px-4">
           <div className="bg-card rounded-3xl border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-100">
-            {/* Action 1: व्यक्तिगत जानकारी */}
+            {/* Action 1: Personal Info */}
             <button 
               onClick={() => navigate('/member/profile/edit')}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
@@ -271,14 +284,14 @@ const MyProfilePage = () => {
                   <User size={18} />
                 </div>
                 <div>
-                  <span className="text-[13px] font-extrabold text-text-primary block">व्यक्तिगत जानकारी</span>
-                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">अपनी जानकारी जोड़ें और अपडेट करें</span>
+                  <span className="text-[13px] font-extrabold text-text-primary block">Personal Info</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">Add and update your information</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-gray-300" />
             </button>
 
-            {/* Action 2: व्यवसाय जानकारी */}
+            {/* Action 2: Professional Info */}
             <button 
               onClick={() => navigate('/member/professional/apply')}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
@@ -288,14 +301,14 @@ const MyProfilePage = () => {
                   <Briefcase size={18} />
                 </div>
                 <div>
-                  <span className="text-[13px] font-extrabold text-text-primary block">व्यवसाय जानकारी</span>
-                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">व्यवसाय और सेवाएँ जोड़ें</span>
+                  <span className="text-[13px] font-extrabold text-text-primary block">Professional Info</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">Add business and services</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-gray-300" />
             </button>
 
-            {/* Action 3: सेवाएँ / उत्पाद */}
+            {/* Action 3: Services / Products */}
             <button 
               onClick={() => navigate('/member/professional')}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
@@ -305,14 +318,14 @@ const MyProfilePage = () => {
                   <Package size={18} />
                 </div>
                 <div>
-                  <span className="text-[13px] font-extrabold text-text-primary block">सेवाएँ / उत्पाद</span>
-                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">आपके उत्पाद और व्यावसायिक सेवाएँ</span>
+                  <span className="text-[13px] font-extrabold text-text-primary block">Services / Products</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">Your products and business services</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-gray-300" />
             </button>
 
-            {/* Action 4: सोशल मीडिया लिंक */}
+            {/* Action 4: Social Media Links */}
             <button 
               onClick={() => setShowSocialModal(true)}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
@@ -322,14 +335,14 @@ const MyProfilePage = () => {
                   <Globe size={18} />
                 </div>
                 <div>
-                  <span className="text-[13px] font-extrabold text-text-primary block">सोशल मीडिया लिंक</span>
-                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">सोशल मीडिया प्रोफाइल लिंक जोड़ें</span>
+                  <span className="text-[13px] font-extrabold text-text-primary block">Social Media Links</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">Add social media profile links</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-gray-300" />
             </button>
 
-            {/* Action 5: गोपनीयता सेटिंग्स */}
+            {/* Action 5: Privacy Settings */}
             <button 
               onClick={() => setShowPrivacyModal(true)}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
@@ -339,14 +352,14 @@ const MyProfilePage = () => {
                   <Lock size={18} />
                 </div>
                 <div>
-                  <span className="text-[13px] font-extrabold text-text-primary block">गोपनीयता सेटिंग्स</span>
-                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">प्रोफ़ाइल गोपनीयता प्रबंधित करें</span>
+                  <span className="text-[13px] font-extrabold text-text-primary block">Privacy Settings</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">Manage profile privacy</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-gray-300" />
             </button>
 
-            {/* Action: अवरुद्ध सदस्य */}
+            {/* Action: Blocked Users */}
             <button 
               onClick={() => setShowBlockedModal(true)}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors text-left"
@@ -356,14 +369,14 @@ const MyProfilePage = () => {
                   <span className="text-base">🚫</span>
                 </div>
                 <div>
-                  <span className="text-[13px] font-extrabold text-text-primary block">अवरुद्ध सदस्य (Blocked Users)</span>
-                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">ब्लॉक किए गए सदस्यों की सूची</span>
+                  <span className="text-[13px] font-extrabold text-text-primary block">Blocked Users</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">List of blocked members</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-gray-300" />
             </button>
 
-            {/* Action 6: लॉगआउट */}
+            {/* Action 6: Logout */}
             <button 
               onClick={() => {
                 logoutUser();
@@ -376,8 +389,8 @@ const MyProfilePage = () => {
                   <LogOut size={18} />
                 </div>
                 <div>
-                  <span className="text-[13px] font-extrabold text-red-500 block">लॉगआउट</span>
-                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">एप्लीकेशन से लॉगआउट करें</span>
+                  <span className="text-[13px] font-extrabold text-red-500 block">Logout</span>
+                  <span className="text-[9.5px] font-bold text-text-secondary mt-0.5 block leading-none">Logout from the application</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-gray-300 group-hover:text-red-300" />
@@ -390,33 +403,33 @@ const MyProfilePage = () => {
       {showSocialModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-card w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-4 animate-scale-up">
-            <h3 className="text-sm font-bold text-text-primary">सोशल मीडिया लिंक जोड़ें</h3>
+            <h3 className="text-sm font-bold text-text-primary">Add Social Media Links</h3>
             <div className="space-y-3">
               <div>
-                <label className="text-[10px] font-bold text-text-secondary uppercase">फेसबुक (Facebook)</label>
+                <label className="text-[10px] font-bold text-text-secondary uppercase">Facebook</label>
                 <input 
                   type="text" 
                   value={facebook}
                   onChange={(e) => setFacebook(e.target.value)}
-                  className="w-full mt-1 bg-surface border border-gray-150 rounded-xl px-4 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
+                  className="w-full mt-1 bg-surface border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-text-secondary uppercase">ट्विटर (Twitter)</label>
+                <label className="text-[10px] font-bold text-text-secondary uppercase">Twitter</label>
                 <input 
                   type="text" 
                   value={twitter}
                   onChange={(e) => setTwitter(e.target.value)}
-                  className="w-full mt-1 bg-surface border border-gray-150 rounded-xl px-4 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
+                  className="w-full mt-1 bg-surface border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-text-secondary uppercase">लिंक्डइन (LinkedIn)</label>
+                <label className="text-[10px] font-bold text-text-secondary uppercase">LinkedIn</label>
                 <input 
                   type="text" 
                   value={linkedin}
                   onChange={(e) => setLinkedin(e.target.value)}
-                  className="w-full mt-1 bg-surface border border-gray-150 rounded-xl px-4 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
+                  className="w-full mt-1 bg-surface border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
                 />
               </div>
             </div>
@@ -425,13 +438,13 @@ const MyProfilePage = () => {
                 onClick={() => setShowSocialModal(false)}
                 className="flex-1 py-3 border border-gray-200 text-text-primary rounded-2xl font-bold text-xs press-scale text-center hover:bg-gray-50"
               >
-                रद्द करें
+                Cancel
               </button>
               <button 
                 onClick={handleSaveSocials}
                 className="flex-1 py-3 bg-indigo-600 text-white rounded-2xl font-bold text-xs press-scale text-center hover:bg-indigo-700 shadow-md flex items-center justify-center gap-1.5"
               >
-                <Check size={14} /> सहेजें
+                <Check size={14} /> Save
               </button>
             </div>
           </div>
@@ -443,21 +456,21 @@ const MyProfilePage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-card w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-4 animate-scale-up max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b pb-2">
-              <h3 className="text-sm font-black text-text-primary">गोपनीयता सेटिंग्स (Privacy Settings)</h3>
+              <h3 className="text-sm font-black text-text-primary">Privacy Settings</h3>
               <button onClick={() => setShowPrivacyModal(false)} className="text-slate-400">✕</button>
             </div>
             
             <div className="space-y-4 pt-1">
               {/* Profile Type Toggle */}
               <div className="space-y-2">
-                <label className="text-[11px] font-black text-text-secondary uppercase block">प्रोफ़ाइल प्रकार (Profile Type)</label>
+                <label className="text-[11px] font-black text-text-secondary uppercase block">Profile Type</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setMyPrivacySetting('public')}
                     className={`py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 ${
                       myPrivacySetting === 'public'
-                        ? 'bg-indigo-605 border-indigo-605 text-white shadow-sm font-extrabold'
-                        : 'bg-white border-gray-150 text-slate-650'
+                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm font-bold'
+                        : 'bg-white border-gray-200 text-slate-600'
                     }`}
                   >
                     🔓 Public
@@ -466,8 +479,8 @@ const MyProfilePage = () => {
                     onClick={() => setMyPrivacySetting('private')}
                     className={`py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 ${
                       myPrivacySetting === 'private'
-                        ? 'bg-indigo-605 border-indigo-605 text-white shadow-sm font-extrabold'
-                        : 'bg-white border-gray-150 text-slate-650'
+                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm font-bold'
+                        : 'bg-white border-gray-200 text-slate-600'
                     }`}
                   >
                     🔒 Private
@@ -477,43 +490,43 @@ const MyProfilePage = () => {
 
               {/* Granular Option: Phone */}
               <div className="space-y-2">
-                <label className="text-[11px] font-black text-text-secondary uppercase">मोबाइल नंबर गोपनीयता (Mobile Visibility)</label>
+                <label className="text-[11px] font-black text-text-secondary uppercase">Mobile Visibility</label>
                 <select
                   value={myPhoneSetting}
                   onChange={(e) => setMyPhoneSetting(e.target.value)}
-                  className="w-full bg-surface border border-gray-150 rounded-xl px-3 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
+                  className="w-full bg-surface border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
                 >
-                  <option value="public">सभी को दिखाएं (Public)</option>
-                  <option value="followers">केवल फ़ॉलोअर्स को (Followers Only)</option>
-                  <option value="private">किसी को नहीं (Only Me)</option>
+                  <option value="public">Public</option>
+                  <option value="followers">Followers Only</option>
+                  <option value="private">Only Me</option>
                 </select>
               </div>
 
               {/* Granular Option: Email */}
               <div className="space-y-2">
-                <label className="text-[11px] font-black text-text-secondary uppercase">ईमेल गोपनीयता (Email Visibility)</label>
+                <label className="text-[11px] font-black text-text-secondary uppercase">Email Visibility</label>
                 <select
                   value={myEmailSetting}
                   onChange={(e) => setMyEmailSetting(e.target.value)}
-                  className="w-full bg-surface border border-gray-150 rounded-xl px-3 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
+                  className="w-full bg-surface border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
                 >
-                  <option value="public">सभी को दिखाएं (Public)</option>
-                  <option value="followers">केवल फ़ॉलोअर्स को (Followers Only)</option>
-                  <option value="private">किसी को नहीं (Only Me)</option>
+                  <option value="public">Public</option>
+                  <option value="followers">Followers Only</option>
+                  <option value="private">Only Me</option>
                 </select>
               </div>
 
               {/* Granular Option: Family Tree */}
               <div className="space-y-2">
-                <label className="text-[11px] font-black text-text-secondary uppercase">फैमिली ट्री गोपनीयता (Family Tree Visibility)</label>
+                <label className="text-[11px] font-black text-text-secondary uppercase">Family Tree Visibility</label>
                 <select
                   value={myFamilySetting}
                   onChange={(e) => setMyFamilySetting(e.target.value)}
-                  className="w-full bg-surface border border-gray-150 rounded-xl px-3 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
+                  className="w-full bg-surface border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-indigo-500"
                 >
-                  <option value="public">सभी को दिखाएं (Public)</option>
-                  <option value="followers">केवल फ़ॉलोअर्स को (Followers Only)</option>
-                  <option value="private">किसी को नहीं (Only Me)</option>
+                  <option value="public">Public</option>
+                  <option value="followers">Followers Only</option>
+                  <option value="private">Only Me</option>
                 </select>
               </div>
             </div>
@@ -523,13 +536,13 @@ const MyProfilePage = () => {
                 onClick={() => setShowPrivacyModal(false)}
                 className="flex-1 py-3 border border-gray-200 text-text-primary rounded-2xl font-bold text-xs press-scale text-center hover:bg-gray-50"
               >
-                रद्द करें
+                Cancel
               </button>
               <button 
                 onClick={handleSavePrivacy}
                 className="flex-1 py-3 bg-indigo-600 text-white rounded-2xl font-bold text-xs press-scale text-center hover:bg-indigo-700 shadow-md flex items-center justify-center gap-1.5"
               >
-                <Check size={14} /> सहेजें
+                <Check size={14} /> Save
               </button>
             </div>
           </div>
@@ -542,7 +555,7 @@ const MyProfilePage = () => {
           <div className="bg-card w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col max-h-[75vh] animate-scale-up">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100 shrink-0">
               <h3 className="text-sm font-black text-text-primary uppercase tracking-wide">
-                {membersListModalType === 'followers' ? 'अनुयायी (Followers)' : 'फॉलोइंग (Following)'}
+                {membersListModalType === 'followers' ? 'Followers' : 'Following'}
               </h3>
               <button 
                 onClick={() => setMembersListModalType(null)}
@@ -573,7 +586,7 @@ const MyProfilePage = () => {
                     ) : (
                       <button
                         onClick={() => unfollowUser(m.id)}
-                        className="px-3.5 py-1.5 bg-slate-200 text-slate-700 hover:bg-slate-300 rounded-xl text-[11px] font-extrabold press-scale"
+                        className="px-3.5 py-1.5 bg-slate-250 text-slate-700 hover:bg-slate-300 rounded-xl text-[11px] font-extrabold press-scale"
                       >
                         Unfollow
                       </button>
@@ -583,7 +596,7 @@ const MyProfilePage = () => {
               ) : (
                 <div className="text-center py-10 text-slate-400">
                   <p className="text-xs font-semibold">
-                    कोई {membersListModalType === 'followers' ? 'फॉलोअर' : 'फॉलोइंग'} नहीं है।
+                    No {membersListModalType === 'followers' ? 'followers' : 'following'} found.
                   </p>
                 </div>
               )}
@@ -598,7 +611,7 @@ const MyProfilePage = () => {
           <div className="bg-card w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col max-h-[75vh] animate-scale-up">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100 shrink-0">
               <h3 className="text-sm font-black text-text-primary uppercase tracking-wide">
-                अवरुद्ध सदस्य (Blocked Users)
+                Blocked Users
               </h3>
               <button 
                 onClick={() => setShowBlockedModal(false)}
@@ -630,7 +643,7 @@ const MyProfilePage = () => {
               ) : (
                 <div className="text-center py-10 text-slate-400">
                   <p className="text-xs font-semibold">
-                    कोई अवरुद्ध सदस्य नहीं है।
+                    No blocked users found.
                   </p>
                 </div>
               )}

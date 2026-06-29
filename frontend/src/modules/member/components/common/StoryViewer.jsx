@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart } from 'lucide-react';
+import { X, Heart, Send } from 'lucide-react';
 import { Avatar } from './Avatar';
+import { useData } from '../../context/DataProvider';
 
 const slideVariants = {
   enter: (direction) => ({
@@ -21,6 +22,9 @@ const slideVariants = {
 export const StoryViewer = ({ story, stories = [], onStoryChange, onClose }) => {
   const [progress, setProgress] = useState(0);
   const [likedStories, setLikedStories] = useState({});
+  const { sendChatMessage, getOrCreateChat } = useData();
+  const [replyText, setReplyText] = useState('');
+  const [showToast, setShowToast] = useState(false);
 
   const isCurrentStoryLiked = story ? !!likedStories[story.id] : false;
 
@@ -32,6 +36,24 @@ export const StoryViewer = ({ story, stories = [], onStoryChange, onClose }) => 
         [story.id]: !prev[story.id]
       }));
     }
+  };
+
+  const handleSendReply = () => {
+    const trimmed = replyText.trim();
+    if (!trimmed || !story) return;
+
+    const posterId = story.memberId;
+    if (posterId === 'me' || posterId === 'u1') {
+      setReplyText('');
+      return;
+    }
+
+    const resolvedChatId = getOrCreateChat(posterId);
+    sendChatMessage(resolvedChatId, `Replied to your story: "${trimmed}"`);
+    setReplyText('');
+
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2000);
   };
 
   // Grouping and index variables
@@ -233,21 +255,45 @@ export const StoryViewer = ({ story, stories = [], onStoryChange, onClose }) => 
                 <input 
                   type="text" 
                   placeholder="Reply to story..." 
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
                   className="flex-1 bg-black/40 backdrop-blur-md border border-white/20 rounded-full px-5 py-3 text-white placeholder-white/60 text-[14px] outline-none focus:bg-black/60 transition-colors"
                   onClick={(e) => e.stopPropagation()} // Prevent closing/advancing when typing
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleSendReply();
+                    }
+                  }}
                 />
-                <button 
-                  onClick={toggleLike}
-                  className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center press-scale shrink-0 active:scale-95 transition-all"
-                >
-                  <Heart 
-                    size={22} 
-                    className={isCurrentStoryLiked ? "text-rose-500 fill-rose-500" : "text-slate-500"} 
-                    fill={isCurrentStoryLiked ? "currentColor" : "none"} 
-                  />
-                </button>
+                {replyText.trim() ? (
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleSendReply(); }}
+                    className="w-12 h-12 rounded-full bg-indigo-650 text-white flex items-center justify-center press-scale shrink-0 active:scale-95 transition-all shadow-md"
+                  >
+                    <Send size={20} className="ml-0.5" />
+                  </button>
+                ) : (
+                  <button 
+                    onClick={toggleLike}
+                    className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center press-scale shrink-0 active:scale-95 transition-all"
+                  >
+                    <Heart 
+                      size={22} 
+                      className={isCurrentStoryLiked ? "text-rose-500 fill-rose-500" : "text-slate-500"} 
+                      fill={isCurrentStoryLiked ? "currentColor" : "none"} 
+                    />
+                  </button>
+                )}
               </div>
             </div>
+
+            {/* Float Sent Toast */}
+            {showToast && (
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/85 text-white font-black text-[12px] px-5 py-3.5 rounded-full shadow-2xl border border-white/10 z-[60] flex items-center gap-2 backdrop-blur-xs animate-fade-in select-none">
+                <span>Reply Sent! 💬</span>
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
 

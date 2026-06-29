@@ -311,8 +311,8 @@ const membershipRanks = {
 
 const MatrimonialHomePage = () => {
   const navigate = useNavigate();
-  const { currentUser, matrimonialProfiles, toggleMatrimonialInterest, handleMatrimonialInterestResponse } = useData();
-  const { shortlistedProfiles, toggleShortlist, isShortlisted } = useMatrimonial();
+  const { currentUser, matrimonialProfiles, toggleMatrimonialInterest, handleMatrimonialInterestResponse, updateProfile } = useData();
+  const { shortlistedProfiles, toggleShortlist, isShortlisted, searchFilters, setSearchFilters, recentlyViewedProfiles } = useMatrimonial();
 
   const receivedCount = matrimonialProfiles.filter(p => p.interests?.received && !p.interests?.accepted && p.id !== 'mt1').length;
   const acceptedCount = matrimonialProfiles.filter(p => p.interests?.accepted).length;
@@ -340,10 +340,10 @@ const MatrimonialHomePage = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [myPhotosCount, setMyPhotosCount] = useState(3);
-  const [myMatrimonialBio, setMyMatrimonialBio] = useState("Hi, I am Rajesh Agrawal. I work as a Senior software developer in Indore. Looking for a progressive, family-oriented partner who shares similar values and interest in traveling.");
-  const [myGotra, setMyGotra] = useState("Garg");
-  const [myDiet, setMyDiet] = useState("Vegetarian");
-  const [myIncome, setMyIncome] = useState("₹10-15 Lacs p.a");
+  const [myMatrimonialBio, setMyMatrimonialBio] = useState(currentUser?.matrimonialBio || "Hi, I am Rajesh Agrawal. I work as a Senior software developer in Indore. Looking for a progressive, family-oriented partner who shares similar values and interest in traveling.");
+  const [myGotra, setMyGotra] = useState(currentUser?.gotra || "Garg");
+  const [myDiet, setMyDiet] = useState(currentUser?.diet || "Vegetarian");
+  const [myIncome, setMyIncome] = useState(currentUser?.income || "₹10-15 Lacs p.a");
   const [activePickerSheet, setActivePickerSheet] = useState(null); // null | 'gotra' | 'diet' | 'income' | 'partner-gotra' | 'partner-diet'
 
   // User's own membership level (Can be switched dynamically for testing)
@@ -373,6 +373,32 @@ const MatrimonialHomePage = () => {
     setTimeout(() => setToastMessage(''), 2500);
   };
 
+  // Sync state with currentUser changes
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.matrimonialBio) setMyMatrimonialBio(currentUser.matrimonialBio);
+      if (currentUser.gotra) setMyGotra(currentUser.gotra);
+      if (currentUser.diet) setMyDiet(currentUser.diet);
+      if (currentUser.income) setMyIncome(currentUser.income);
+    }
+  }, [currentUser]);
+
+  // Handle Search Filters from Search Page
+  useEffect(() => {
+    if (searchFilters) {
+      if (searchFilters.minAge && searchFilters.maxAge) {
+        setAgeRange({ min: searchFilters.minAge, max: searchFilters.maxAge });
+      }
+      if (searchFilters.gotra) {
+        setSelectedGotra(searchFilters.gotra);
+      }
+      if (searchFilters.diet) {
+        setSelectedDiet(searchFilters.diet);
+      }
+      setSearchFilters(null); // Reset after applying
+    }
+  }, [searchFilters, setSearchFilters]);
+
   const handleInterest = (profileId) => {
     toggleMatrimonialInterest(profileId);
     showToast('Interest Request Sent Successfully! 💕');
@@ -388,9 +414,17 @@ const MatrimonialHomePage = () => {
     showToast('Profile Hidden/Ignored');
   };
 
-  // Filter logic on dummy matrimonial feed
+  // Filter logic on dynamic matrimonial feed
   const filteredFeed = useMemo(() => {
-    return dummyMatrimonialFeed.filter(profile => {
+    return matrimonialProfiles.map(profile => {
+      // Normalize fields to ensure full compatibility with render layouts
+      return {
+        ...profile,
+        income: profile.annualIncome || profile.income || 'Not specified',
+        activeStatus: profile.online ? 'Online Now' : (profile.lastActive || profile.activeStatus || 'Active Today'),
+        membershipTier: profile.membershipTier || (profile.premiumStatus ? 'Pro Max' : 'Normal')
+      };
+    }).filter(profile => {
       // 1. Exclude ignored profiles
       if (ignoredIds.includes(profile.id)) return false;
 
@@ -399,15 +433,17 @@ const MatrimonialHomePage = () => {
         const query = searchText.toLowerCase();
         const matchesName = profile.name.toLowerCase().includes(query);
         const matchesCity = profile.city.toLowerCase().includes(query);
-        const matchesProfession = profile.profession.toLowerCase().includes(query);
-        const matchesGotra = profile.gotra.toLowerCase().includes(query);
+        const matchesProfession = profile.profession?.toLowerCase().includes(query);
+        const matchesGotra = profile.gotra?.toLowerCase().includes(query);
         if (!matchesName && !matchesCity && !matchesProfession && !matchesGotra) return false;
       }
 
       // 3. Quick Pills filter
-      if (activeFilterPill === 'verified' && profile.id === 'feed_khyati') return false; // mockup verified filtering
-      if (activeFilterPill === 'joined' && profile.age > 26) return false; // mockup just joined
-      if (activeFilterPill === 'nearby' && profile.city !== 'Indore') return false; // mockup nearby
+      if (activeFilterPill === 'verified' && !profile.verifiedStatus) return false;
+      if (activeFilterPill === 'joined' && !profile.isNew) return false;
+      
+      const userCity = currentUser?.city || 'Indore';
+      if (activeFilterPill === 'nearby' && profile.city !== userCity) return false;
 
       // 4. Advanced Filters
       if (profile.age < ageRange.min || profile.age > ageRange.max) return false;
@@ -416,7 +452,34 @@ const MatrimonialHomePage = () => {
 
       return true;
     });
-  }, [ignoredIds, activeFilterPill, searchText, ageRange, selectedGotra, selectedDiet]);
+  }, [matrimonialProfiles, ignoredIds, activeFilterPill, searchText, ageRange, selectedGotra, selectedDiet, currentUser]);
+
+  const dynamicVisitors = useMemo(() => {
+    return matrimonialProfiles.filter(p => p.id !== 'mt1').slice(0, 3).map((p, idx) => {
+      return {
+        ...p,
+        income: p.annualIncome || p.income || '₹8-10 Lacs p.a',
+        activeStatus: p.online ? 'Online Now' : (p.lastActive || 'Active Today'),
+        membershipTier: p.membershipTier || (p.premiumStatus ? 'Pro Max' : 'Normal'),
+        visitedDate: `${idx + 1} day${idx > 0 ? 's' : ''} ago`,
+        requiresUpgrade: idx % 2 === 0,
+        managedBy: ['Self', 'Parents', 'Sibling'][idx % 3]
+      };
+    });
+  }, [matrimonialProfiles]);
+
+  const dynamicVisited = useMemo(() => {
+    return recentlyViewedProfiles.map((p, idx) => {
+      return {
+        ...p,
+        income: p.annualIncome || p.income || '₹8-10 Lacs p.a',
+        activeStatus: p.online ? 'Online Now' : (p.lastActive || 'Active Today'),
+        membershipTier: p.membershipTier || (p.premiumStatus ? 'Pro Max' : 'Normal'),
+        visitedDate: `${idx + 1} day${idx > 0 ? 's' : ''} ago`,
+        managedBy: ['Self', 'Parents', 'Sibling'][idx % 3]
+      };
+    });
+  }, [recentlyViewedProfiles]);
 
   // Active bottom tab
   const [activeBottomTab, setActiveBottomTab] = useState('matches'); // 'matches' | 'activity' | 'messenger' | 'premium'
@@ -705,7 +768,7 @@ const MatrimonialHomePage = () => {
                             onClick={(e) => {
                               e.stopPropagation();
                               if (isConnected) {
-                                navigate(`/member/chat/${profile.id}`);
+                                navigate(`/member/matrimonial/chat/${profile.id}`);
                               } else {
                                 showToast("Connection pending. You can message once they accept your interest!");
                               }
@@ -773,7 +836,7 @@ const MatrimonialHomePage = () => {
                 onClick={() => setCurrentSubView('visits')}
                 className="flex-1 bg-white rounded-2xl p-3.5 border border-slate-200/50 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-center cursor-pointer active:scale-95 transition-all"
               >
-                <span className="text-[26px] font-black text-indigo-600 block leading-none">{mockProfileVisitors.length}</span>
+                <span className="text-[26px] font-black text-indigo-600 block leading-none">{dynamicVisitors.length}</span>
                 <span className="text-[11.5px] font-bold text-slate-650 mt-1.5 block leading-tight">Profile<br/>Visits</span>
               </div>
 
@@ -895,7 +958,7 @@ const MatrimonialHomePage = () => {
 
                           {activityInterestTab === 'Accepted' && (
                             <button 
-                              onClick={() => navigate(`/member/chat/${item.id}`)}
+                              onClick={() => navigate(`/member/matrimonial/chat/${item.id}`)}
                               className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10.5px] font-extrabold px-4 py-1.5 rounded-lg active:scale-95 transition-transform flex items-center gap-1 shadow-sm"
                             >
                               <MessageCircle size={13} /> Chat
@@ -995,7 +1058,7 @@ const MatrimonialHomePage = () => {
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {visitsTab === 'visitors' ? (
               <div className="space-y-6">
-                {mockProfileVisitors.map((visitor) => (
+                {dynamicVisitors.map((visitor) => (
                   <div key={visitor.id} className="bg-white rounded-[32px] overflow-hidden border border-slate-200/40 shadow-md relative">
                     <div className="relative aspect-[3/4.5] overflow-hidden bg-slate-900 cursor-pointer flex flex-col justify-end" style={{ minHeight: '480px' }}>
                       {/* Photo base */}
@@ -1098,7 +1161,7 @@ const MatrimonialHomePage = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             if (!visitor.requiresUpgrade) {
-                              navigate(`/member/chat/${visitor.id}`);
+                              navigate(`/member/matrimonial/chat/${visitor.id}`);
                             } else {
                               showToast('Upgrade to chat with this profile!');
                             }
@@ -1117,91 +1180,99 @@ const MatrimonialHomePage = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                {mockProfilesIVisited.map((visited) => (
-                  <div key={visited.id} className="bg-white rounded-[32px] overflow-hidden border border-slate-200/40 shadow-md relative">
-                    <div className="relative aspect-[3/4.5] overflow-hidden bg-slate-900 cursor-pointer flex flex-col justify-end" style={{ minHeight: '480px' }}>
-                      
-                      {/* Dynamic background photo */}
-                      <img
-                        src={visited.avatar}
-                        alt={visited.name}
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
-                      
-                      <div className="absolute top-4 left-4 text-white text-[11.5px] font-extrabold tracking-wide text-left bg-black/30 backdrop-blur-xs px-2.5 py-1.5 rounded-lg z-10">
-                        Visited on {visited.visitedDate}
-                      </div>
+                {dynamicVisited.length > 0 ? (
+                  dynamicVisited.map((visited) => (
+                    <div key={visited.id} className="bg-white rounded-[32px] overflow-hidden border border-slate-200/40 shadow-md relative">
+                      <div className="relative aspect-[3/4.5] overflow-hidden bg-slate-900 cursor-pointer flex flex-col justify-end" style={{ minHeight: '480px' }}>
+                        
+                        {/* Dynamic background photo */}
+                        <img
+                          src={visited.avatar}
+                          alt={visited.name}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                        
+                        <div className="absolute top-4 left-4 text-white text-[11.5px] font-extrabold tracking-wide text-left bg-black/30 backdrop-blur-xs px-2.5 py-1.5 rounded-lg z-10">
+                          Visited on {visited.visitedDate}
+                        </div>
 
-                      {/* Top Right Photo Count Badge */}
-                      <div className="absolute top-4 right-4 bg-black/45 backdrop-blur-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 pointer-events-none z-10">
-                        <Image size={12} className="text-white" />
-                        <span className="text-[10px] font-black text-white">{visited.photoCount}</span>
-                      </div>
+                        {/* Top Right Photo Count Badge */}
+                        <div className="absolute top-4 right-4 bg-black/45 backdrop-blur-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 pointer-events-none z-10">
+                          <Image size={12} className="text-white" />
+                          <span className="text-[10px] font-black text-white">
+                            {visited.photos?.length || visited.photoCount || 1}
+                          </span>
+                        </div>
 
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent pt-36 pb-26 px-5 z-5" />
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent pt-36 pb-26 px-5 z-5" />
 
-                      {/* Text details */}
-                      <div className="relative z-10 px-5 pb-3 pointer-events-none">
-                        <span className="text-[11px] text-white/80 font-bold uppercase tracking-wider">
-                          {visited.activeStatus}
-                        </span>
-                        <h2 className="text-white text-[23px] font-black mt-1 leading-none">
-                          {visited.name}, {visited.age}
-                        </h2>
-                        <p className="text-white/80 text-[13px] font-bold mt-2 leading-none">
-                          {visited.height} · {visited.city} · {visited.community}
-                        </p>
-                        <p className="text-white/85 text-[12.5px] font-semibold mt-1.5 leading-none">
-                          {visited.profession} · {visited.income}
-                        </p>
-                        <p className="text-white/70 text-[12px] font-semibold mt-1.5 leading-none">
-                          {visited.education}
-                        </p>
-                      </div>
+                        {/* Text parameters on top of the image */}
+                        <div className="relative z-10 px-5 pb-3 pointer-events-none">
+                          <span className="text-[11.5px] text-white/80 font-bold uppercase tracking-wider">
+                            {visited.activeStatus}
+                          </span>
+                          <h2 className="text-white text-[23px] font-black mt-1 leading-none">
+                            {visited.name}, {visited.age}
+                          </h2>
+                          <p className="text-white/80 text-[13px] font-bold mt-2 leading-none">
+                            {visited.height} · {visited.city} · {visited.community}
+                          </p>
+                          <p className="text-white/85 text-[12.5px] font-semibold mt-1.5 leading-none">
+                            {visited.profession} · {visited.income}
+                          </p>
+                          <p className="text-white/70 text-[12px] font-semibold mt-1.5 leading-none">
+                            {visited.education}
+                          </p>
+                        </div>
 
-                      {/* Managed By Strip */}
-                      <div className="relative z-10 bg-black/35 backdrop-blur-xs py-2 px-5 text-center text-white/85 text-[11px] font-semibold italic border-y border-white/10 select-none pointer-events-none">
-                        Profile managed by {visited.managedBy}
-                      </div>
+                        {/* Managed By Strip */}
+                        <div className="relative z-10 bg-black/35 backdrop-blur-xs py-2 px-5 text-center text-white/85 text-[11px] font-semibold italic border-y border-white/10 select-none pointer-events-none">
+                          Profile managed by {visited.managedBy}
+                        </div>
 
-                      {/* Action Circular Buttons (Chat, Contact, Cancel) */}
-                      <div className="relative z-10 py-4 px-4 flex justify-around items-center select-none bg-transparent">
-                        {/* Chat */}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); navigate(`/member/chat/${visited.id}`); }}
-                          className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
-                        >
-                          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
-                            <MessageCircle size={20} />
-                          </div>
-                          <span className="text-[10px] font-bold text-white tracking-wide">Chat</span>
-                        </button>
+                        {/* Action Circular Buttons (Chat, Contact, Cancel) */}
+                        <div className="relative z-10 py-4 px-4 flex justify-around items-center select-none bg-transparent">
+                          {/* Chat */}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); navigate(`/member/matrimonial/chat/${visited.id}`); }}
+                            className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                          >
+                            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                              <MessageCircle size={20} />
+                            </div>
+                            <span className="text-[10px] font-bold text-white tracking-wide">Chat</span>
+                          </button>
 
-                        {/* Contact details */}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); showToast(`Opening contact phone for ${visited.name}`); }}
-                          className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
-                        >
-                          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
-                            <Phone size={20} />
-                          </div>
-                          <span className="text-[10px] font-bold text-white tracking-wide">Contact</span>
-                        </button>
+                          {/* Contact details */}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); showToast(`Opening contact phone for ${visited.name}`); }}
+                            className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                          >
+                            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                              <Phone size={20} />
+                            </div>
+                            <span className="text-[10px] font-bold text-white tracking-wide">Contact</span>
+                          </button>
 
-                        {/* Cancel visited */}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setCurrentSubView(null); }}
-                          className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
-                        >
-                          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
-                            <X size={20} />
-                          </div>
-                          <span className="text-[10px] font-bold text-white tracking-wide">Cancel</span>
-                        </button>
+                          {/* Cancel visited */}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setCurrentSubView(null); }}
+                            className="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                          >
+                            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-xs text-white hover:bg-black/50 transition-all">
+                              <X size={20} />
+                            </div>
+                            <span className="text-[10px] font-bold text-white tracking-wide">Cancel</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-16 text-slate-400 font-bold text-sm bg-white rounded-3xl border border-slate-200/50 p-6 shadow-sm">
+                    No recently viewed profiles.
                   </div>
-                ))}
+                )}
               </div>
             )}
           </div>
@@ -1421,15 +1492,15 @@ const MatrimonialHomePage = () => {
               {/* Horizontal Scroll list */}
               <div className="flex gap-4 overflow-x-auto scrollbar-hide py-2" data-swipe-block="true">
                 {[
-                  { name: 'S verma', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80' },
-                  { name: 'Rani', avatar: '' },
-                  { name: 'Jagriti Gupta', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80' },
-                  { name: 'Jaiswal Pragati', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80' },
-                  { name: 'Priyel Bhatnagar', avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=150&q=80' }
+                  { id: 's_verma', name: 'S verma', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80' },
+                  { id: 'rani', name: 'Rani', avatar: '' },
+                  { id: 'jagriti', name: 'Jagriti Gupta', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80' },
+                  { id: 'pragati', name: 'Jaiswal Pragati', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80' },
+                  { id: 'feed_priya', name: 'Priyel Bhatnagar', avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=150&q=80' }
                 ].map((user, idx) => (
                   <div 
                     key={idx} 
-                    onClick={() => navigate('/member/chat/feed_priya')}
+                    onClick={() => navigate(`/member/matrimonial/chat/${user.id}`)}
                     className="flex flex-col items-center gap-1.5 cursor-pointer shrink-0 active:scale-95 transition-transform"
                   >
                     <div className="w-13 h-13 rounded-full bg-slate-200 border-2 border-slate-100 flex items-center justify-center text-slate-500 relative shadow-sm">
@@ -1483,7 +1554,7 @@ const MatrimonialHomePage = () => {
                   ].map((conv) => (
                     <div
                       key={conv.id}
-                      onClick={() => navigate(`/member/chat/${conv.id}`)}
+                      onClick={() => navigate(`/member/matrimonial/chat/${conv.id}`)}
                       className="p-3.5 flex gap-3.5 items-center cursor-pointer hover:bg-slate-50/50 active:bg-slate-50 transition-colors first:rounded-t-3xl last:rounded-b-3xl"
                     >
                       <img src={conv.avatar} alt={conv.name} className="w-12 h-12 rounded-full object-cover border border-slate-100 shadow-xs" />
@@ -1530,7 +1601,7 @@ const MatrimonialHomePage = () => {
                     ].map((interest) => (
                       <div
                         key={interest.id}
-                        onClick={() => navigate('/member/chat/feed_priya')}
+                        onClick={() => navigate(`/member/matrimonial/chat/${interest.id}`)}
                         className="p-3.5 flex gap-3.5 items-center cursor-pointer hover:bg-slate-50/50 active:bg-slate-50 transition-colors first:rounded-t-3xl last:rounded-b-3xl"
                       >
                         <img src={interest.avatar} alt={interest.name} className="w-13 h-15 rounded-xl object-cover border border-slate-100 shadow-xs" />
@@ -1765,6 +1836,7 @@ const MatrimonialHomePage = () => {
               />
               <button 
                 onClick={() => {
+                  updateProfile({ matrimonialBio: myMatrimonialBio });
                   showToast('Matrimonial Bio Saved successfully! 💕');
                 }}
                 className="mt-3 w-full py-2.5 bg-rose-500 text-white rounded-xl text-[12px] font-black shadow-xs active:scale-95 transition-transform uppercase tracking-wider"
@@ -1901,7 +1973,7 @@ const MatrimonialHomePage = () => {
               {activePickerSheet === 'gotra' && ['Garg', 'Bansal', 'Mittal', 'Goyal', 'Jindal', 'Singhal', 'Kansal'].map(g => (
                 <button
                   key={g}
-                  onClick={() => { setMyGotra(g); setActivePickerSheet(null); showToast(`Selected Gotra: ${g}`); }}
+                  onClick={() => { setMyGotra(g); updateProfile({ gotra: g }); setActivePickerSheet(null); showToast(`Selected Gotra: ${g}`); }}
                   className={`w-full text-left px-4 py-3 rounded-xl text-[13.5px] font-extrabold transition-all border ${
                     myGotra === g ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-white border-slate-150 text-slate-650 hover:bg-slate-50'
                   }`}
@@ -1913,7 +1985,7 @@ const MatrimonialHomePage = () => {
               {activePickerSheet === 'diet' && ['Vegetarian', 'Non-Vegetarian', 'Eggetarian'].map(d => (
                 <button
                   key={d}
-                  onClick={() => { setMyDiet(d); setActivePickerSheet(null); showToast(`Selected Diet: ${d}`); }}
+                  onClick={() => { setMyDiet(d); updateProfile({ diet: d }); setActivePickerSheet(null); showToast(`Selected Diet: ${d}`); }}
                   className={`w-full text-left px-4 py-3 rounded-xl text-[13.5px] font-extrabold transition-all border ${
                     myDiet === d ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-white border-slate-150 text-slate-650 hover:bg-slate-50'
                   }`}
@@ -1925,7 +1997,7 @@ const MatrimonialHomePage = () => {
               {activePickerSheet === 'income' && ['₹5-7.5 Lacs p.a', '₹7.5-10 Lacs p.a', '₹10-15 Lacs p.a', '₹15-20 Lacs p.a', '₹20+ Lacs p.a'].map(inc => (
                 <button
                   key={inc}
-                  onClick={() => { setMyIncome(inc); setActivePickerSheet(null); showToast(`Selected Income: ${inc}`); }}
+                  onClick={() => { setMyIncome(inc); updateProfile({ income: inc }); setActivePickerSheet(null); showToast(`Selected Income: ${inc}`); }}
                   className={`w-full text-left px-4 py-3 rounded-xl text-[13.5px] font-extrabold transition-all border ${
                     myIncome === inc ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-white border-slate-150 text-slate-650 hover:bg-slate-50'
                   }`}

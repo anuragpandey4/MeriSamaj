@@ -26,6 +26,7 @@ export const MatrimonialProvider = () => {
   const [blockedIds, setBlockedIds] = useState(() => loadState('blocked', []));
   const [viewMode, setViewMode] = useState(() => loadState('viewMode', 'grid')); // 'grid' | 'list'
   const [activeDiscoveryTab, setActiveDiscoveryTab] = useState('daily');
+  const [searchFilters, setSearchFilters] = useState(null);
 
   // Persist to localStorage
   useEffect(() => { localStorage.setItem('merisamaj_matri_shortlisted', JSON.stringify(shortlistedIds)); }, [shortlistedIds]);
@@ -95,6 +96,8 @@ export const MatrimonialProvider = () => {
     isBlocked,
     toggleViewMode,
     setActiveDiscoveryTab,
+    searchFilters,
+    setSearchFilters,
   };
 
   return (
