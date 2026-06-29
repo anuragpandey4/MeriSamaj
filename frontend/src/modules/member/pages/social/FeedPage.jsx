@@ -542,20 +542,20 @@ const FeedPage = ({ isHub = false, feedType = 'city', searchQuery = '' }) => {
           </button>
         </div>
 
-        {/* ─── STORY RINGS (ACTIVE MEMBERS) ─── */}
-        <div className="pb-3 mb-1">
+        {/* ─── STORY CARDS (FACEBOOK STYLE) ─── */}
+        <div className="pb-3 mb-1 mt-2">
           <div 
             ref={storiesRef} 
-            className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-4.5 px-4.5"
+            className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-2 -mx-4.5 px-4.5"
             onTouchStart={(e) => e.stopPropagation()}
             onTouchMove={(e) => e.stopPropagation()}
             data-swipe-block="true"
           >
-            {/* Add/View Story Button (Current User) */}
+            {/* Create Story Card */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer"
+              className="relative w-[92px] h-[146px] rounded-xl shrink-0 cursor-pointer overflow-hidden border border-slate-200 bg-white shadow-sm flex flex-col"
               onClick={() => {
                 const myStories = stories.filter(s => s.memberId === 'me');
                 if (myStories.length > 0) {
@@ -565,44 +565,53 @@ const FeedPage = ({ isHub = false, feedType = 'city', searchQuery = '' }) => {
                 }
               }}
             >
-              <div className={`relative w-15 h-15 rounded-full p-[2px] ${(stories.filter(s => s.memberId === 'me').length > 0) ? 'bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500' : 'bg-slate-200'}`}>
-                <div className="w-full h-full rounded-full border-2 border-white bg-white overflow-hidden flex items-center justify-center shadow-inner">
-                  {currentUser?.avatar ? (
-                    <img src={currentUser.avatar} alt="Me" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full bg-brand-primary/10 flex items-center justify-center text-[18px] font-black text-brand-primary">
-                      {currentUser?.initials || 'ME'}
-                    </div>
-                  )}
-                </div>
-                <div 
-                  className="absolute bottom-0 right-0 w-5 h-5 bg-brand-primary rounded-full border-2 border-white flex items-center justify-center shadow-sm"
-                  onClick={(e) => {
+              <div className="h-[65%] w-full bg-slate-100 overflow-hidden">
+                {currentUser?.avatar ? (
+                  <img src={currentUser.avatar} alt="Me" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-brand-primary/10 flex items-center justify-center text-[28px] font-black text-brand-primary">
+                    {currentUser?.initials || 'ME'}
+                  </div>
+                )}
+              </div>
+              <div className="h-[35%] w-full relative flex items-end justify-center pb-2.5 bg-white">
+                <div className="absolute -top-4 w-8 h-8 bg-blue-500 rounded-full border-4 border-white flex items-center justify-center shadow-sm" onClick={(e) => {
                     e.stopPropagation();
                     navigate('/member/social/create', { state: { createStoryMode: true } });
-                  }}
-                >
-                  <PlusCircle size={11} className="text-white" strokeWidth={3} fill="currentColor" />
+                  }}>
+                  <PlusCircle size={18} className="text-white" strokeWidth={2.5} fill="currentColor" />
                 </div>
+                <span className="text-[11px] font-bold text-slate-800 tracking-tight">Create story</span>
               </div>
-              <span className="text-[10.5px] font-bold text-slate-400 truncate w-15 text-center">Your Story</span>
             </motion.div>
 
-            {stories.filter(s => s.memberId !== 'me').map((story, idx) => (
+            {/* Other User Stories */}
+            {stories
+              .filter(s => s.memberId !== 'me')
+              .filter((story, index, self) => index === self.findIndex((t) => t.memberId === story.memberId))
+              .map((story, idx) => (
               <motion.div 
                 key={story.id} 
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.04 }}
-                className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer animate-fade-in"
+                className="relative w-[92px] h-[146px] rounded-xl shrink-0 cursor-pointer overflow-hidden shadow-sm animate-fade-in group"
                 onClick={() => setActiveStory(story)}
               >
-                <div className="w-15 h-15 rounded-full p-[2px] bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500">
-                  <div className="w-full h-full rounded-full border-2 border-white bg-white overflow-hidden flex items-center justify-center shadow-inner">
-                    <Avatar initials={story.initials} avatar={story.avatar} size="sm" />
+                <img src={story.image || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600'} alt="Story" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/70 pointer-events-none" />
+                
+                {/* User Avatar Circle */}
+                <div className="absolute top-2.5 left-2.5 w-9 h-9 rounded-full p-[2px] bg-blue-500 z-10 shadow-sm">
+                  <div className="w-full h-full rounded-full border-2 border-white bg-white overflow-hidden flex items-center justify-center">
+                    <Avatar initials={story.initials} avatar={story.avatar} size="xs" />
                   </div>
                 </div>
-                <span className="text-[10.5px] font-bold text-slate-500 truncate w-15 text-center">{story.name.split(' ')[0]}</span>
+                
+                {/* User Name */}
+                <span className="absolute bottom-2.5 left-2.5 right-2 text-[11px] font-semibold text-white leading-tight drop-shadow-md z-10">
+                  {story.name}
+                </span>
               </motion.div>
             ))}
           </div>
