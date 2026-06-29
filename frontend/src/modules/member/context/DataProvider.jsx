@@ -873,6 +873,48 @@ export const DataProvider = ({ children }) => {
         });
       }, 1500);
     }
+    
+    // Simulate Reply for Matrimonial Chats
+    if (chatId.startsWith('matrimonial_')) {
+      setTimeout(() => {
+        const partnerId = chatId.replace('matrimonial_', '');
+        const autoText = [
+          'Thanks for messaging! I went through your profile and found it interesting. 😊',
+          'Let me discuss this with my parents and get back to you soon. 🙏',
+          'Hi! Let us connect over a call sometime this weekend? 📞',
+          'Hi, nice to meet you. Would you like to share your horoscope first? ✨',
+          'Yes, absolutely. I am open to discussing further. 💍',
+        ][Math.floor(Math.random() * 5)];
+
+        const mockDict = {
+          'feed_priya': 'Priyel',
+          'feed_ruchi': 'Aakanksha',
+          's_verma': 'S verma',
+          'rani': 'Rani',
+          'jagriti': 'Jagriti',
+          'pragati': 'Pragati',
+          'txar8899': 'TXAR8899',
+          'aanchal': 'Aanchal'
+        };
+        const partnerName = mockDict[partnerId] || 'Partner';
+
+        const replyMsg = {
+          id: `m_${Date.now()}_reply`,
+          text: autoText,
+          timestamp: new Date().toISOString(),
+          senderId: partnerId,
+          senderName: partnerName
+        };
+
+        setChatMessages(current => {
+          const currentMsgs = current[chatId] || [];
+          return {
+            ...current,
+            [chatId]: [...currentMsgs, replyMsg]
+          };
+        });
+      }, 2000);
+    }
   };
 
   const addObituary = (obituary) => {
