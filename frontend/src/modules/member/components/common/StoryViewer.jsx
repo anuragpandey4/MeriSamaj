@@ -80,11 +80,16 @@ export const StoryViewer = ({ story, stories = [], onStoryChange, onClose }) => 
     setPrevStoryId(story.id);
   }
 
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Reset progress when story changes
+  useEffect(() => {
+    setProgress(0);
+  }, [story?.id]);
+
   // Auto advance timeline (5 seconds total)
   useEffect(() => {
-    if (!story) return;
-    
-    setProgress(0); // Reset progress when story opens
+    if (!story || isPaused) return;
 
     const duration = 5000;
     const interval = 50; // Update every 50ms
@@ -120,7 +125,7 @@ export const StoryViewer = ({ story, stories = [], onStoryChange, onClose }) => 
     }, interval);
 
     return () => clearInterval(timer);
-  }, [story?.id, activeStoryIndex, currentMemberIndex, onStoryChange, onClose]);
+  }, [story?.id, isPaused, activeStoryIndex, currentMemberIndex, onStoryChange, onClose]);
 
   if (!story) return null;
 
@@ -257,6 +262,8 @@ export const StoryViewer = ({ story, stories = [], onStoryChange, onClose }) => 
                   placeholder="Reply to story..." 
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
+                  onFocus={() => setIsPaused(true)}
+                  onBlur={() => setIsPaused(false)}
                   className="flex-1 bg-black/40 backdrop-blur-md border border-white/20 rounded-full px-5 py-3 text-white placeholder-white/60 text-[14px] outline-none focus:bg-black/60 transition-colors"
                   onClick={(e) => e.stopPropagation()} // Prevent closing/advancing when typing
                   onKeyDown={(e) => {
