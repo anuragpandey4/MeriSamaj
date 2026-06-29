@@ -1,12 +1,14 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Users, Heart, BookOpen, User, Settings, LogOut } from 'lucide-react';
+import { useData } from '../../context/DataProvider';
 
 const tabPaths = ['/member/home', '/member/social', '/member/matrimonial', '/member/directory', '/member/profile'];
 const hiddenPaths = ['/member/events', '/member/groups', '/member/notifications', '/member/splash', '/member/login', '/member/setup-profile', '/member/select-community', '/member/verify-otp'];
 
 export const SideNav = () => {
   const location = useLocation();
+  const { logoutUser } = useData();
   
   const shouldHide = hiddenPaths.some(p => location.pathname.startsWith(p));
   const pathSegments = location.pathname.split('/').filter(Boolean);
@@ -67,6 +69,7 @@ export const SideNav = () => {
           <span className="text-base font-medium">Settings</span>
         </NavLink>
         <button 
+          onClick={logoutUser}
           className="w-full flex items-center px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl transition-all mt-1"
         >
           <LogOut size={20} className="mr-3" />

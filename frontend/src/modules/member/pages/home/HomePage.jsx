@@ -10,8 +10,7 @@ import { t } from '../../utils/translations';
 import { StoryViewer } from '../../components/common/StoryViewer';
 import { CityLandscape } from '../../components/common/CityLandscape';
 import { mockAdmins as mockAdminsRaw } from '../../data/mockUsers';
-
-
+import { mockSuccessStories } from '../../data/mockMatrimonial';
 
 const announcements = [
   { id: 1, image: '/images/banners/mahotsav.png', link: '/member/events' },
@@ -32,30 +31,6 @@ const quickActions = [
   { icon: Vote, label: 'Voting', path: '/member/voting', bg: 'bg-purple-50', text: 'text-purple-600', desc: 'Community Polls', span: 'col-span-1' },
   { icon: OmIcon, label: 'Shraddhanjali', path: '/member/shradhanjali', bg: 'bg-orange-100 bg-[linear-gradient(to_right,#fdba74_1px,transparent_1px),linear-gradient(to_bottom,#fdba74_1px,transparent_1px)] [background-size:14px_14px]', text: 'text-orange-600', desc: 'Om Shanti & Condolences', span: 'col-span-2' },
   { icon: HeartHandshake, label: 'Donation', path: '/member/donation', bg: 'bg-rose-50', text: 'text-rose-600', desc: 'Contribute to Samaj', span: 'col-span-2' },
-];
-
-const mockSuccessStories = [
-  {
-    id: 1,
-    names: 'Rahul & Priya',
-    date: 'Dec 12, 2025',
-    image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=600&auto=format&fit=crop',
-    quote: 'We found our perfect match within our Samaj. Thank you MeriSamaj Matrimony!'
-  },
-  {
-    id: 2,
-    names: 'Amit & Neha',
-    date: 'Jan 05, 2026',
-    image: 'https://images.unsplash.com/photo-1621801306185-3e2840134444?q=80&w=600&auto=format&fit=crop',
-    quote: 'A wonderful platform that honors our traditions and connects families.'
-  },
-  {
-    id: 3,
-    names: 'Vikram & Anjali',
-    date: 'Feb 18, 2026',
-    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=600&auto=format&fit=crop',
-    quote: 'From matching profiles to matching hearts. A blessed journey.'
-  }
 ];
 
 const HomePage = () => {
@@ -119,7 +94,7 @@ const HomePage = () => {
 
         {/* Floating Navbar */}
         <div className="relative z-10 px-5 pt-6 pb-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 cursor-pointer press-scale" onClick={() => navigate('/member/settings')}>
             <div className="w-[44px] h-[44px] rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center text-[18px] font-serif shadow-lg border border-white/30">
               {currentUser.community.substring(0, 1)}
             </div>
@@ -148,15 +123,23 @@ const HomePage = () => {
         <div className="relative z-10 px-5 pt-10 pb-4 flex flex-col justify-end" />
       </div>
 
-      {/* User Welcome */}
-      <div className="px-5 pt-5 relative z-10">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-text-secondary font-medium">{t('Welcome back,', language)}</p>
-            <h1 className="text-[22px] font-extrabold text-text-primary tracking-tight mt-0.5">{currentUser.name}</h1>
-          </div>
-          <Avatar initials={currentUser.initials} src={currentUser.avatar} size="lg" color="bg-brand-primary/10 text-brand-primary border-2 border-brand-primary/20 text-md" />
+      {/* Spacer to maintain gap */}
+      <div className="h-4" />
+
+      {/* Events & Announcements Section Header */}
+      <div className="px-5 pb-3 relative z-10">
+        <div className="flex items-center gap-1.5 mb-1.5 animate-fade-in">
+          <span className="bg-indigo-50 border border-indigo-100 text-indigo-750 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md flex items-center gap-1 shadow-2xs">
+            <Sparkles size={9} className="text-indigo-600 animate-pulse fill-indigo-250" />
+            Highlights
+          </span>
         </div>
+        <h2 className="text-[16px] font-black text-slate-800 tracking-tight leading-tight">
+          Upcoming Events & Announcements
+        </h2>
+        <p className="text-[11.5px] text-slate-400 font-bold mt-1 leading-normal max-w-[320px]">
+          Stay connected with the latest happenings, festivals, and key updates of our community.
+        </p>
       </div>
 
       {/* ─── PREMIUM ANNOUNCEMENT CAROUSEL ─── */}
@@ -411,16 +394,16 @@ const HomePage = () => {
               onClick={() => navigate('/member/matrimonial')}
               className="snap-center shrink-0 w-[280px] h-[340px] rounded-[32px] relative overflow-hidden shadow-md active:scale-[0.98] transition-transform cursor-pointer"
             >
-              <img src={story.image} alt={story.names} className="absolute inset-0 w-full h-full object-cover" />
+              <img src={story.avatar} alt={story.groomName} className="absolute inset-0 w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
               
               <div className="absolute inset-0 p-5 flex flex-col justify-end">
                 <div className="bg-pink-500/90 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest inline-flex self-start mb-3 shadow-sm border border-pink-400/50">
                   {t('Met through Samaj Matrimony', language)}
                 </div>
-                <h4 className="text-white text-[22px] font-serif font-bold leading-tight drop-shadow-md">{story.names}</h4>
+                <h4 className="text-white text-[22px] font-serif font-bold leading-tight drop-shadow-md">{story.groomName}</h4>
                 <p className="text-white/80 text-[12px] font-medium mt-1 drop-shadow-sm flex items-center gap-1.5">
-                  <Heart size={12} className="text-pink-400" fill="currentColor" /> {t('Married on', language)} {story.date}
+                  <Heart size={12} className="text-pink-400" fill="currentColor" /> {t('Married in', language)} {story.marriageDate}
                 </p>
                 <div className="mt-4 pt-3 border-t border-white/20">
                   <p className="text-white/90 text-[13px] italic font-medium leading-snug drop-shadow-sm">
