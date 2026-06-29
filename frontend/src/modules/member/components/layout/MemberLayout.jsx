@@ -5,7 +5,7 @@ import { SideNav } from './SideNav';
 import { useData } from '../../context/DataProvider';
 import { 
   Home, Users, Heart, BookOpen, MessageCircle, User, Vote, 
-  HeartHandshake, Briefcase, Shield, X, LogOut, Award
+  HeartHandshake, Briefcase, Shield, X, LogOut, Award, Mail
 } from 'lucide-react';
 import { Avatar } from '../common/Avatar';
 
@@ -27,6 +27,7 @@ export const MemberLayout = () => {
     { name: 'Home', path: '/member/home', icon: Home },
     { name: 'Social Hub', path: '/member/social', icon: Users },
     { name: 'Matrimonial', path: '/member/matrimonial', icon: Heart },
+    { name: 'Nimantran (Invitations)', path: '/member/nimantran', icon: Mail },
     { name: 'Directory', path: '/member/directory', icon: BookOpen },
     { name: 'Chat Messenger', path: '/member/chat', icon: MessageCircle },
     { name: 'Voting / Polls', path: '/member/voting', icon: Vote },

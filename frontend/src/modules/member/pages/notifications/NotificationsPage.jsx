@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Megaphone, Heart, Calendar, Users, Check, Vote } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { Megaphone, Heart, Calendar, Users, Check, Vote, Mail, HeartHandshake, Flame } from 'lucide-react';
 import { PageHeader } from '../../components/layout/PageHeader';
-import { useData } from '../../context/DataProvider';
+import { useData, getNotificationModule } from '../../context/DataProvider';
 import { mockNotifications } from '../../data/mockEvents';
 
 const typeConfig = {
@@ -10,47 +11,102 @@ const typeConfig = {
   event: { icon: Calendar, color: 'bg-social-module/10 text-social-module' },
   community: { icon: Users, color: 'bg-emerald-100 text-emerald-600' },
   group: { icon: Users, color: 'bg-indigo-100 text-indigo-600' },
-  voting: { icon: Vote, color: 'bg-purple-100 text-purple-600' },
+  voting: { icon: Vote, color: 'bg-purple-100 text-purple-650' },
+  donation: { icon: HeartHandshake, color: 'bg-rose-100 text-rose-600' },
+  nimantran: { icon: Mail, color: 'bg-indigo-100 text-indigo-650' },
+  shradhanjali: { icon: Flame, color: 'bg-amber-100 text-amber-700' }
+};
+
+const moduleTitles = {
+  home: 'General Notifications',
+  matrimonial: 'Matrimonial Alerts',
+  nimantran: 'Nimantran Alerts',
+  chat: 'Chat Notifications',
+  donation: 'Donation Updates',
+  voting: 'Voting Updates',
+  shradhanjali: 'Shradhanjali Alerts',
+  community: 'Community Updates'
 };
 
 const NotificationsPage = () => {
   const { followedAnnouncements, toggleFollowedAnnouncement, notifications, markAllNotificationsRead, groups } = useData();
   const [showSettings, setShowSettings] = useState(false);
+  const [searchParams] = useSearchParams();
+  const activeModule = searchParams.get('module') || 'home';
 
   const markAllRead = () => {
-    markAllNotificationsRead();
+    markAllNotificationsRead(activeModule);
   };
 
-  // Filter notifications based on preferences
+  // Filter notifications based on preferences and active module
   const filteredNotifications = notifications.filter(n => {
+    const nModule = getNotificationModule(n.type);
+    if (nModule !== activeModule) return false;
+
     if (n.type === 'announcement') return followedAnnouncements?.announcements;
     if (n.type === 'matrimonial') return followedAnnouncements?.matrimonial;
     if (n.type === 'event') return followedAnnouncements?.events;
-    if (n.type === 'voting') return followedAnnouncements?.voting !== false; // default true
+    if (n.type === 'voting') return followedAnnouncements?.voting !== false;
     if (n.type === 'group') {
       const g = groups.find(group => group.id === n.groupId);
       return followedAnnouncements?.groups && (!g || !g.isMuted);
     }
+    if (n.type === 'nimantran' || n.type === 'invitation') return followedAnnouncements?.nimantran !== false;
+    if (n.type === 'donation') return followedAnnouncements?.donation !== false;
+    if (n.type === 'shradhanjali') return followedAnnouncements?.shradhanjali !== false;
+    if (['community', 'member', 'follow_request_sent', 'follow_accept'].includes(n.type)) return followedAnnouncements?.community !== false;
     return true;
   });
+
+  const modulePreferences = {
+    home: [
+      { key: 'announcements', label: 'Samaj Announcements' },
+      { key: 'events', label: 'Community Events' }
+    ],
+    matrimonial: [
+      { key: 'matrimonial', label: 'Matrimonial Alerts' }
+    ],
+    chat: [
+      { key: 'groups', label: 'Group & Chat Activity' }
+    ],
+    voting: [
+      { key: 'voting', label: 'Voting & Poll Alerts' }
+    ],
+    nimantran: [
+      { key: 'nimantran', label: 'Nimantran Alerts' }
+    ],
+    donation: [
+      { key: 'donation', label: 'Donation Updates' }
+    ],
+    shradhanjali: [
+      { key: 'shradhanjali', label: 'Shradhanjali Alerts' }
+    ],
+    community: [
+      { key: 'community', label: 'Community Updates' }
+    ]
+  };
+
+  const activePreferences = modulePreferences[activeModule] || [];
 
   return (
     <div className="min-h-screen bg-surface pb-28">
       <PageHeader
-        title="Notifications"
+        title={moduleTitles[activeModule] || 'General Notifications'}
         showBack={true}
         rightContent={
           <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setShowSettings(!showSettings)} 
-              className={`text-[12px] font-bold px-3 py-1.5 rounded-xl border transition-all press-scale ${
-                showSettings 
-                  ? 'bg-brand-primary/10 border-brand-primary text-brand-primary' 
-                  : 'bg-gray-50 border-gray-200 text-text-secondary'
-              }`}
-            >
-              Filters
-            </button>
+            {activePreferences.length > 0 && (
+              <button 
+                onClick={() => setShowSettings(!showSettings)} 
+                className={`text-[12px] font-bold px-3 py-1.5 rounded-xl border transition-all press-scale ${
+                  showSettings 
+                    ? 'bg-brand-primary/10 border-brand-primary text-brand-primary' 
+                    : 'bg-gray-50 border-gray-200 text-text-secondary'
+                }`}
+              >
+                Filters
+              </button>
+            )}
             <button onClick={markAllRead} className="text-[12px] text-brand-primary font-bold press-scale flex items-center gap-1">
               <Check size={14} /> Read all
             </button>
@@ -59,74 +115,24 @@ const NotificationsPage = () => {
       />
 
       <div className="pt-16">
-        {showSettings && (
+        {showSettings && activePreferences.length > 0 && (
           <div className="bg-white border border-gray-100 rounded-2xl mx-5 p-4 mb-4 shadow-sm animate-fade-in-down">
             <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-3">Subscription Preferences</h3>
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-text-primary">Samaj Announcements</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={followedAnnouncements?.announcements} 
-                    onChange={() => toggleFollowedAnnouncement('announcements')} 
-                    className="sr-only peer" 
-                  />
-                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-text-primary">Matrimonial Alerts</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={followedAnnouncements?.matrimonial} 
-                    onChange={() => toggleFollowedAnnouncement('matrimonial')} 
-                    className="sr-only peer" 
-                  />
-                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-text-primary">Community Events</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={followedAnnouncements?.events} 
-                    onChange={() => toggleFollowedAnnouncement('events')} 
-                    className="sr-only peer" 
-                  />
-                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-text-primary">Group Activity</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={followedAnnouncements?.groups} 
-                    onChange={() => toggleFollowedAnnouncement('groups')} 
-                    className="sr-only peer" 
-                  />
-                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-text-primary">Voting & Elections</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={followedAnnouncements?.voting !== false} 
-                    onChange={() => toggleFollowedAnnouncement('voting')} 
-                    className="sr-only peer" 
-                  />
-                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>
-                </label>
-              </div>
+              {activePreferences.map(pref => (
+                <div key={pref.key} className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-text-primary">{pref.label}</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={followedAnnouncements?.[pref.key] !== false} 
+                      onChange={() => toggleFollowedAnnouncement(pref.key)} 
+                      className="sr-only peer" 
+                    />
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>
+                  </label>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -138,7 +144,7 @@ const NotificationsPage = () => {
           </div>
         ) : (
           filteredNotifications.map((n, i) => {
-            const config = typeConfig[n.type] || typeConfig.community;
+            const config = typeConfig[n.type] || typeConfig.community || typeConfig.announcement;
             return (
               <div
                 key={n.id}

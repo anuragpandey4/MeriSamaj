@@ -592,8 +592,9 @@ const CreateShradhanjaliPage = () => {
         <input
           type="tel"
           value={form.familyContact}
-          onChange={e => set('familyContact', e.target.value)}
-          placeholder="+91 98765 43210"
+          onChange={e => set('familyContact', e.target.value.replace(/\D/g, '').slice(0, 10))}
+          placeholder="9876543210"
+          maxLength={10}
           className="w-full rounded-xl px-4 py-3 text-[15px] border outline-none bg-[#FAFAF8] transition-all"
           style={{ borderColor: '#E5E7EB' }}
         />

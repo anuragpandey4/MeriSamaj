@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useDraggableScroll } from '../../../../hooks/useDraggableScroll';
-import { Bell, Search, Calendar, Heart, Users, BookOpen, Briefcase, Vote, ChevronRight, MapPin, Shield, Crown, ImagePlus, ArrowRight, Plus, Sparkles, GraduationCap, HeartHandshake, Flame, User, Smile, Phone, MessageCircle, Clock, CalendarDays } from 'lucide-react';
+import { Bell, Search, Calendar, Heart, Users, BookOpen, Briefcase, Vote, ChevronRight, MapPin, Shield, Crown, ImagePlus, ArrowRight, Plus, Sparkles, GraduationCap, HeartHandshake, Flame, User, Smile, Phone, MessageCircle, Clock, CalendarDays, Mail, Home, Wallet } from 'lucide-react';
 import { Avatar } from '../../components/common/Avatar';
 import { Badge } from '../../components/common/Badge';
 import { useData } from '../../context/DataProvider';
@@ -29,13 +29,16 @@ const quickActions = [
   { icon: BookOpen, label: 'Directory', path: '/member/directory', bg: 'bg-emerald-50', text: 'text-emerald-600', desc: 'Browse Samaj Members', span: 'col-span-2' },
   { icon: Users, label: 'Groups', path: '/member/groups', bg: 'bg-blue-50', text: 'text-blue-600', desc: 'Discussions', span: 'col-span-1' },
   { icon: Vote, label: 'Voting', path: '/member/voting', bg: 'bg-purple-50', text: 'text-purple-600', desc: 'Community Polls', span: 'col-span-1' },
+  { icon: Home, label: 'Dharmashala', path: '/member/dharmashala', bg: 'bg-emerald-50', text: 'text-emerald-700', desc: 'Book Rooms', span: 'col-span-1' },
+  { icon: Wallet, label: 'Samaj Fund', path: '/member/fund', bg: 'bg-indigo-50', text: 'text-indigo-700', desc: 'Community Fund', span: 'col-span-1' },
+  { icon: Mail, label: 'Nimantran', path: '/member/nimantran', bg: 'bg-indigo-50', text: 'text-indigo-600', desc: 'Event Invitations', span: 'col-span-2' },
   { icon: OmIcon, label: 'Shraddhanjali', path: '/member/shradhanjali', bg: 'bg-orange-100 bg-[linear-gradient(to_right,#fdba74_1px,transparent_1px),linear-gradient(to_bottom,#fdba74_1px,transparent_1px)] [background-size:14px_14px]', text: 'text-orange-600', desc: 'Om Shanti & Condolences', span: 'col-span-2' },
   { icon: HeartHandshake, label: 'Donation', path: '/member/donation', bg: 'bg-rose-50', text: 'text-rose-600', desc: 'Contribute to Samaj', span: 'col-span-2' },
 ];
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { currentUser, members: mockMembers, admins: contextAdmins, posts: mockPosts, events: mockEvents, language, setLanguage, followedAnnouncements } = useData();
+  const { currentUser, members: mockMembers, admins: contextAdmins, posts: mockPosts, events: mockEvents, language, setLanguage, followedAnnouncements, getUnreadCountForModule } = useData();
   const mockAdmins = contextAdmins && contextAdmins.length > 0 ? contextAdmins : mockAdminsRaw;
   const [activeAnnouncementIndex, setActiveAnnouncementIndex] = useState(0);
   const carouselRef = useDraggableScroll();
@@ -61,7 +64,7 @@ const HomePage = () => {
     return () => clearInterval(interval);
   }, [displayAnnouncements]);
 
-  const unreadCount = 3;
+  const unreadCount = getUnreadCountForModule('home');
 
   const communityPosts = mockPosts.filter(p => p.community === currentUser.community || true).slice(0, 10);
 
@@ -110,7 +113,7 @@ const HomePage = () => {
             >
               {language === 'en' ? 'HI' : 'EN'}
             </button>
-            <button className="relative w-10 h-10 rounded-full bg-white/15 backdrop-blur-md shadow-sm border border-white/20 flex items-center justify-center press-scale" onClick={() => navigate('/member/notifications')}>
+            <button className="relative w-10 h-10 rounded-full bg-white/15 backdrop-blur-md shadow-sm border border-white/20 flex items-center justify-center press-scale" onClick={() => navigate('/member/notifications?module=home')}>
               <Bell size={20} className="text-white" />
               {unreadCount > 0 && (
                 <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white/40" />

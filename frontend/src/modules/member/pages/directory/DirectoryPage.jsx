@@ -21,7 +21,7 @@ import { useDraggableScroll } from '../../../../hooks/useDraggableScroll';
 
 const DirectoryPage = () => {
   const navigate = useNavigate();
-  const { setMobileMenuOpen } = useData();
+  const { setMobileMenuOpen, getUnreadCountForModule } = useData();
   const [searchQuery, setSearchQuery] = useState('');
   const scrollRef = useDraggableScroll();
 
@@ -61,9 +61,11 @@ const DirectoryPage = () => {
             <Users size={13} />
             मेरा परिवार
           </button>
-          <button className="p-1 press-scale relative">
+          <button onClick={() => navigate('/member/notifications?module=community')} className="p-1 press-scale relative">
             <Bell size={22} className="text-text-primary" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-600 rounded-full" />
+            {getUnreadCountForModule('community') > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-600 rounded-full" />
+            )}
           </button>
         </div>
       </div>

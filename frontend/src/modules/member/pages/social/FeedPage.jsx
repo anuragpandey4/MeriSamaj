@@ -417,7 +417,7 @@ const PostCard = ({ post, index, lang, onShareClick }) => {
 
 const FeedPage = ({ isHub = false, feedType = 'city', searchQuery = '' }) => {
   const navigate = useNavigate();
-  const { posts, members: mockMembers, currentUser, language, stories = [] } = useData();
+  const { posts, members: mockMembers, currentUser, language, stories = [], getUnreadCountForModule } = useData();
   const [activeTab, setActiveTab] = useState('all');
   const [searchText, setSearchText] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -493,11 +493,13 @@ const FeedPage = ({ isHub = false, feedType = 'city', searchQuery = '' }) => {
           <div className="flex items-center justify-between px-5 h-16">
             <h1 className="text-[20px] font-black text-slate-800 tracking-tight">Social Hub</h1>
             <div className="flex items-center gap-4">
-              <button onClick={() => navigate('/member/notifications')} className="relative text-slate-700 active:scale-95 transition-transform">
+              <button onClick={() => navigate('/member/notifications?module=community')} className="relative text-slate-700 active:scale-95 transition-transform">
                 <Bell size={22} />
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                  3
-                </span>
+                {getUnreadCountForModule('community') > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                    {getUnreadCountForModule('community')}
+                  </span>
+                )}
               </button>
               <div className="cursor-pointer active:scale-95 transition-transform" onClick={() => navigate('/member/profile')}>
                 <Avatar initials={currentUser?.initials || 'U'} size="sm" color="bg-blue-100 text-blue-700" />

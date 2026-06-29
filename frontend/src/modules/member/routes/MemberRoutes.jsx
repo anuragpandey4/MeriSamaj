@@ -67,6 +67,20 @@ import ShradhanjaliHomePage from '../pages/obituary/ShradhanjaliHomePage';
 import ShradhanjaliDetailPage from '../pages/obituary/ShradhanjaliDetailPage';
 import CreateShradhanjaliPage from '../pages/obituary/CreateShradhanjaliPage';
 
+// Dharmashala Booking Module
+import DharmashalaHomePage from '../pages/dharmashala/DharmashalaHomePage';
+import DharmashalaBookingPage from '../pages/dharmashala/DharmashalaBookingPage';
+import MyBookingsPage from '../pages/dharmashala/MyBookingsPage';
+
+// Samaj Fund Module
+import FundDashboardPage from '../pages/fund/FundDashboardPage';
+import IncomeSourcesPage from '../pages/fund/IncomeSourcesPage';
+import ExpenseDetailsPage from '../pages/fund/ExpenseDetailsPage';
+import MemberDuesListPage from '../pages/fund/MemberDuesListPage';
+import FundMemberProfilePage from '../pages/fund/FundMemberProfilePage';
+import FundHistoryPage from '../pages/fund/FundHistoryPage';
+import FundReportPage from '../pages/fund/FundReportPage';
+
 // Feature: Leadership
 import LeadershipPage from '../pages/leadership/LeadershipPage';
 
@@ -77,6 +91,11 @@ import { CensusPage } from '../pages/census/CensusPage';
 // import ChatListPage from '../pages/chat/ChatListPage';
 import ChatRouteWrapper from '../pages/chat/ChatRouteWrapper';
 import CallScreen from '../pages/chat/CallScreen';
+
+// Feature: Nimantran
+import NimantranHomePage from '../pages/nimantran/NimantranHomePage';
+import CreateNimantranPage from '../pages/nimantran/CreateNimantranPage';
+import NimantranDetailPage from '../pages/nimantran/NimantranDetailPage';
 
 export const MemberRoutes = () => {
   const location = useLocation();
@@ -165,6 +184,25 @@ export const MemberRoutes = () => {
           <Route path="shradhanjali" element={<AnimatedPage><ShradhanjaliHomePage /></AnimatedPage>} />
           <Route path="shradhanjali/create" element={<AnimatedPage><CreateShradhanjaliPage /></AnimatedPage>} />
           <Route path="shradhanjali/:id" element={<AnimatedPage><ShradhanjaliDetailPage /></AnimatedPage>} />
+
+          {/* Nimantran Module */}
+          <Route path="nimantran" element={<AnimatedPage><NimantranHomePage /></AnimatedPage>} />
+          <Route path="nimantran/create" element={<AnimatedPage><CreateNimantranPage /></AnimatedPage>} />
+          <Route path="nimantran/:id" element={<AnimatedPage><NimantranDetailPage /></AnimatedPage>} />
+
+          {/* Dharmashala Booking Module */}
+          <Route path="dharmashala" element={<AnimatedPage><DharmashalaHomePage /></AnimatedPage>} />
+          <Route path="dharmashala/bookings" element={<AnimatedPage><MyBookingsPage /></AnimatedPage>} />
+          <Route path="dharmashala/:id" element={<AnimatedPage><DharmashalaBookingPage /></AnimatedPage>} />
+
+          {/* Samaj Fund Module */}
+          <Route path="fund" element={<AnimatedPage><FundDashboardPage /></AnimatedPage>} />
+          <Route path="fund/income" element={<AnimatedPage><IncomeSourcesPage /></AnimatedPage>} />
+          <Route path="fund/expense" element={<AnimatedPage><ExpenseDetailsPage /></AnimatedPage>} />
+          <Route path="fund/dues" element={<AnimatedPage><MemberDuesListPage /></AnimatedPage>} />
+          <Route path="fund/member/:id" element={<AnimatedPage><FundMemberProfilePage /></AnimatedPage>} />
+          <Route path="fund/history" element={<AnimatedPage><FundHistoryPage /></AnimatedPage>} />
+          <Route path="fund/report" element={<AnimatedPage><FundReportPage /></AnimatedPage>} />
 
           {/* Catch-all for missing phase B pages */}
           <Route path="*" element={<div className="flex flex-col items-center justify-center min-h-[60vh]"><p className="text-gray-400 text-sm">Feature coming soon (Phase B)</p></div>} />

@@ -145,7 +145,7 @@ const DiscoverIcon = ({ size = 26, isActive }) => (
 const SocialHubPage = ({ initialTab = 'city-feed' }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentUser, setMobileMenuOpen } = useData();
+  const { currentUser, setMobileMenuOpen, getUnreadCountForModule } = useData();
   const [activeTab, setActiveTab] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -356,11 +356,13 @@ const SocialHubPage = ({ initialTab = 'city-feed' }) => {
                 <button className="text-text-primary" onClick={() => setIsSearchOpen(true)}>
                   <Search size={22} />
                 </button>
-                <button className="relative text-text-primary" onClick={() => navigate('/member/notifications')}>
+                <button className="relative text-text-primary" onClick={() => navigate('/member/notifications?module=community')}>
                   <Bell size={22} />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                    3
-                  </span>
+                  {getUnreadCountForModule('community') > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                      {getUnreadCountForModule('community')}
+                    </span>
+                  )}
                 </button>
                 <div className="cursor-pointer active:scale-95 transition-transform" onClick={() => navigate('/member/profile')}>
                   <Avatar initials={currentUser?.initials || 'U'} size="sm" color="bg-blue-100 text-blue-700" />

@@ -171,9 +171,10 @@ export const StoryViewer = ({ story, stories = [], onStoryChange, onClose }) => 
       <motion.div 
         drag="y"
         dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={{ top: 0.02, bottom: 0.8 }}
+        dragElastic={{ top: 0, bottom: 0.8 }}
         onDragEnd={(event, info) => {
-          if (info.offset.y > 100) {
+          // Close if dragged down past 100px OR if flicked down with speed
+          if (info.offset.y > 100 || (info.offset.y > 20 && info.velocity.y > 300)) {
             onClose();
           }
         }}

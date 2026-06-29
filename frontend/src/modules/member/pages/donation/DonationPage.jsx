@@ -19,7 +19,7 @@ import { donationGuidelines, topDonors, impactStats } from './mockDonationData';
 
 const DonationPage = () => {
   const navigate = useNavigate();
-  const { setMobileMenuOpen } = useData();
+  const { setMobileMenuOpen, getUnreadCountForModule } = useData();
   const { purposes } = useDonation();
 
   // Helper for purpose icons
@@ -56,9 +56,11 @@ const DonationPage = () => {
           >
             मेरे योगदान
           </button>
-          <button className="p-1 press-scale relative">
+          <button onClick={() => navigate('/member/notifications?module=donation')} className="p-1 press-scale relative">
             <Bell size={22} className="text-text-primary" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-purple-600 rounded-full" />
+            {getUnreadCountForModule('donation') > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-purple-650 rounded-full" />
+            )}
           </button>
         </div>
       </div>

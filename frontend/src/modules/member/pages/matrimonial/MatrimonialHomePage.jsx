@@ -311,7 +311,7 @@ const membershipRanks = {
 
 const MatrimonialHomePage = () => {
   const navigate = useNavigate();
-  const { currentUser, matrimonialProfiles, toggleMatrimonialInterest, handleMatrimonialInterestResponse, updateProfile } = useData();
+  const { currentUser, matrimonialProfiles, toggleMatrimonialInterest, handleMatrimonialInterestResponse, updateProfile, getUnreadCountForModule } = useData();
   const { shortlistedProfiles, toggleShortlist, isShortlisted, searchFilters, setSearchFilters, recentlyViewedProfiles } = useMatrimonial();
 
   const receivedCount = matrimonialProfiles.filter(p => p.interests?.received && !p.interests?.accepted && p.id !== 'mt1').length;
@@ -816,11 +816,13 @@ const MatrimonialHomePage = () => {
               <h1 className="text-[18px] font-black text-slate-800 tracking-tight leading-none">Activity</h1>
             </div>
             <div className="flex items-center gap-3">
-              <button className="text-slate-700 relative" onClick={() => navigate('/member/matrimonial/interests')}>
-                <Bell size={21} />
-                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border border-white">
-                  3
-                </span>
+              <button className="text-slate-700 relative" onClick={() => navigate('/member/notifications?module=matrimonial')}>
+                <Heart size={21} />
+                {getUnreadCountForModule('matrimonial') > 0 && (
+                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border border-white">
+                    {getUnreadCountForModule('matrimonial')}
+                  </span>
+                )}
               </button>
               <button className="text-slate-700" onClick={() => setIsSearchOpen(true)}>
                 <Search size={21} />
@@ -1457,11 +1459,13 @@ const MatrimonialHomePage = () => {
               <h1 className="text-[18px] font-black text-slate-800 tracking-tight leading-none">Messenger</h1>
             </div>
             <div className="flex items-center gap-3">
-              <button className="text-slate-700 relative" onClick={() => navigate('/member/matrimonial/interests')}>
-                <Bell size={21} />
-                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border border-white">
-                  3
-                </span>
+              <button className="text-slate-700 relative" onClick={() => navigate('/member/notifications?module=matrimonial')}>
+                <Heart size={21} />
+                {getUnreadCountForModule('matrimonial') > 0 && (
+                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border border-white">
+                    {getUnreadCountForModule('matrimonial')}
+                  </span>
+                )}
               </button>
               <button className="text-slate-700" onClick={() => setIsSearchOpen(true)}>
                 <Search size={21} />

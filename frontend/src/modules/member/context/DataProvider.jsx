@@ -7,6 +7,7 @@ import { mockEvents as initialEvents } from '../data/mockEvents';
 import { mockMatrimonialProfiles as initialMatrimonial } from '../data/mockMatrimonial';
 import { mockObituaries as initialObituaries } from '../data/mockObituaries';
 import { mockChats as initialChats, mockMessages as initialMessages } from '../data/mockChats';
+import { mockNimantran as initialNimantran } from '../data/mockNimantran';
 
 const getCommunitySurname = (community) => {
   if (!community) return 'Agrawal';
@@ -62,7 +63,22 @@ const initialNotifications = [
   { id: 'n5', type: 'announcement', title: 'Office Bearers Meeting', message: 'Monthly meeting scheduled for Sunday, 10 AM at Samaj Bhawan.', time: '1 day ago', isRead: true },
   { id: 'ng1', type: 'group', groupId: 'g1', groupName: 'Agrawal Youth Indore', title: 'New message in Agrawal Youth Indore', message: 'Vikas Jain: Has anyone got the details for the upcoming...', time: '12 min ago', isRead: false },
   { id: 'nv1', type: 'voting', title: 'समाज चुनाव शुरू हुआ', message: 'Samaj Head election voting has started. Cast your vote before Jul 20.', time: '2 hours ago', isRead: false },
+  { id: 'nd1', type: 'donation', title: 'योगदान प्राप्त हुआ', message: 'आपके ₹5,000 के योगदान की रसीद जेनरेट हो गई है।', time: '4 hours ago', isRead: false },
+  { id: 'nn1', type: 'nimantran', title: 'नया आमंत्रण', message: 'राकेश गुप्ता ने आपको गृह प्रवेश कार्यक्रम में आमंत्रित किया है।', time: '30 min ago', isRead: false },
+  { id: 'ns1', type: 'shradhanjali', title: 'श्रद्धांजलि सभा सूचना', message: 'स्व. रामप्रसाद जी की पगड़ी रस्म कल दोपहर 2 बजे रखी गई है।', time: '1 day ago', isRead: false }
 ];
+
+export const getNotificationModule = (type) => {
+  if (['announcement', 'event', 'system', 'global'].includes(type)) return 'home';
+  if (['matrimonial'].includes(type)) return 'matrimonial';
+  if (['nimantran', 'invitation'].includes(type)) return 'nimantran';
+  if (['chat', 'group', 'message'].includes(type)) return 'chat';
+  if (['donation'].includes(type)) return 'donation';
+  if (['voting'].includes(type)) return 'voting';
+  if (['shradhanjali'].includes(type)) return 'shradhanjali';
+  if (['community', 'member', 'follow_request_sent', 'follow_accept', 'follow_request'].includes(type)) return 'community';
+  return 'home';
+};
 
 const adaptGroups = (groupsList, community) => {
   const surname = getCommunitySurname(community);
@@ -369,6 +385,9 @@ export const DataProvider = ({ children }) => {
   const [blockedUsers, setBlockedUsers] = useState(() => loadState('blockedUsers', defaultBlockedUsers));
   const [granularPrivacy, setGranularPrivacy] = useState(() => loadState('granularPrivacy', defaultGranularPrivacy));
 
+  // Invitations State
+  const [invitations, setInvitations] = useState(() => loadState('invitations', initialNimantran));
+
   // Sync to localStorage when state changes
   useEffect(() => saveState('currentUser', currentUser), [currentUser]);
   useEffect(() => saveState('members', members), [members]);
@@ -393,6 +412,7 @@ export const DataProvider = ({ children }) => {
   useEffect(() => saveState('followRelations', followRelations), [followRelations]);
   useEffect(() => saveState('blockedUsers', blockedUsers), [blockedUsers]);
   useEffect(() => saveState('granularPrivacy', granularPrivacy), [granularPrivacy]);
+  useEffect(() => saveState('invitations', invitations), [invitations]);
 
   // Follow System Methods
   const sendFollowRequest = (targetUserId) => {
@@ -1233,8 +1253,19 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  const markAllNotificationsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+  const markAllNotificationsRead = (moduleName = null) => {
+    setNotifications(prev => prev.map(n => {
+      if (moduleName && getNotificationModule(n.type) !== moduleName) return n;
+      return { ...n, isRead: true };
+    }));
+  };
+
+  const getNotificationsForModule = (moduleName) => {
+    return adaptedNotificationsList.filter(n => getNotificationModule(n.type) === moduleName);
+  };
+
+  const getUnreadCountForModule = (moduleName) => {
+    return adaptedNotificationsList.filter(n => getNotificationModule(n.type) === moduleName && !n.isRead).length;
   };
 
   const clearChatMessages = (groupId) => {
@@ -1254,6 +1285,41 @@ export const DataProvider = ({ children }) => {
   const adaptedGroupsList = adaptGroups(groups, activeCommunity);
   const adaptedGroupMessagesMap = adaptGroupMessages(groupMessages, activeCommunity);
   const adaptedNotificationsList = adaptNotifications(notifications, activeCommunity);
+
+  const updateInvitationRSVP = (invitationId, status) => {
+    setInvitations(prev => prev.map(inv => {
+      if (inv.id === invitationId) {
+        const existingRSVP = inv.rsvps.find(r => r.memberId === currentUser.id);
+        if (existingRSVP) {
+          return {
+            ...inv,
+            rsvps: inv.rsvps.map(r => r.memberId === currentUser.id ? { ...r, status } : r)
+          };
+        } else {
+          return {
+            ...inv,
+            rsvps: [...inv.rsvps, { memberId: currentUser.id, status }]
+          };
+        }
+      }
+      return inv;
+    }));
+  };
+
+  const createInvitation = (invitationData) => {
+    const newInv = {
+      ...invitationData,
+      id: `nim${Date.now()}`,
+      creatorId: currentUser.id,
+      status: 'Pending',
+      rsvps: []
+    };
+    setInvitations(prev => [newInv, ...prev]);
+  };
+
+  const updateInvitationStatus = (invitationId, status) => {
+    setInvitations(prev => prev.map(inv => inv.id === invitationId ? { ...inv, status } : inv));
+  };
 
   const value = {
     currentUser,
@@ -1284,6 +1350,10 @@ export const DataProvider = ({ children }) => {
     chatMessages,
     getOrCreateChat,
     sendChatMessage,
+    invitations,
+    createInvitation,
+    updateInvitationRSVP,
+    updateInvitationStatus,
     obituaries,
     addObituary,
     toggleObituaryShraddhanjali,
@@ -1307,6 +1377,9 @@ export const DataProvider = ({ children }) => {
     sendGroupMessage,
     createGroup,
     markAllNotificationsRead,
+    getNotificationsForModule,
+    getUnreadCountForModule,
+    getNotificationModule,
     updateGroupDetails,
     reactToGroupMessage,
     clearChatMessages,
