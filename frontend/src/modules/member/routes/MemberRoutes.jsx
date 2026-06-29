@@ -19,6 +19,7 @@ import MyProfilePage from '../pages/profile/MyProfilePage';
 import EventsPage from '../pages/events/EventsPage';
 // import GroupsPage from '../pages/groups/GroupsPage';
 import NotificationsPage from '../pages/notifications/NotificationsPage';
+import SettingsPage from '../pages/settings/SettingsPage';
 
 // Detail Pages (Built in Phase A)
 import CreatePostPage from '../pages/social/CreatePostPage';
@@ -108,6 +109,7 @@ export const MemberRoutes = () => {
           <Route path="profile" element={<AnimatedPage><MyProfilePage /></AnimatedPage>} />
 
           {/* Sub Pages (bottom nav hidden via BottomNav logic) */}
+          <Route path="settings" element={<AnimatedPage><SettingsPage /></AnimatedPage>} />
           <Route path="events" element={<AnimatedPage><EventsPage /></AnimatedPage>} />
           <Route path="events/:eventId" element={<AnimatedPage><EventDetailPage /></AnimatedPage>} />
 

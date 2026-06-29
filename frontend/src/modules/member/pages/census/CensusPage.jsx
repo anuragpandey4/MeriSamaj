@@ -1300,7 +1300,8 @@ export const CensusPage = () => {
               {(currentView === 'males' ? filteredMales : filteredFemales).map(member => (
                 <div 
                   key={member.id}
-                  className="bg-white border border-gray-150/70 p-4 rounded-2xl shadow-sm/5 relative overflow-hidden flex items-center gap-3.5"
+                  className="bg-white border border-gray-150/70 p-4 rounded-2xl shadow-sm/5 relative overflow-hidden flex items-center gap-3.5 cursor-pointer hover:border-brand-primary/40 transition-colors"
+                  onClick={() => navigate('/member/directory/' + member.id)}
                 >
                   <div className="w-13 h-13 rounded-full bg-gray-50 border border-gray-100 overflow-hidden shrink-0 flex items-center justify-center relative shadow-inner">
                     <img src={`https://i.pravatar.cc/150?u=${member.id}`} className="w-full h-full object-cover" alt="" />
@@ -1326,7 +1327,7 @@ export const CensusPage = () => {
                     <a href={`tel:${member.phone}`} className="w-8 h-8 rounded-full border border-gray-200 shadow-sm flex items-center justify-center text-[#1e58b8] active:scale-90 transition-transform bg-white">
                       <Phone size={13} />
                     </a>
-                    <button onClick={() => navigate(`/member/chat/me`)} className="w-8 h-8 rounded-full border border-gray-200 shadow-sm flex items-center justify-center text-[#00a651] active:scale-90 transition-transform bg-white">
+                    <button onClick={(e) => { e.stopPropagation(); navigate(`/member/chat/${member.id}`); }} className="w-8 h-8 rounded-full border border-gray-200 shadow-sm flex items-center justify-center text-[#00a651] active:scale-90 transition-transform bg-white">
                       <MessageCircle size={13} />
                     </button>
                   </div>
@@ -1446,7 +1447,8 @@ export const CensusPage = () => {
               {filteredKids.map(member => (
                 <div 
                   key={member.id}
-                  className="bg-white border border-gray-150/70 p-4 rounded-2xl shadow-sm/5 relative overflow-hidden flex items-center gap-3.5"
+                  className="bg-white border border-gray-150/70 p-4 rounded-2xl shadow-sm/5 relative overflow-hidden flex items-center gap-3.5 cursor-pointer hover:border-emerald-500/40 transition-colors"
+                  onClick={() => navigate('/member/directory/' + member.id)}
                 >
                   <div className="w-13 h-13 rounded-full bg-emerald-50 border border-emerald-100 overflow-hidden shrink-0 flex items-center justify-center relative shadow-inner">
                     <img src={`https://i.pravatar.cc/100?u=${member.id}`} className="w-full h-full object-cover" alt="" />
