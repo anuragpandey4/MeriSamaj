@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, X, Eye, MessageCircle } from 'lucide-react';
+import { Plus, Search, X, Eye, MessageCircle, Bell } from 'lucide-react';
 import { useData } from '../../context/DataProvider';
 import { AnimatedPage } from '../../components/layout/AnimatedPage';
 
@@ -182,7 +182,7 @@ const MemorialCard = ({ obituary, index }) => {
 /* ─── Page ─── */
 const ShradhanjaliHomePage = () => {
   const navigate = useNavigate();
-  const { obituaries } = useData();
+  const { obituaries, getUnreadCountForModule } = useData();
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
   const [showSearch, setShowSearch] = useState(false);
@@ -254,7 +254,7 @@ const ShradhanjaliHomePage = () => {
             )}
           </AnimatePresence>
 
-          {/* Right: count badge + search toggle */}
+          {/* Right: count badge + bell + search toggle */}
           <div className="flex items-center gap-2 shrink-0">
             {!showSearch && filtered.length > 0 && (
               <span
@@ -264,6 +264,16 @@ const ShradhanjaliHomePage = () => {
                 {filtered.length}
               </span>
             )}
+            <button
+              onClick={() => navigate('/member/notifications?module=shradhanjali')}
+              className="p-2 rounded-full press-scale relative"
+              style={{ background: 'rgba(124,92,46,0.08)' }}
+            >
+              <Bell size={18} style={{ color: '#7C5C2E' }} />
+              {getUnreadCountForModule('shradhanjali') > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-rose-500 rounded-full" />
+              )}
+            </button>
             <button
               onClick={() => { setShowSearch(!showSearch); if (showSearch) setSearch(''); }}
               className="p-2 rounded-full press-scale"

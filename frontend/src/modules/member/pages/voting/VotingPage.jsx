@@ -17,7 +17,7 @@ import { votingInstructions, votingGuidelines, securityFeatures } from './mockVo
 
 const VotingPage = () => {
   const navigate = useNavigate();
-  const { setMobileMenuOpen } = useData();
+  const { setMobileMenuOpen, getUnreadCountForModule } = useData();
   const { elections, votedElections } = useVoting();
 
   const activeElections = elections.filter(e => e.status === 'Active');
@@ -42,9 +42,11 @@ const VotingPage = () => {
           </button>
           <h1 className="text-base font-bold text-text-primary">जय समाज</h1>
         </div>
-        <button className="p-1 press-scale relative">
+        <button onClick={() => navigate('/member/notifications?module=voting')} className="p-1 press-scale relative">
           <Bell size={22} className="text-text-primary" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-purple-600 rounded-full" />
+          {getUnreadCountForModule('voting') > 0 && (
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-purple-600 rounded-full" />
+          )}
         </button>
       </div>
 

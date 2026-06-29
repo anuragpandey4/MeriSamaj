@@ -28,7 +28,7 @@ const groupColors = {
 const GroupsPage = ({ isHub = false, triggerCreateGroup, onGroupCreateTriggered }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { groups, groupMessages, members, createGroup, toggleGroupMute, joinGroup } = useData();
+  const { groups, groupMessages, members, createGroup, toggleGroupMute, joinGroup, getUnreadCountForModule } = useData();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchText, setSearchText] = useState('');
   const [showAlertModal, setShowAlertModal] = useState(false);
@@ -132,9 +132,11 @@ const GroupsPage = ({ isHub = false, triggerCreateGroup, onGroupCreateTriggered 
             <Menu size={22} />
           </button>
           <h1 className="text-[17px] font-black text-slate-800 absolute left-1/2 -translate-x-1/2">Groups</h1>
-          <button className="p-1 -mr-1 text-slate-800 active:scale-95 transition-transform relative">
+          <button onClick={() => navigate('/member/notifications?module=chat')} className="p-1 -mr-1 text-slate-800 active:scale-95 transition-transform relative">
             <Bell size={22} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-primary rounded-full ring-2 ring-white" />
+            {getUnreadCountForModule('chat') > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-primary rounded-full ring-2 ring-white" />
+            )}
           </button>
         </div>
       )}

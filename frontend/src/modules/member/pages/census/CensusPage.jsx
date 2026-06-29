@@ -2035,10 +2035,11 @@ export const CensusPage = () => {
                       <label className="text-[10px] font-black text-gray-400 tracking-wider uppercase block mb-1">Phone (फ़ोन) *</label>
                       <input 
                         type="tel"
-                        placeholder="+91 98765..."
+                        placeholder="9876543210"
+                        maxLength={10}
                         required
                         value={updateForm.phone}
-                        onChange={e => setUpdateForm({...updateForm, phone: e.target.value})}
+                        onChange={e => setUpdateForm({...updateForm, phone: e.target.value.replace(/\D/g, '').slice(0, 10)})}
                         className="w-full bg-gray-50 border border-gray-150 rounded-xl p-2.5 text-[13.5px] font-extrabold outline-none text-gray-800"
                       />
                     </div>
