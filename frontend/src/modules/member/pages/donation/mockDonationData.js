@@ -63,11 +63,14 @@ export const donationGuidelines = [
 ];
 
 export const topDonors = [
-  { id: "td1", name: "राकेश शर्मा", amount: "₹25,000", initials: "RS" },
-  { id: "td2", name: "सुरेश यादव", amount: "₹21,000", initials: "SY" },
-  { id: "td3", name: "मनीष गुप्ता", amount: "₹15,500", initials: "MG" },
-  { id: "td4", name: "अजय सिंह", amount: "₹11,000", initials: "AS" },
-  { id: "td5", name: "विनोद कुमार", amount: "₹7,500", initials: "VK" }
+  { id: "td1", name: "राकेश शर्मा", amount: 25000, initials: "RS" },
+  { id: "td2", name: "सुरेश यादव", amount: 21000, initials: "SY" },
+  { id: "td3", name: "मनीष गुप्ता", amount: 15500, initials: "MG" },
+  { id: "td4", name: "अजय सिंह", amount: 11000, initials: "AS" },
+  { id: "td5", name: "विनोद कुमार", amount: 7500, initials: "VK" },
+  { id: "td6", name: "सुनीता अग्रवाल", amount: 5000, initials: "SA" },
+  { id: "td7", name: "पंकज जैन", amount: 3500, initials: "PJ" },
+  { id: "td8", name: "रोहित वर्मा", amount: 2100, initials: "RV" }
 ];
 
 export const impactStats = [
@@ -84,7 +87,8 @@ export const initialPurposes = [
     raised: 875000,
     target: 1500000,
     percentage: 58,
-    desc: "समाज के भव्य भवन और सभागार के निर्माण के लिए सहयोग राशि।"
+    desc: "समाज के भव्य भवन और सभागार के निर्माण के लिए सहयोग राशि।",
+    city: "Indore"
   },
   {
     id: "p2",
@@ -92,7 +96,8 @@ export const initialPurposes = [
     raised: 325000,
     target: 1000000,
     percentage: 32,
-    desc: "निर्धन एवं मेधावी छात्रों को उच्च शिक्षा एवं कोचिंग के लिए छात्रवृत्ति।"
+    desc: "निर्धन एवं मेधावी छात्रों को उच्च शिक्षा एवं कोचिंग के लिए छात्रवृत्ति।",
+    city: "Indore"
   },
   {
     id: "p3",
@@ -100,7 +105,8 @@ export const initialPurposes = [
     raised: 145000,
     target: 500000,
     percentage: 29,
-    desc: "निःशुल्क चिकित्सा जाँच, स्वास्थ्य परीक्षण एवं दवा वितरण शिविर।"
+    desc: "निःशुल्क चिकित्सा जाँच, स्वास्थ्य परीक्षण एवं दवा वितरण शिविर।",
+    city: "Bhopal"
   },
   {
     id: "p4",
@@ -108,9 +114,34 @@ export const initialPurposes = [
     raised: 210000,
     target: 700000,
     percentage: 30,
-    desc: "समाज की जरूरतमंद कन्याओं के विवाह में आर्थिक सहयोग एवं उपहार सामग्री।"
+    desc: "समाज की जरूरतमंद कन्याओं के विवाह में आर्थिक सहयोग एवं उपहार सामग्री।",
+    city: "Jaipur"
   }
 ];
+
+export const recentDonors = {
+  "p1": [
+    { id: "rd1", name: "अमित कुमार", amount: 5100, date: "2026-06-30T10:00:00Z", initials: "AK" },
+    { id: "rd2", name: "पूजा शर्मा", amount: 2100, date: "2026-06-29T14:30:00Z", initials: "PS" },
+    { id: "rd3", name: "विकास सिंह", amount: 11000, date: "2026-06-28T09:15:00Z", initials: "VS" },
+    { id: "rd4", name: "नेहा गुप्ता", amount: 1000, date: "2026-06-27T16:45:00Z", initials: "NG" },
+    { id: "rd5", name: "रवि पटेल", amount: 500, date: "2026-06-26T11:20:00Z", initials: "RP" }
+  ],
+  "p2": [
+    { id: "rd6", name: "सुनील यादव", amount: 2500, date: "2026-06-30T09:00:00Z", initials: "SY" },
+    { id: "rd7", name: "प्रिया जैन", amount: 5100, date: "2026-06-28T10:30:00Z", initials: "PJ" },
+    { id: "rd8", name: "संदीप वर्मा", amount: 1100, date: "2026-06-25T14:15:00Z", initials: "SV" }
+  ],
+  "p3": [
+    { id: "rd9", name: "डॉ. रमेश", amount: 11000, date: "2026-06-29T11:00:00Z", initials: "DR" },
+    { id: "rd10", name: "सविता चौहान", amount: 2100, date: "2026-06-27T13:45:00Z", initials: "SC" }
+  ],
+  "p4": [
+    { id: "rd11", name: "अंजलि राठौर", amount: 5000, date: "2026-06-30T08:30:00Z", initials: "AR" },
+    { id: "rd12", name: "कमलेश कुमार", amount: 2100, date: "2026-06-29T16:00:00Z", initials: "KK" },
+    { id: "rd13", name: "मनीषा पटेल", amount: 11000, date: "2026-06-28T12:00:00Z", initials: "MP" }
+  ]
+};
 
 export const initialDonationHistory = [
   {
