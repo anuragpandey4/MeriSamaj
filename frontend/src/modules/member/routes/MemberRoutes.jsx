@@ -45,6 +45,7 @@ import FamilyPage from '../pages/profile/FamilyPage';
 import VerifyMembershipPage from '../pages/profile/VerifyMembershipPage';
 import UpgradeMembershipPage from '../pages/profile/UpgradeMembershipPage';
 import ProfessionalDirectoryPage from '../pages/directory/ProfessionalDirectoryPage';
+import ProfessionalDetailPage from '../pages/directory/ProfessionalDetailPage';
 import ApplyProfessionalPage from '../pages/directory/ApplyProfessionalPage';
 import VotingPage from '../pages/voting/VotingPage';
 import PollDetailPage from '../pages/voting/PollDetailPage';
@@ -73,6 +74,8 @@ import DharmashalaBookingPage from '../pages/dharmashala/DharmashalaBookingPage'
 import MyBookingsPage from '../pages/dharmashala/MyBookingsPage';
 
 // Samaj Fund Module
+import FundListingPage from '../pages/fund/FundListingPage';
+import FundTotalReportPage from '../pages/fund/FundTotalReportPage';
 import FundDashboardPage from '../pages/fund/FundDashboardPage';
 import IncomeSourcesPage from '../pages/fund/IncomeSourcesPage';
 import ExpenseDetailsPage from '../pages/fund/ExpenseDetailsPage';
@@ -91,6 +94,7 @@ import { CensusPage } from '../pages/census/CensusPage';
 // import ChatListPage from '../pages/chat/ChatListPage';
 import ChatRouteWrapper from '../pages/chat/ChatRouteWrapper';
 import CallScreen from '../pages/chat/CallScreen';
+import ChatInfoPage from '../pages/chat/ChatInfoPage';
 
 // Feature: Nimantran
 import NimantranHomePage from '../pages/nimantran/NimantranHomePage';
@@ -150,6 +154,7 @@ export const MemberRoutes = () => {
           <Route path="profile/upgrade" element={<AnimatedPage><UpgradeMembershipPage /></AnimatedPage>} />
 
           <Route path="professional" element={<AnimatedPage><ProfessionalDirectoryPage /></AnimatedPage>} />
+          <Route path="professional/:id" element={<AnimatedPage><ProfessionalDetailPage /></AnimatedPage>} />
           <Route path="professional/apply" element={<AnimatedPage><ApplyProfessionalPage /></AnimatedPage>} />
 
           <Route path="voting" element={<VotingProvider />}>
@@ -175,6 +180,7 @@ export const MemberRoutes = () => {
           {/* Chat base route mapped to SocialHub */}
           <Route path="chat" element={<AnimatedPage><SocialHubPage initialTab="chat" /></AnimatedPage>} />
           <Route path="chat/:chatId" element={<AnimatedPage><ChatRouteWrapper /></AnimatedPage>} />
+          <Route path="chat/info/:chatId" element={<AnimatedPage><ChatInfoPage /></AnimatedPage>} />
           <Route path="chat/call/:chatId" element={<AnimatedPage><CallScreen /></AnimatedPage>} />
 
           <Route path="obituaries" element={<AnimatedPage><ObituaryPage /></AnimatedPage>} />
@@ -196,13 +202,15 @@ export const MemberRoutes = () => {
           <Route path="dharmashala/:id" element={<AnimatedPage><DharmashalaBookingPage /></AnimatedPage>} />
 
           {/* Samaj Fund Module */}
-          <Route path="fund" element={<AnimatedPage><FundDashboardPage /></AnimatedPage>} />
-          <Route path="fund/income" element={<AnimatedPage><IncomeSourcesPage /></AnimatedPage>} />
-          <Route path="fund/expense" element={<AnimatedPage><ExpenseDetailsPage /></AnimatedPage>} />
-          <Route path="fund/dues" element={<AnimatedPage><MemberDuesListPage /></AnimatedPage>} />
-          <Route path="fund/member/:id" element={<AnimatedPage><FundMemberProfilePage /></AnimatedPage>} />
-          <Route path="fund/history" element={<AnimatedPage><FundHistoryPage /></AnimatedPage>} />
-          <Route path="fund/report" element={<AnimatedPage><FundReportPage /></AnimatedPage>} />
+          <Route path="fund" element={<AnimatedPage><FundListingPage /></AnimatedPage>} />
+          <Route path="fund/total-report" element={<AnimatedPage><FundTotalReportPage /></AnimatedPage>} />
+          <Route path="fund/:fundId" element={<AnimatedPage><FundDashboardPage /></AnimatedPage>} />
+          <Route path="fund/:fundId/income" element={<AnimatedPage><IncomeSourcesPage /></AnimatedPage>} />
+          <Route path="fund/:fundId/expense" element={<AnimatedPage><ExpenseDetailsPage /></AnimatedPage>} />
+          <Route path="fund/:fundId/dues" element={<AnimatedPage><MemberDuesListPage /></AnimatedPage>} />
+          <Route path="fund/:fundId/member/:id" element={<AnimatedPage><FundMemberProfilePage /></AnimatedPage>} />
+          <Route path="fund/:fundId/history" element={<AnimatedPage><FundHistoryPage /></AnimatedPage>} />
+          <Route path="fund/:fundId/report" element={<AnimatedPage><FundReportPage /></AnimatedPage>} />
 
           {/* Catch-all for missing phase B pages */}
           <Route path="*" element={<div className="flex flex-col items-center justify-center min-h-[60vh]"><p className="text-gray-400 text-sm">Feature coming soon (Phase B)</p></div>} />

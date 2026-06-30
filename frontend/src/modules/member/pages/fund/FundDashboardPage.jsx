@@ -1,278 +1,606 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Info, PlusCircle, MinusCircle, FileText, UserMinus, X, CheckCircle2 } from 'lucide-react';
-import { mockFundData } from '../../data/mockFund';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ChevronLeft, Info, FileText, X, CheckCircle2, HeartHandshake, TrendingUp, Users, ShieldAlert, Wallet, QrCode, CreditCard, Landmark } from 'lucide-react';
+import { useFund } from '../../context/FundContext';
 
 export default function FundDashboardPage() {
+  const { fundId } = useParams();
   const navigate = useNavigate();
-  const [showIncomeModal, setShowIncomeModal] = useState(false);
-  const [showExpenseModal, setShowExpenseModal] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [showInfoModal, setShowInfoModal] = useState(false);
+  const { getFundById, getContributionsByFund, getExpensesByFund, currentUserId, isAdmin, makePayment } = useFund();
 
-  const percentage = Math.round((mockFundData.totalFund / mockFundData.targetFund) * 100);
-  const remaining = mockFundData.targetFund - mockFundData.totalFund;
-  const remainingPercentage = 100 - percentage;
+  const [showPayModal, setShowPayModal] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [payAmount, setPayAmount] = useState(0);
+
+  // Advanced Payment States
+  const [checkoutStep, setCheckoutStep] = useState('select-method'); // 'select-method' | 'processing' | 'success'
+  const [paymentMethod, setPaymentMethod] = useState(''); // 'upi' | 'card' | 'netbanking'
+  const [upiMethod, setUpiMethod] = useState('apps'); // 'apps' | 'id'
+  const [selectedUpiApp, setSelectedUpiApp] = useState('GPay');
+  const [upiId, setUpiId] = useState('');
+  
+  const [cardName, setCardName] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
+  
+  const [selectedBank, setSelectedBank] = useState('SBI');
+  const [isBankDropdownOpen, setIsBankDropdownOpen] = useState(false);
+
+  const banksList = [
+    { id: 'SBI', name: 'State Bank of India (SBI)' },
+    { id: 'HDFC', name: 'HDFC Bank' },
+    { id: 'ICICI', name: 'ICICI Bank' },
+    { id: 'AXIS', name: 'Axis Bank' },
+    { id: 'KOTAK', name: 'Kotak Mahindra Bank' }
+  ];
+
+  const formatCardNumber = (value) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    const matches = v.match(/\d{4,16}/g);
+    const match = (matches && matches[0]) || '';
+    const parts = [];
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4));
+    }
+    return parts.length > 0 ? parts.join(' ') : v;
+  };
+
+  const formatExpiry = (value) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    if (v.length >= 2) return `${v.slice(0, 2)}/${v.slice(2, 4)}`;
+    return v;
+  };
+
+  const fund = getFundById(fundId);
+  
+  if (!fund) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <h2 className="text-xl font-bold text-slate-800">Fund Not Found</h2>
+          <button onClick={() => navigate('/member/fund')} className="mt-4 text-indigo-600 font-bold">Go Back</button>
+        </div>
+      </div>
+    );
+  }
+
+  const fundContribs = getContributionsByFund(fundId);
+  const fundExpenses = getExpensesByFund(fundId);
+
+  // My Contribution
+  const myContrib = fundContribs.find(c => c.memberId === currentUserId) || { assignedAmount: 0, paidAmount: 0 };
+  const myDue = myContrib.assignedAmount - myContrib.paidAmount;
+  const isPaid = myContrib.paidAmount > 0 && myDue <= 0;
+
+  // Community Calculations
+  const totalMembers = fund.assignedMembers.length;
+  let targetCollection = 0;
+  let totalCollected = 0;
+  let fullyPaidMembers = 0;
+
+  fundContribs.forEach(c => {
+    targetCollection += c.assignedAmount || 0;
+    totalCollected += c.paidAmount || 0;
+    if (c.paidAmount >= c.assignedAmount) fullyPaidMembers++;
+  });
+  
+  const percentage = targetCollection > 0 ? Math.round((totalCollected / targetCollection) * 100) : 0;
+  const remaining = targetCollection - totalCollected;
+
+  // Financial Dashboard (Expenses)
+  const totalExpenses = fundExpenses.reduce((acc, curr) => acc + curr.amount, 0);
+  const availableBalance = totalCollected - totalExpenses;
+
+  const handlePayment = () => {
+    if (payAmount <= 0) return;
+    setCheckoutStep('processing');
+    setTimeout(() => {
+      makePayment(fundId, currentUserId, Number(payAmount));
+      setCheckoutStep('success');
+    }, 2000);
+  };
+
+  const openPaymentModal = () => {
+    setPayAmount(myDue);
+    setCheckoutStep('select-method');
+    setShowPayModal(true);
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans pb-10">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans pb-10 select-none">
       {/* Header */}
       <div className="bg-white border-b border-slate-100 px-4 h-14 flex items-center justify-between sticky top-0 z-30 shadow-sm shrink-0">
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => navigate('/member')} 
-            className="w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-700 transition-colors"
+            onClick={() => navigate(-1)} 
+            className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 active:scale-95 transition-transform"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={22} />
           </button>
-          <h1 className="text-[17px] font-bold text-slate-800">समाज फंड</h1>
+          <div className="flex flex-col">
+            <h1 className="text-[16px] font-black text-slate-800 leading-tight line-clamp-1 pr-2">{fund.name}</h1>
+            <p className="text-[10px] text-slate-500 font-bold leading-none uppercase tracking-wider">{fund.status}</p>
+          </div>
         </div>
-        <button 
-          onClick={() => setShowInfoModal(true)}
-          className="w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-700 transition-colors"
-        >
-          <Info size={20} />
-        </button>
       </div>
 
       <div className="p-4 space-y-4">
-        {/* Main Fund Banner */}
-        <div className="bg-indigo-700 rounded-[24px] p-5 text-center text-white shadow-md relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/4" />
-          <p className="text-[12px] font-medium text-indigo-100 mb-1 relative z-10">कुल उपलब्ध फंड</p>
-          <h2 className="text-3xl font-black relative z-10">₹ {mockFundData.totalFund.toLocaleString('en-IN')}</h2>
-          
-          <div className="flex bg-white rounded-2xl mt-5 shadow-sm overflow-hidden text-slate-800 divide-x divide-slate-100 relative z-10">
-            <div 
-              onClick={() => navigate('/member/fund/income')}
-              className="flex-1 py-3 px-2 text-center hover:bg-slate-50 cursor-pointer transition-colors"
-            >
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">इस माह आय</p>
-              <p className="text-[14px] font-black text-emerald-600">₹ {mockFundData.thisMonthIncome.toLocaleString('en-IN')}</p>
+        
+        {/* MY CONTRIBUTION WIDGET */}
+        {fund.assignedMembers.includes(currentUserId) && (
+          <div className="bg-white rounded-[24px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-slate-100 relative overflow-hidden">
+            <div className="flex items-center gap-2 mb-3">
+              <HeartHandshake size={18} className="text-indigo-600" />
+              <h3 className="font-black text-[15px] text-slate-800 tracking-tight">My Contribution</h3>
             </div>
-            <div 
-              onClick={() => navigate('/member/fund/expense')}
-              className="flex-1 py-3 px-2 text-center hover:bg-slate-50 cursor-pointer transition-colors"
-            >
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">इस माह व्यय</p>
-              <p className="text-[14px] font-black text-rose-600">₹ {mockFundData.thisMonthExpense.toLocaleString('en-IN')}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Fund Status (Donut Chart) */}
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm">
-          <h3 className="font-bold text-[15px] text-slate-800 mb-4">फंड स्थिति</h3>
-          
-          <div className="flex items-center gap-6">
-            {/* CSS Donut Chart */}
-            <div className="relative w-28 h-28 shrink-0">
-              <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
-                <circle cx="18" cy="18" r="15.91549430918954" fill="transparent" stroke="#f1f5f9" strokeWidth="4"></circle>
-                <circle 
-                  cx="18" cy="18" r="15.91549430918954" fill="transparent" 
-                  stroke="#10b981" strokeWidth="4" 
-                  strokeDasharray={`${percentage} ${100 - percentage}`} strokeDashoffset="0">
-                </circle>
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-[10px] font-bold text-slate-400 leading-tight">कुल लक्ष्य</span>
-                <span className="text-[13px] font-black text-slate-800 leading-tight">₹ 15L</span>
-              </div>
-            </div>
-
-            <div className="flex-1 space-y-3">
+            
+            <div className="flex items-end justify-between">
               <div>
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                  <p className="text-[11px] font-bold text-slate-600">अब तक प्राप्त</p>
+                <p className="text-[11px] font-bold text-slate-400 mb-0.5">Assigned Amount</p>
+                <p className="text-[18px] font-black text-slate-800 leading-none">₹{myContrib.assignedAmount.toLocaleString('en-IN')}</p>
+                
+                <div className="flex items-center gap-3 mt-3">
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Paid</p>
+                    <p className="text-[13px] font-black text-emerald-600">₹{myContrib.paidAmount.toLocaleString('en-IN')}</p>
+                  </div>
+                  <div className="w-px h-6 bg-slate-100" />
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Balance</p>
+                    <p className={`text-[13px] font-black ${myDue > 0 ? 'text-rose-600' : 'text-slate-800'}`}>₹{myDue.toLocaleString('en-IN')}</p>
+                  </div>
                 </div>
-                <p className="text-[13px] font-black text-slate-800 pl-4">₹ {mockFundData.totalFund.toLocaleString('en-IN')} <span className="text-slate-400 text-[11px] font-medium">({percentage}%)</span></p>
               </div>
               
-              <div>
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-200" />
-                  <p className="text-[11px] font-bold text-slate-600">अभी आवश्यकता</p>
+              {myDue > 0 ? (
+                <button 
+                  onClick={openPaymentModal}
+                  className="bg-indigo-600 text-white text-[13px] font-bold px-5 py-2.5 rounded-xl shadow-[0_4px_12px_rgba(79,70,229,0.3)] active:scale-95 transition-all"
+                >
+                  Pay Now
+                </button>
+              ) : (
+                <div className="bg-emerald-50 text-emerald-600 border border-emerald-100 px-4 py-2 rounded-xl flex items-center gap-1.5">
+                  <CheckCircle2 size={16} />
+                  <span className="text-[12px] font-bold">Paid</span>
                 </div>
-                <p className="text-[13px] font-black text-slate-800 pl-4">₹ {remaining.toLocaleString('en-IN')} <span className="text-slate-400 text-[11px] font-medium">({remainingPercentage}%)</span></p>
-              </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* COMMUNITY COLLECTION BANNER */}
+        <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-[24px] p-5 text-white shadow-md relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/4" />
+          <p className="text-[12px] font-medium text-indigo-100 mb-1 relative z-10">Community Collection</p>
+          <div className="flex items-end gap-2 relative z-10 mb-4">
+            <h2 className="text-3xl font-black leading-none">₹ {totalCollected.toLocaleString('en-IN')}</h2>
+            <span className="text-[12px] font-bold text-indigo-200 mb-1">/ ₹{targetCollection.toLocaleString('en-IN')}</span>
+          </div>
+          
+          <div className="relative z-10">
+            <div className="flex justify-between text-[11px] font-bold text-indigo-100 mb-1.5">
+              <span>Collection Progress</span>
+              <span>{percentage}%</span>
+            </div>
+            <div className="h-2 w-full bg-indigo-950/40 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-emerald-400 rounded-full transition-all duration-1000" 
+                style={{ width: `${percentage}%` }}
+              />
             </div>
           </div>
         </div>
 
-        {/* Quick Actions Grid */}
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm">
-          <h3 className="font-bold text-[15px] text-slate-800 mb-4">त्वरित कार्य</h3>
+        {/* FINANCIAL DASHBOARD */}
+        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] space-y-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Wallet size={18} className="text-slate-700" />
+            <h3 className="font-black text-[15px] text-slate-800 tracking-tight">Financial Dashboard</h3>
+          </div>
           
-          <div className="grid grid-cols-4 gap-3">
-            <button onClick={() => setShowIncomeModal(true)} className="flex flex-col items-center gap-2 group">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
-                <PlusCircle size={22} />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Total Expenses</p>
+              <p className="text-[15px] font-black text-rose-600">₹ {totalExpenses.toLocaleString('en-IN')}</p>
+            </div>
+            <div className="bg-emerald-50/50 p-3 rounded-2xl border border-emerald-100">
+              <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">Available Bal.</p>
+              <p className="text-[15px] font-black text-emerald-700">₹ {availableBalance.toLocaleString('en-IN')}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* QUICK STATS */}
+        <div className="grid grid-cols-2 gap-3">
+          <div 
+            onClick={() => navigate(`/member/fund/${fundId}/dues`)}
+            className="bg-white p-4 rounded-[20px] shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center cursor-pointer active:scale-95 transition-all"
+          >
+            <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-2">
+              <TrendingUp size={20} />
+            </div>
+            <h3 className="text-[16px] font-black text-slate-800">{fullyPaidMembers} / {totalMembers}</h3>
+            <p className="text-[10px] font-bold text-slate-400 mt-0.5">Fully Paid</p>
+          </div>
+          
+          <div 
+            onClick={() => navigate(`/member/fund/${fundId}/dues`)}
+            className="bg-white p-4 rounded-[20px] shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center cursor-pointer active:scale-95 transition-all"
+          >
+            <div className="w-10 h-10 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mb-2">
+              <ShieldAlert size={20} />
+            </div>
+            <h3 className="text-[16px] font-black text-slate-800">₹ {remaining.toLocaleString('en-IN')}</h3>
+            <p className="text-[10px] font-bold text-slate-400 mt-0.5">Pending Collection</p>
+          </div>
+        </div>
+
+        {/* NAVIGATIONS */}
+        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm mt-2">
+          <h3 className="font-bold text-[14px] text-slate-800 mb-4">Manage Fund</h3>
+          
+          <div className="grid grid-cols-3 gap-3">
+            <button onClick={() => navigate(`/member/fund/${fundId}/dues`)} className="flex flex-col items-center gap-2 group">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-100 active:scale-95 transition-all">
+                <Users size={22} />
               </div>
-              <span className="text-[10px] font-bold text-slate-600 text-center leading-tight">आय जोड़ें</span>
+              <span className="text-[10px] font-bold text-slate-600 text-center leading-tight">Members</span>
             </button>
-            <button onClick={() => setShowExpenseModal(true)} className="flex flex-col items-center gap-2 group">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
-                <MinusCircle size={22} />
-              </div>
-              <span className="text-[10px] font-bold text-slate-600 text-center leading-tight">व्यय जोड़ें</span>
-            </button>
-            <button onClick={() => navigate('/member/fund/report')} className="flex flex-col items-center gap-2 group">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
+            <button onClick={() => navigate(`/member/fund/${fundId}/expense`)} className="flex flex-col items-center gap-2 group">
+              <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:bg-rose-100 active:scale-95 transition-all">
                 <FileText size={22} />
               </div>
-              <span className="text-[10px] font-bold text-slate-600 text-center leading-tight">रिपोर्ट देखें</span>
+              <span className="text-[10px] font-bold text-slate-600 text-center leading-tight">Expenses</span>
             </button>
-            <button onClick={() => navigate('/member/fund/dues')} className="flex flex-col items-center gap-2 group">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
-                <UserMinus size={22} />
+            <button onClick={() => navigate(`/member/fund/${fundId}/report`)} className="flex flex-col items-center gap-2 group">
+              <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-600 flex items-center justify-center group-hover:bg-slate-100 active:scale-95 transition-all">
+                <Info size={22} />
               </div>
-              <span className="text-[10px] font-bold text-slate-600 text-center leading-tight">सदस्य बकाया</span>
+              <span className="text-[10px] font-bold text-slate-600 text-center leading-tight">Reports</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Add Income Modal */}
-      {showIncomeModal && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center p-4 sm:p-0">
-          <div className="bg-white w-full max-w-sm rounded-t-[32px] sm:rounded-[28px] overflow-hidden shadow-2xl animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
-            <div className="p-5 pb-0">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-[18px] font-black text-slate-800">आय जोड़ें</h3>
-                <button onClick={() => setShowIncomeModal(false)} className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"><X size={18} /></button>
-              </div>
-              
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="text-[12px] font-bold text-slate-500 mb-1 block">आय का स्रोत</label>
-                  <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] font-bold text-slate-800 outline-none">
-                    <option>दान (व्यक्तिगत)</option>
-                    <option>सदस्य वार्षिक शुल्क</option>
-                    <option>भवन किराया</option>
-                    <option>अन्य</option>
-                  </select>
+      {/* ─── CHECKOUT / PAYMENT FLOW MODAL ─── */}
+      {showPayModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-fade-in">
+          <div 
+            onClick={() => setIsBankDropdownOpen(false)}
+            className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-scale-up text-left max-h-[85vh]"
+          >
+            {/* Checkout Header */}
+            <div className="bg-indigo-50/50 px-5 py-4 border-b border-indigo-100/50 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center border border-indigo-200">
+                  <Wallet size={16} className="fill-indigo-600/10" />
                 </div>
                 <div>
-                  <label className="text-[12px] font-bold text-slate-500 mb-1 block">राशि (₹)</label>
-                  <input type="number" placeholder="0" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[16px] font-black text-emerald-600 outline-none" />
-                </div>
-                <div>
-                  <label className="text-[12px] font-bold text-slate-500 mb-1 block">विवरण</label>
-                  <input type="text" placeholder="विवरण दर्ज करें" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] font-medium text-slate-800 outline-none" />
+                  <h3 className="text-xs font-black text-indigo-950">Fund Contribution Pay</h3>
+                  <p className="text-[9px] font-bold text-slate-500 tracking-wide uppercase">Secure checkout</p>
                 </div>
               </div>
+              {checkoutStep !== 'processing' && (
+                <button 
+                  onClick={() => setShowPayModal(false)}
+                  className="p-1 hover:bg-slate-100 rounded-full text-slate-500"
+                >
+                  <X size={16} />
+                </button>
+              )}
             </div>
-            <div className="p-4 bg-white border-t border-slate-100">
-              <button 
-                onClick={() => { setShowIncomeModal(false); setShowSuccess('income'); }}
-                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] font-bold rounded-xl shadow-sm transition-all active:scale-95"
-              >
-                जमा करें
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Add Expense Modal */}
-      {showExpenseModal && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center p-4 sm:p-0">
-          <div className="bg-white w-full max-w-sm rounded-t-[32px] sm:rounded-[28px] overflow-hidden shadow-2xl animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
-            <div className="p-5 pb-0">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-[18px] font-black text-slate-800">व्यय जोड़ें</h3>
-                <button onClick={() => setShowExpenseModal(false)} className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"><X size={18} /></button>
-              </div>
+            {/* Checkout Body Content */}
+            <div className="flex-1 p-5 overflow-y-auto space-y-4">
               
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="text-[12px] font-bold text-slate-500 mb-1 block">व्यय की श्रेणी</label>
-                  <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] font-bold text-slate-800 outline-none">
-                    <option>धर्मशाला रखरखाव</option>
-                    <option>शैक्षिक सहायता</option>
-                    <option>समारोह एवं कार्यक्रम</option>
-                    <option>अन्य</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[12px] font-bold text-slate-500 mb-1 block">राशि (₹)</label>
-                  <input type="number" placeholder="0" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[16px] font-black text-rose-600 outline-none" />
-                </div>
-                <div>
-                  <label className="text-[12px] font-bold text-slate-500 mb-1 block">विवरण</label>
-                  <input type="text" placeholder="विवरण दर्ज करें" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] font-medium text-slate-800 outline-none" />
-                </div>
-              </div>
-            </div>
-            <div className="p-4 bg-white border-t border-slate-100">
-              <button 
-                onClick={() => { setShowExpenseModal(false); setShowSuccess('expense'); }}
-                className="w-full py-3.5 bg-rose-600 hover:bg-rose-700 text-white text-[14px] font-bold rounded-xl shadow-sm transition-all active:scale-95"
-              >
-                जमा करें
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              {checkoutStep === 'select-method' ? (
+                <>
+                  {/* Summary Box */}
+                  <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex justify-between items-center text-xs font-bold text-slate-800">
+                    <div className="text-left">
+                      <span className="text-[10px] text-slate-500 font-bold block">{fund.name}</span>
+                      <span className="text-indigo-950 text-sm mt-0.5 block">Amount Due: ₹{myDue.toLocaleString('en-IN')}</span>
+                    </div>
+                  </div>
 
-      {/* Success Popup */}
-      {showSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-xs rounded-[28px] overflow-hidden shadow-2xl scale-100 animate-in zoom-in-95 duration-200 text-center p-6 pt-8">
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${showSuccess === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
-              <CheckCircle2 size={32} />
-            </div>
-            <h3 className="text-xl font-black text-slate-800 mb-2">सफलतापूर्वक जोड़ा गया</h3>
-            <p className="text-[13px] text-slate-500 font-medium mb-6">
-              आपके द्वारा दर्ज की गई जानकारी सिस्टम में सफलतापूर्वक अपडेट कर दी गई है।
-            </p>
-            <button 
-              onClick={() => setShowSuccess(false)}
-              className="w-full py-3.5 text-[14px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-xl transition-colors"
-            >
-              ठीक है
-            </button>
-          </div>
-        </div>
-      )}
-      {/* Samaj Fund Information Modal */}
-      {showInfoModal && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center p-4 sm:p-0">
-          <div className="bg-white w-full max-w-sm rounded-t-[32px] sm:rounded-[28px] overflow-hidden shadow-2xl animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
-            <div className="p-5 pb-0">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[17px] font-black text-slate-800">समाज फंड विवरण</h3>
-                <button onClick={() => setShowInfoModal(false)} className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"><X size={18} /></button>
-              </div>
-              
-              <div className="space-y-4 text-[13px] text-slate-650 font-medium leading-relaxed mb-6 max-h-[300px] overflow-y-auto">
-                <p>
-                  <strong>समाज फंड (Community Fund)</strong> का मुख्य उद्देश्य समाज के विकास, जरूरतमंदों की मदद और सामाजिक परियोजनाओं के क्रियान्वयन के लिए आवश्यक वित्तीय संसाधन एकत्र करना है।
-                </p>
-                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
-                  <h4 className="font-bold text-slate-800 text-[12px] mb-1.5">फंड का मुख्य उपयोग:</h4>
-                  <ul className="list-disc pl-4 space-y-1">
-                    <li>धर्मशाला का समय पर रख-रखाव और मरम्मत।</li>
-                    <li>समाज के मेधावी व जरूरतमंद छात्रों के लिए छात्रवृत्ति।</li>
-                    <li>सामूहिक विवाह सम्मलेन एवं अन्य सामाजिक कार्यक्रम।</li>
-                    <li>चिकित्सा एवं आपातकालीन सहायता।</li>
-                  </ul>
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 mb-1 block uppercase tracking-wider">Amount to Pay (₹)</label>
+                    <input 
+                      type="number" 
+                      value={payAmount}
+                      onChange={(e) => setPayAmount(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-[14px] font-bold text-slate-800 outline-none focus:border-indigo-600 transition-colors"
+                    />
+                  </div>
+
+                  {/* Payment Channel Options */}
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider block text-left">Choose Payment Method</label>
+                    
+                    {/* Method 1: UPI */}
+                    <div 
+                      onClick={() => setPaymentMethod('upi')}
+                      className={`border rounded-2xl p-3 cursor-pointer transition-all flex items-start gap-3 text-left ${
+                        paymentMethod === 'upi' ? 'border-indigo-600 bg-indigo-50/10' : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <input 
+                        type="radio" 
+                        name="payment_method" 
+                        checked={paymentMethod === 'upi'}
+                        onChange={() => setPaymentMethod('upi')}
+                        className="mt-0.5 accent-indigo-600"
+                      />
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-extrabold text-slate-800">UPI (Google Pay, PhonePe, UPI ID)</span>
+                          <QrCode size={16} className="text-slate-400" />
+                        </div>
+                        
+                        {paymentMethod === 'upi' && (
+                          <div className="mt-3.5 space-y-3 pt-3.5 border-t border-slate-100 animate-fade-in-up">
+                            <div className="flex gap-2 text-[10px] font-bold">
+                              {['GPay', 'PhonePe', 'Paytm'].map((app) => (
+                                <button
+                                  key={app}
+                                  type="button"
+                                  onClick={(e) => { e.stopPropagation(); setUpiMethod('apps'); setSelectedUpiApp(app); }}
+                                  className={`flex-1 py-2 border rounded-xl transition-all ${
+                                    upiMethod === 'apps' && selectedUpiApp === app
+                                      ? 'border-indigo-600 bg-indigo-50/40 text-indigo-700 font-extrabold'
+                                      : 'border-slate-200 text-slate-500 hover:border-slate-300 font-bold'
+                                  }`}
+                                >
+                                  {app}
+                                </button>
+                              ))}
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setUpiMethod('id'); }}
+                                className={`flex-1 py-2 border rounded-xl transition-all ${
+                                  upiMethod === 'id'
+                                    ? 'border-indigo-600 bg-indigo-50/40 text-indigo-700 font-extrabold'
+                                    : 'border-slate-200 text-slate-500 hover:border-slate-300 font-bold'
+                                }`}
+                              >
+                                Enter UPI ID
+                              </button>
+                            </div>
+
+                            {upiMethod === 'id' && (
+                              <input 
+                                type="text"
+                                placeholder="example@upi"
+                                value={upiId}
+                                onClick={(e) => e.stopPropagation()}
+                                onChange={(e) => setUpiId(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-800 outline-none focus:border-indigo-600"
+                              />
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Method 2: Cards */}
+                    <div 
+                      onClick={() => setPaymentMethod('card')}
+                      className={`border rounded-2xl p-3 cursor-pointer transition-all flex items-start gap-3 text-left ${
+                        paymentMethod === 'card' ? 'border-indigo-600 bg-indigo-50/10' : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <input 
+                        type="radio" 
+                        name="payment_method" 
+                        checked={paymentMethod === 'card'}
+                        onChange={() => setPaymentMethod('card')}
+                        className="mt-0.5 accent-indigo-600"
+                      />
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-extrabold text-slate-800">Credit / Debit Card</span>
+                          <CreditCard size={16} className="text-slate-400" />
+                        </div>
+
+                        {paymentMethod === 'card' && (
+                          <div className="mt-3.5 space-y-3 pt-3.5 border-t border-slate-100 animate-fade-in-up text-left" onClick={(e) => e.stopPropagation()}>
+                            <div>
+                              <label className="text-[9px] font-bold text-slate-500 uppercase block mb-1">Card Holder Name</label>
+                              <input 
+                                type="text"
+                                placeholder="Enter holder name"
+                                value={cardName}
+                                onChange={(e) => setCardName(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-indigo-600"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[9px] font-bold text-slate-500 uppercase block mb-1">Card Number</label>
+                              <input 
+                                type="text"
+                                maxLength="19"
+                                placeholder="XXXX XXXX XXXX XXXX"
+                                value={cardNumber}
+                                onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-indigo-600"
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="text-[9px] font-bold text-slate-500 uppercase block mb-1">Expiry Date</label>
+                                <input 
+                                  type="text"
+                                  maxLength="5"
+                                  placeholder="MM/YY"
+                                  value={cardExpiry}
+                                  onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
+                                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-indigo-600"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[9px] font-bold text-slate-500 uppercase block mb-1">CVV</label>
+                                <input 
+                                  type="password"
+                                  maxLength="3"
+                                  placeholder="XXX"
+                                  value={cardCvv}
+                                  onChange={(e) => setCardCvv(e.target.value.replace(/[^0-9]/g, ''))}
+                                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-indigo-600"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Method 3: Netbanking */}
+                    <div 
+                      onClick={() => setPaymentMethod('netbanking')}
+                      className={`border rounded-2xl p-3 cursor-pointer transition-all flex items-start gap-3 text-left ${
+                        paymentMethod === 'netbanking' ? 'border-indigo-600 bg-indigo-50/10' : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <input 
+                        type="radio" 
+                        name="payment_method" 
+                        checked={paymentMethod === 'netbanking'}
+                        onChange={() => setPaymentMethod('netbanking')}
+                        className="mt-0.5 accent-indigo-600"
+                      />
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-extrabold text-slate-800">Net Banking</span>
+                          <Landmark size={16} className="text-slate-400" />
+                        </div>
+
+                        {paymentMethod === 'netbanking' && (
+                          <div className="mt-3.5 pt-3.5 border-t border-slate-100 animate-fade-in-up text-left" onClick={(e) => e.stopPropagation()}>
+                            <label className="text-[9px] font-bold text-slate-500 uppercase block mb-1">Select Bank</label>
+                            <div className="relative">
+                              <button 
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setIsBankDropdownOpen(!isBankDropdownOpen); }}
+                                className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-800 outline-none text-left flex justify-between items-center pr-8 font-bold focus:border-indigo-600 cursor-pointer"
+                              >
+                                <span>{banksList.find(b => b.id === selectedBank)?.name || selectedBank}</span>
+                                <span className="text-[8px] text-slate-500">▼</span>
+                              </button>
+
+                              {isBankDropdownOpen && (
+                                <div className="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 max-h-40 overflow-y-auto divide-y divide-slate-100 py-1">
+                                  {banksList.map((bank) => (
+                                    <div
+                                      key={bank.id}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedBank(bank.id);
+                                        setIsBankDropdownOpen(false);
+                                      }}
+                                      className={`px-3.5 py-2.5 text-xs font-semibold cursor-pointer hover:bg-indigo-50/50 transition-colors text-left ${
+                                        selectedBank === bank.id ? 'text-indigo-600 bg-indigo-50/20 font-bold' : 'text-slate-800'
+                                      }`}
+                                    >
+                                      {bank.name}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pay button */}
+                  <div className="pt-3">
+                    <button
+                      onClick={handlePayment}
+                      disabled={
+                        payAmount <= 0 ||
+                        !paymentMethod ||
+                        (paymentMethod === 'upi' && upiMethod === 'id' && !upiId.includes('@')) ||
+                        (paymentMethod === 'card' && (!cardName || cardNumber.length < 15 || cardExpiry.length < 5 || cardCvv.length < 3))
+                      }
+                      className={`w-full py-3.5 text-white font-extrabold text-xs rounded-2xl active:scale-95 transition-all shadow-md ${
+                        (payAmount > 0 && paymentMethod && 
+                        (paymentMethod !== 'upi' || upiMethod !== 'id' || upiId.includes('@')) && 
+                        (paymentMethod !== 'card' || (cardName && cardNumber.length >= 15 && cardExpiry.length === 5 && cardCvv.length === 3)))
+                          ? 'bg-indigo-600 hover:bg-indigo-700 cursor-pointer shadow-indigo-200'
+                          : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
+                      }`}
+                    >
+                      Pay ₹{Number(payAmount).toLocaleString('en-IN')} securely
+                    </button>
+                    <p className="text-[9px] text-center text-slate-500 mt-2.5">
+                      🔒 Your transaction is secured with 256-bit SSL encryption.
+                    </p>
+                  </div>
+                </>
+              ) : checkoutStep === 'processing' ? (
+                /* ─── PAYMENT PROCESSING SPIN STATE ─── */
+                <div className="flex flex-col items-center justify-center py-12 space-y-4 text-center">
+                  <div className="relative flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full border-4 border-indigo-100 border-t-indigo-600 animate-spin" />
+                    <Wallet size={20} className="text-indigo-600 absolute animate-pulse fill-indigo-600/10" />
+                  </div>
+                  <div className="text-center space-y-1.5">
+                    <h4 className="text-xs font-extrabold text-indigo-950">Authorizing Payment...</h4>
+                    <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
+                      Please do not refresh the page or press the back button.
+                    </p>
+                  </div>
                 </div>
-                <p>
-                  यह पूरी तरह पारदर्शी है। हर दानकर्ता का विवरण (उनकी प्राइवेसी प्राथमिकताओं के अनुसार) और किए गए खर्चों का लेखा-जोखा समय-समय पर रिपोर्ट सेक्शन में अपडेट किया जाता है।
-                </p>
-              </div>
-            </div>
-            <div className="p-4 bg-white border-t border-slate-100">
-              <button 
-                onClick={() => setShowInfoModal(false)}
-                className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[14px] font-bold rounded-xl shadow-sm transition-all active:scale-95"
-              >
-                ठीक है
-              </button>
+              ) : (
+                /* ─── SUCCESS screen ─── */
+                <div className="flex flex-col items-center justify-center py-6 text-center space-y-5 animate-fade-in-up">
+                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shadow-md animate-scale-up mx-auto">
+                    <CheckCircle2 size={36} className="stroke-[2.5]" />
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <h3 className="text-sm font-black text-emerald-950">Payment Successful!</h3>
+                    <p className="text-[11px] text-slate-500 font-medium leading-relaxed px-4">
+                      Thank you! Your contribution to <strong>{fund.name}</strong> has been successfully recorded.
+                    </p>
+                  </div>
+
+                  {/* Receipt Box */}
+                  <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl w-full text-left space-y-2.5 text-[10px] font-bold text-slate-800">
+                    <div className="flex justify-between items-center pb-2 border-b border-slate-200">
+                      <span className="text-slate-500 uppercase">Receipt details</span>
+                      <span className="bg-emerald-100 text-emerald-800 text-[8px] font-black uppercase px-2 py-0.5 rounded-full">Paid</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Fund Name:</span>
+                      <span className="text-right truncate ml-4">{fund.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Amount Paid:</span>
+                      <span className="text-emerald-700 font-extrabold">₹{Number(payAmount).toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Trans ID:</span>
+                      <span className="font-mono text-slate-400">TXN{Math.floor(Date.now() / 1000)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Date:</span>
+                      <span>{new Date().toLocaleDateString('en-IN')}</span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setShowPayModal(false)}
+                    className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-extrabold active:scale-95 shadow-lg shadow-emerald-100 transition-all animate-scale-up"
+                  >
+                    Done
+                  </button>
+                </div>
+              )}
+
             </div>
           </div>
         </div>

@@ -1,35 +1,32 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Calendar, Download, ChevronDown, Filter } from 'lucide-react';
 import { useFund } from '../../context/FundContext';
 
-export default function FundReportPage() {
-  const { fundId } = useParams();
+export default function FundTotalReportPage() {
   const navigate = useNavigate();
-  const { getFundById, getContributionsByFund, getExpensesByFund } = useFund();
-  
+  const { funds, contributions, expenses } = useFund();
+
   const [year, setYear] = useState('2023-24');
   const [isDownloading, setIsDownloading] = useState(false);
   const years = ['2023-24', '2024-25', '2025-26'];
   const cycleYear = () => setYear(years[(years.indexOf(year) + 1) % years.length]);
+  
+  let currentFund = 0;
+  let totalExpense = 0;
 
-  const fund = getFundById(fundId);
-  const contributions = getContributionsByFund(fundId);
-  const expenses = getExpensesByFund(fundId);
+  funds.forEach(fund => {
+    const fundContribs = contributions[fund.id] || [];
+    fundContribs.forEach(c => {
+      currentFund += c.paidAmount || 0;
+    });
 
-  if (!fund) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <h2 className="text-xl font-bold text-slate-800">Fund Not Found</h2>
-          <button onClick={() => navigate('/member/fund')} className="mt-4 text-indigo-600 font-bold">Go Back</button>
-        </div>
-      </div>
-    );
-  }
+    const fundExps = expenses[fund.id] || [];
+    fundExps.forEach(e => {
+      totalExpense += e.amount || 0;
+    });
+  });
 
-  const currentFund = contributions.reduce((acc, curr) => acc + curr.paidAmount, 0);
-  const totalExpense = expenses.reduce((acc, curr) => acc + curr.amount, 0);
   const netSaving = currentFund - totalExpense;
 
   // Mock monthly data for the bar chart
@@ -55,8 +52,8 @@ export default function FundReportPage() {
             <ChevronLeft size={24} />
           </button>
           <div className="flex flex-col">
-            <h1 className="text-[17px] font-bold text-slate-800">Fund Report</h1>
-            <p className="text-[10px] text-slate-500 font-bold uppercase">{fund.name}</p>
+            <h1 className="text-[17px] font-bold text-slate-800">Total Funds Report</h1>
+            <p className="text-[10px] text-slate-500 font-bold uppercase">All Active Funds</p>
           </div>
         </div>
       </div>
@@ -142,7 +139,7 @@ export default function FundReportPage() {
             </>
           ) : (
             <>
-              <Download size={18} /> Download Detailed Report
+              <Download size={18} /> Download Full Report
             </>
           )}
         </button>

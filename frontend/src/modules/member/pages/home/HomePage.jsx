@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useDraggableScroll } from '../../../../hooks/useDraggableScroll';
-import { Bell, Search, Calendar, Heart, Users, BookOpen, Briefcase, Vote, ChevronRight, MapPin, Shield, Crown, ImagePlus, ArrowRight, Plus, Sparkles, GraduationCap, HeartHandshake, Flame, User, Smile, Phone, MessageCircle, Clock, CalendarDays, Mail, Home, Wallet } from 'lucide-react';
+import { Bell, Search, Calendar, Heart, Users, BookOpen, Briefcase, Vote, ChevronRight, MapPin, Shield, Crown, ImagePlus, ArrowRight, Plus, Sparkles, GraduationCap, HeartHandshake, Flame, User, Smile, Phone, MessageCircle, Clock, CalendarDays, Mail, Home, Wallet, Megaphone } from 'lucide-react';
 import { Avatar } from '../../components/common/Avatar';
 import { Badge } from '../../components/common/Badge';
 import { useData } from '../../context/DataProvider';
@@ -11,17 +11,21 @@ import { StoryViewer } from '../../components/common/StoryViewer';
 import { CityLandscape } from '../../components/common/CityLandscape';
 import { mockAdmins as mockAdminsRaw } from '../../data/mockUsers';
 import { mockSuccessStories } from '../../data/mockMatrimonial';
+// Removed broken mockFundData import
 
-const announcements = [
-  { id: 1, image: '/images/banners/mahotsav.png', link: '/member/events' },
-  { id: 2, image: '/images/banners/matrimonial.png', link: '/member/events' },
-  { id: 3, image: '/images/banners/scholarship.png', link: '/member/events' },
-];
+
 
 const OmIcon = ({ size, className }) => (
   <span style={{ fontSize: `${size}px`, lineHeight: 1 }} className={`${className} font-serif select-none`}>
     ॐ
   </span>
+);
+
+const DiyaIcon = ({ size, className }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M12 2.5s-3 4-3 7.5c0 1.9 1.2 3.5 3 3.5s3-1.6 3-3.5c0-3.5-3-7.5-3-7.5z" />
+    <path d="M4 14.5c0 3 3.5 5.5 8 5.5s8-2.5 8-5.5H4z" />
+  </svg>
 );
 
 const quickActions = [
@@ -38,31 +42,24 @@ const quickActions = [
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { currentUser, members: mockMembers, admins: contextAdmins, posts: mockPosts, events: mockEvents, language, setLanguage, followedAnnouncements, getUnreadCountForModule } = useData();
+  const { currentUser, members: mockMembers, admins: contextAdmins, posts: mockPosts, events: mockEvents, language, setLanguage, notifications, getUnreadCountForModule } = useData();
   const mockAdmins = contextAdmins && contextAdmins.length > 0 ? contextAdmins : mockAdminsRaw;
-  const [activeAnnouncementIndex, setActiveAnnouncementIndex] = useState(0);
-  const carouselRef = useDraggableScroll();
   const subHeadsRef = useDraggableScroll();
+  const updatesScrollRef = useDraggableScroll();
   
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning,' : hour < 18 ? 'Good afternoon,' : 'Good evening,';
 
-  const displayAnnouncements = followedAnnouncements?.announcements ? announcements : [];
+  // Dynamic counts for quick actions (with fallbacks for UI demonstration)
+  const nimantranCount = getUnreadCountForModule('nimantran') || 3;
+  const donationCount = getUnreadCountForModule('donation') || 5;
+  const shradhanjaliCount = getUnreadCountForModule('shradhanjali') || 2;
 
-  useEffect(() => {
-    if (displayAnnouncements.length === 0) return;
-    const interval = setInterval(() => {
-      setActiveAnnouncementIndex((prev) => {
-        const next = (prev + 1) % displayAnnouncements.length;
-        if (carouselRef.current) {
-          const itemWidth = carouselRef.current.clientWidth;
-          carouselRef.current.scrollTo({ left: itemWidth * next, behavior: 'smooth' });
-        }
-        return next;
-      });
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [displayAnnouncements]);
+  // Dynamic counts for summary cards
+  const newDonationsCount = notifications?.filter(n => n.type === 'donation' && !n.isRead)?.length || 0;
+  const newNoticesCount = notifications?.filter(n => n.type === 'announcement' && !n.isRead)?.length || 0;
+  const newEventsCount = notifications?.filter(n => n.type === 'event' && !n.isRead)?.length || 0;
+  const totalUpdatesCount = newDonationsCount + newNoticesCount + newEventsCount + 2; // +2 for bookings & funds mockup
 
   const unreadCount = getUnreadCountForModule('home');
 
@@ -129,66 +126,133 @@ const HomePage = () => {
       {/* Spacer to maintain gap */}
       <div className="h-4" />
 
-      {/* Events & Announcements Section Header */}
-      <div className="px-5 pb-3 relative z-10">
-        <div className="flex items-center gap-1.5 mb-1.5 animate-fade-in">
-          <span className="bg-indigo-50 border border-indigo-100 text-indigo-750 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md flex items-center gap-1 shadow-2xs">
-            <Sparkles size={9} className="text-indigo-600 animate-pulse fill-indigo-250" />
-            Highlights
-          </span>
+      {/* ─── NEW INTERACTIVE HIGHLIGHTS MODULE ─── */}
+      <div className="px-5 mt-4 relative z-10 flex gap-3">
+        {/* Invitations (Nimantran) */}
+        <div 
+          onClick={() => navigate('/member/nimantran')}
+          className="flex-1 bg-white rounded-[20px] p-2.5 pb-3 shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-gray-100 flex flex-col items-center justify-center text-center cursor-pointer press-scale relative"
+        >
+          {nimantranCount > 0 && (
+            <div className="absolute top-1 right-1.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+              {nimantranCount}
+            </div>
+          )}
+          <div className="w-14 h-14 bg-gradient-to-b from-indigo-400 to-indigo-600 shadow-lg shadow-indigo-500/40 rounded-full flex items-center justify-center mb-2">
+            <Mail className="text-white" size={24} strokeWidth={2} />
+          </div>
+          <h4 className="text-[12px] font-black text-gray-800 leading-tight">Invitations</h4>
+          <p className="text-[8.5px] font-bold text-gray-400 mt-0.5 leading-tight tracking-tight">View new invites</p>
         </div>
-        <h2 className="text-[16px] font-black text-slate-800 tracking-tight leading-tight">
-          Upcoming Events & Announcements
-        </h2>
-        <p className="text-[11.5px] text-slate-400 font-bold mt-1 leading-normal max-w-[320px]">
-          Stay connected with the latest happenings, festivals, and key updates of our community.
-        </p>
+
+        {/* Contributions (Yogdan) */}
+        <div 
+          onClick={() => navigate('/member/donation')}
+          className="flex-1 bg-white rounded-[20px] p-2.5 pb-3 shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-gray-100 flex flex-col items-center justify-center text-center cursor-pointer press-scale relative"
+        >
+          {donationCount > 0 && (
+            <div className="absolute top-1 right-1.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+              {donationCount}
+            </div>
+          )}
+          <div className="w-14 h-14 bg-gradient-to-b from-pink-400 to-rose-500 shadow-lg shadow-rose-500/40 rounded-full flex items-center justify-center mb-2">
+            <HeartHandshake className="text-white" size={24} strokeWidth={2} />
+          </div>
+          <h4 className="text-[12px] font-black text-gray-800 leading-tight">Contributions</h4>
+          <p className="text-[8.5px] font-bold text-gray-400 mt-0.5 leading-tight tracking-tight">Support the Samaj</p>
+        </div>
+
+        {/* Obituary (Shradhanjali) */}
+        <div 
+          onClick={() => navigate('/member/shradhanjali')}
+          className="flex-1 bg-white rounded-[20px] p-2.5 pb-3 shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-gray-100 flex flex-col items-center justify-center text-center cursor-pointer press-scale relative"
+        >
+          {shradhanjaliCount > 0 && (
+            <div className="absolute top-1 right-1.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+              {shradhanjaliCount}
+            </div>
+          )}
+          <div className="w-14 h-14 bg-gradient-to-b from-amber-400 to-orange-500 shadow-lg shadow-orange-500/40 rounded-full flex items-center justify-center mb-2">
+            <DiyaIcon className="text-white" size={26} />
+          </div>
+          <h4 className="text-[12px] font-black text-gray-800 leading-tight">Obituary</h4>
+          <p className="text-[8.5px] font-bold text-gray-400 mt-0.5 leading-tight tracking-tight">Heartfelt tributes</p>
+        </div>
       </div>
 
-      {/* ─── PREMIUM ANNOUNCEMENT CAROUSEL ─── */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="mt-3 pb-2 relative z-10"
-      >
-        {displayAnnouncements.length === 0 ? (
-          <div className="mx-5 p-6 bg-white border border-gray-100 rounded-3xl text-center py-8 shadow-sm">
-            <Shield className="mx-auto text-brand-primary opacity-60 mb-2" size={28} />
-            <h4 className="text-sm font-bold text-text-primary">Announcements Muted</h4>
-            <p className="text-xs text-text-secondary mt-1 max-w-[240px] mx-auto leading-relaxed">You have disabled community announcements. Enable them in your Notification Preferences to see updates.</p>
-            <button 
-              onClick={() => navigate('/member/notifications')} 
-              className="mt-3 px-4 py-2 bg-brand-primary text-white text-xs font-bold rounded-xl press-scale shadow-sm"
-            >
-              Configure Preferences
-            </button>
+      {/* ─── TODAY'S UPDATES SECTION ─── */}
+      <div className="mt-5 relative z-10">
+        {/* Header */}
+        <div className="px-5 flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Bell className="text-gray-700" size={18} strokeWidth={2.5} />
+              {totalUpdatesCount > 0 && (
+                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 border-2 border-surface rounded-full"></div>
+              )}
+            </div>
+            <h3 className="text-[15px] font-black text-slate-800 tracking-tight">Today's Updates</h3>
+            {totalUpdatesCount > 0 && (
+              <span className="bg-red-50 text-red-600 text-[10px] font-black px-1.5 py-0.5 rounded-md">
+                {totalUpdatesCount}
+              </span>
+            )}
           </div>
-        ) : (
-          <>
-            <div
-              ref={carouselRef}
-              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-0"
-              onScroll={(e) => {
-                const idx = Math.round(e.target.scrollLeft / e.target.clientWidth);
-                if (idx !== activeAnnouncementIndex) setActiveAnnouncementIndex(idx);
-              }}
-            >
-              {displayAnnouncements.map((a) => (
-                <div key={a.id} onClick={() => navigate(a.link)} className="snap-center shrink-0 w-full h-[220px] rounded-none relative overflow-hidden shadow-sm press-scale group cursor-pointer bg-gray-100">
-                  <img src={a.image} alt="Announcement" className="absolute inset-0 w-full h-full object-cover" />
-                </div>
-              ))}
+          <button onClick={() => navigate('/member/notifications')} className="text-[11px] font-bold text-brand-primary flex items-center">
+            View All <ChevronRight size={14} />
+          </button>
+        </div>
+
+        {/* Compact Single-Row Summary Cards (No Scrollbar) */}
+        <div className="bg-white border border-gray-100 rounded-[16px] p-2.5 mx-5 mb-2 shadow-[0_2px_10px_rgba(0,0,0,0.03)] flex items-center justify-between">
+          
+          {/* New Bookings */}
+          <div onClick={() => navigate('/member/dharmashala')} className="flex flex-col items-center justify-center text-center cursor-pointer press-scale flex-1 border-r border-gray-100 last:border-0 px-0.5">
+            <div className="flex items-center gap-1 mb-1">
+              <Home className="text-emerald-500" size={13} strokeWidth={2.5} />
+              <span className="text-[11px] font-black text-gray-900 leading-none">2</span>
             </div>
-            {/* Dots */}
-            <div className="flex justify-center gap-1.5 mt-4">
-              {displayAnnouncements.map((_, i) => (
-                <div key={i} className={`rounded-full transition-all duration-300 ${i === activeAnnouncementIndex ? 'w-6 h-[4px] bg-brand-primary' : 'w-[4px] h-[4px] bg-gray-300'}`} />
-              ))}
+            <span className="text-[8px] font-bold text-gray-400 leading-tight">New Bookings</span>
+          </div>
+
+          {/* New Funds Received */}
+          <div onClick={() => navigate('/member/fund')} className="flex flex-col items-center justify-center text-center cursor-pointer press-scale flex-1 border-r border-gray-100 last:border-0 px-0.5">
+            <div className="flex items-center gap-0.5 mb-1">
+              <Wallet className="text-indigo-500" size={12} strokeWidth={2.5} />
+              <span className="text-[10px] font-black text-gray-900 leading-none tracking-tighter">₹245k</span>
             </div>
-          </>
-        )}
-      </motion.div>
+            <span className="text-[8px] font-bold text-gray-400 leading-tight">New Funds Received</span>
+          </div>
+
+          {/* New Contributions */}
+          <div onClick={() => navigate('/member/donation')} className="flex flex-col items-center justify-center text-center cursor-pointer press-scale flex-1 border-r border-gray-100 last:border-0 px-0.5">
+            <div className="flex items-center gap-1 mb-1">
+              <Heart className="text-rose-500" size={13} strokeWidth={2.5} />
+              <span className="text-[11px] font-black text-gray-900 leading-none">{newDonationsCount > 0 ? newDonationsCount : '5'}</span>
+            </div>
+            <span className="text-[8px] font-bold text-gray-400 leading-tight">New Contributions</span>
+          </div>
+
+          {/* Important Notice */}
+          <div onClick={() => navigate('/member/notifications')} className="flex flex-col items-center justify-center text-center cursor-pointer press-scale flex-1 border-r border-gray-100 last:border-0 px-0.5">
+            <div className="flex items-center gap-1 mb-1">
+              <Megaphone className="text-orange-500" size={13} strokeWidth={2.5} />
+              <span className="text-[11px] font-black text-gray-900 leading-none">{newNoticesCount > 0 ? newNoticesCount : '1'}</span>
+            </div>
+            <span className="text-[8px] font-bold text-gray-400 leading-tight">Important Notice</span>
+          </div>
+
+          {/* New Events */}
+          <div onClick={() => navigate('/member/events')} className="flex flex-col items-center justify-center text-center cursor-pointer press-scale flex-1 border-r border-gray-100 last:border-0 px-0.5">
+            <div className="flex items-center gap-1 mb-1">
+              <Calendar className="text-blue-500" size={13} strokeWidth={2.5} />
+              <span className="text-[11px] font-black text-gray-900 leading-none">{newEventsCount > 0 ? newEventsCount : '3'}</span>
+            </div>
+            <span className="text-[8px] font-bold text-gray-400 leading-tight">New Events</span>
+          </div>
+          
+        </div>
+      </div>
 
       {/* ─── CENSUS DASHBOARD BANNER ─── */}
       <div className="px-2 mt-5 relative z-10">
@@ -720,38 +784,7 @@ const HomePage = () => {
 
 
 
-      {/* ─── COMMUNITY STATS ─── */}
-      <div className="px-5 mb-6">
-        <h3 className="text-[17px] font-bold text-text-primary tracking-tight mb-4">Community Stats</h3>
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { label: 'Total Members', value: '1,247', icon: Users, iconBg: 'bg-blue-50', iconColor: 'text-blue-600', path: '/member/census', state: { view: 'dashboard' } },
-            { label: 'Men', value: '520', icon: User, iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600', path: '/member/census', state: { view: 'males' } },
-            { label: 'Women', value: '480', icon: User, iconBg: 'bg-pink-50', iconColor: 'text-pink-600', path: '/member/census', state: { view: 'females' } },
-            { label: 'Children', value: '247', icon: Smile, iconBg: 'bg-yellow-50', iconColor: 'text-yellow-600', path: '/member/census', state: { view: 'kids' } },
-            { label: 'Active Cities', value: '12', icon: MapPin, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600', path: '/member/directory' },
-            { label: 'Events This Month', value: '4', icon: Calendar, iconBg: 'bg-orange-50', iconColor: 'text-orange-600', path: '/member/events' },
-            { label: 'Matrimonial', value: '186', icon: Heart, iconBg: 'bg-red-50', iconColor: 'text-red-600', path: '/member/matrimonial' },
-          ].map((stat) => (
-            <div 
-              key={stat.label} 
-              onClick={() => navigate(stat.path, { state: stat.state })}
-              className="card-std p-4 cursor-pointer active:scale-[0.98] hover:shadow-md transition-all flex flex-col justify-between"
-            >
-              <div>
-                <div className={`w-10 h-10 rounded-xl ${stat.iconBg} ${stat.iconColor} flex items-center justify-center mb-3`}>
-                  <stat.icon size={20} />
-                </div>
-                <p className="text-[22px] font-extrabold text-text-primary leading-none tracking-tight">{stat.value}</p>
-              </div>
-              <p className="text-[13px] text-text-secondary mt-2 flex items-center justify-between font-medium">
-                {stat.label}
-                <ChevronRight size={14} className="text-gray-400 opacity-60" />
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
+
 
       {/* ─── END OF FEED ILLUSTRATION ─── */}
       <div className="mt-8 relative w-full h-[450px] flex flex-col items-center justify-end overflow-hidden pb-[160px] -mb-[120px] bg-gradient-to-b from-transparent to-brand-primary/5">

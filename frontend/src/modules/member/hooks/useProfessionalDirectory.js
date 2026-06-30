@@ -61,7 +61,7 @@ const useProfessionalDirectory = (communityId) => {
           });
 
         // Derive unique cities dynamically from data
-        const uniqueCities = ['सभी शहर', ...new Set(enriched.map(p => p.city).sort())];
+        const uniqueCities = ['All Cities', ...new Set(enriched.map(p => p.city).sort())];
 
         setListings(enriched);
         setCategories(derivedCategories);
@@ -93,7 +93,7 @@ const useProfessionalDirectory = (communityId) => {
         // });
         //
         // // Derive cities from data
-        // const uniqueCities = ['सभी शहर', ...new Set(enriched.map(p => p.city).sort())];
+        // const uniqueCities = ['All Cities', ...new Set(enriched.map(p => p.city).sort())];
         //
         // setListings(enriched);
         // setCategories(derivedCategories);
