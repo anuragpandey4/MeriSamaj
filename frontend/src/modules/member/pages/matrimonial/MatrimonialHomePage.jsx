@@ -499,7 +499,7 @@ const MatrimonialHomePage = () => {
   }, []);
 
   return (
-    <div className="h-screen bg-slate-50 flex flex-col overflow-hidden relative select-none">
+    <div className="h-[100dvh] bg-slate-50 flex flex-col overflow-hidden relative select-none w-full">
       
       {/* ─── MAIN MATCHES FEED VIEW ─── */}
       {activeBottomTab === 'matches' && (

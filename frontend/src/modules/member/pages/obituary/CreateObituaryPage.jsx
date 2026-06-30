@@ -98,15 +98,20 @@ const CreateObituaryPage = () => {
             <div className="bg-white p-5 rounded-[24px] border border-gray-100 shadow-sm space-y-4">
               <h3 className="font-serif font-bold text-gray-900 border-b border-gray-100 pb-2 mb-2">Final Rites / Ceremony</h3>
               
-              <div>
+              <div className="relative">
                 <label className="block text-[12px] font-bold text-gray-500 uppercase mb-1.5">Ceremony Type</label>
-                <select name="ritesType" value={formData.ritesType} onChange={handleChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-[15px] outline-none focus:border-gray-400 focus:bg-white transition-colors appearance-none">
-                  <option>Uthavna / Chautha</option>
-                  <option>Pagdi Rasam</option>
-                  <option>Besna</option>
-                  <option>Tiharvi</option>
-                  <option>Funeral</option>
-                </select>
+                <div className="relative">
+                  <select name="ritesType" value={formData.ritesType} onChange={handleChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-[15px] outline-none focus:border-gray-400 focus:bg-white transition-colors appearance-none">
+                    <option>Uthavna / Chautha</option>
+                    <option>Pagdi Rasam</option>
+                    <option>Besna</option>
+                    <option>Tiharvi</option>
+                    <option>Funeral</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
