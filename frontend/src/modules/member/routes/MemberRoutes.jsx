@@ -57,6 +57,7 @@ import DonateSetupPage from '../pages/donation/DonateSetupPage';
 import DonatePaymentPage from '../pages/donation/DonatePaymentPage';
 import DonateSuccessPage from '../pages/donation/DonateSuccessPage';
 import MyDonationsPage from '../pages/donation/MyDonationsPage';
+import DonationCampaignDetailPage from '../pages/donation/DonationCampaignDetailPage';
 import { DonationProvider } from '../pages/donation/DonationContext';
 
 // Feature: Om Shanti (legacy)
@@ -170,6 +171,7 @@ export const MemberRoutes = () => {
             <Route path="payment" element={<AnimatedPage><DonatePaymentPage /></AnimatedPage>} />
             <Route path="success" element={<AnimatedPage><DonateSuccessPage /></AnimatedPage>} />
             <Route path="my" element={<AnimatedPage><MyDonationsPage /></AnimatedPage>} />
+            <Route path="campaign/:id" element={<AnimatedPage><DonationCampaignDetailPage /></AnimatedPage>} />
           </Route>
 
           <Route path="notifications" element={<AnimatedPage><NotificationsPage /></AnimatedPage>} />
