@@ -29,7 +29,7 @@ const DonationCampaignDetailPage = () => {
   const [selectedAmountPreset, setSelectedAmountPreset] = useState(500);
   const [customAmount, setCustomAmount] = useState('');
   const [isCustom, setIsCustom] = useState(false);
-  const [donationType, setDonationType] = useState('एक बार');
+  const [donationType, setDonationType] = useState('One-time');
   const [paymentMethod, setPaymentMethod] = useState('UPI / Google Pay / PhonePe');
 
   if (!purpose) {
@@ -129,9 +129,9 @@ const DonationCampaignDetailPage = () => {
           <div className="space-y-2 bg-gray-50 p-4 rounded-2xl">
             <div className="flex justify-between items-end mb-1">
               <span className="text-sm font-bold text-text-primary">
-                ₹{formatCurrency(purpose.raised)} <span className="text-[11px] font-normal text-text-secondary">प्राप्त</span>
+                ₹{formatCurrency(purpose.raised)} <span className="text-[11px] font-normal text-text-secondary">Raised</span>
               </span>
-              <span className="text-[11px] font-bold text-text-secondary">लक्ष्य: ₹{formatCurrency(purpose.target)}</span>
+              <span className="text-[11px] font-bold text-text-secondary">Goal: ₹{formatCurrency(purpose.target)}</span>
             </div>
             {/* Progress bar */}
             <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -145,7 +145,7 @@ const DonationCampaignDetailPage = () => {
 
         {/* Recent Donors List */}
         <div className="bg-card rounded-3xl p-5 border border-gray-100 shadow-sm space-y-4">
-          <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">हाल ही के दानकर्ता</h3>
+          <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">Recent Donors</h3>
           
           {sortedDonors.length === 0 ? (
             <p className="text-xs text-text-secondary text-center py-4">No donors yet. Be the first to donate!</p>
@@ -171,7 +171,7 @@ const DonationCampaignDetailPage = () => {
                   onClick={() => setShowAllDonors(!showAllDonors)}
                   className="w-full py-2.5 text-xs font-bold text-purple-700 bg-purple-50 rounded-xl press-scale border border-purple-100 mt-2"
                 >
-                  {showAllDonors ? 'कम दिखाएं' : `सभी देखें (${sortedDonors.length})`}
+                  {showAllDonors ? 'Show Less' : `View All (${sortedDonors.length})`}
                 </button>
               )}
             </>
@@ -181,10 +181,10 @@ const DonationCampaignDetailPage = () => {
         {/* Inline Payment Form */}
         {showPaymentSetup && (
           <div className="space-y-6 bg-card border border-purple-200 shadow-lg rounded-3xl p-5 animate-slide-in">
-            <h3 className="text-sm font-bold text-text-primary">दान राशि और विवरण</h3>
+            <h3 className="text-sm font-bold text-text-primary">Donation Amount and Details</h3>
             
             <div className="space-y-3">
-              <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">योगदान राशि चुनें</label>
+              <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">Select Donation Amount</label>
               
               <div className="grid grid-cols-3 gap-2.5">
                 {amountPresets.map(preset => {
@@ -212,7 +212,7 @@ const DonationCampaignDetailPage = () => {
                       : 'border-gray-100 bg-surface text-text-secondary'
                   }`}
                 >
-                  अन्य राशि
+                  Custom
                 </button>
               </div>
 
@@ -221,7 +221,7 @@ const DonationCampaignDetailPage = () => {
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-text-secondary">₹</span>
                   <input
                     type="text"
-                    placeholder="राशि दर्ज करें"
+                    placeholder="Enter amount"
                     value={customAmount}
                     onChange={handleCustomAmountChange}
                     className="w-full bg-surface border border-purple-600 rounded-2xl py-3.5 pl-8 pr-4 text-xs font-bold text-text-primary outline-none"
@@ -231,9 +231,9 @@ const DonationCampaignDetailPage = () => {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">योगदान का प्रकार</label>
+              <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">Donation Type</label>
               <div className="grid grid-cols-2 gap-3">
-                {['एक बार', 'नियमित'].map(type => {
+                {['One-time', 'Regular'].map(type => {
                   const isSelected = donationType === type;
                   return (
                     <div
@@ -248,7 +248,7 @@ const DonationCampaignDetailPage = () => {
                       }`}>
                         {isSelected && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                       </div>
-                      <span className={`text-xs font-bold ${isSelected ? 'text-purple-950' : 'text-text-primary'}`}>{type} योगदान</span>
+                      <span className={`text-xs font-bold ${isSelected ? 'text-purple-950' : 'text-text-primary'}`}>{type} Donation</span>
                     </div>
                   );
                 })}
@@ -256,12 +256,12 @@ const DonationCampaignDetailPage = () => {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">भुगतान विधि चुनें</label>
+              <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">Select Payment Method</label>
               <div className="space-y-2.5">
                 {[
                   { id: 'upi', name: 'UPI / Google Pay', icon: Smartphone, color: 'text-purple-600 bg-purple-50' },
-                  { id: 'card', name: 'डेबिट / क्रेडिट कार्ड', icon: CreditCard, color: 'text-blue-600 bg-blue-50' },
-                  { id: 'netbank', name: 'नेट बैंकिंग', icon: Landmark, color: 'text-amber-600 bg-amber-50' }
+                  { id: 'card', name: 'Debit / Credit Card', icon: CreditCard, color: 'text-blue-600 bg-blue-50' },
+                  { id: 'netbank', name: 'Net Banking', icon: Landmark, color: 'text-amber-600 bg-amber-50' }
                 ].map(method => {
                   const isSelected = paymentMethod === method.name;
                   const Icon = method.icon;

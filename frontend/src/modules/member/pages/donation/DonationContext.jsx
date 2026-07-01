@@ -15,9 +15,9 @@ export const DonationProvider = ({ children }) => {
 
     const formattedAmount = Number(amount);
     
-    // Generate Hindi Date
+    // Generate Date
     const today = new Date();
-    const months = ["जनवरी", "फरवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const formattedDate = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
     
     // Generate Time

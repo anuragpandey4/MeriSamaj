@@ -46,7 +46,20 @@ const ProfessionalDetailPage = () => {
           </button>
           <h1 className="text-[17px] font-black text-gray-900 tracking-tight leading-none">Business Profile</h1>
         </div>
-        <button className="w-9 h-9 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 press-scale">
+        <button 
+          onClick={() => {
+            if (navigator.share) {
+              navigator.share({
+                title: activeProfessional.title,
+                text: `Check out ${activeProfessional.title} on Professional Directory`,
+                url: window.location.href,
+              }).catch(console.error);
+            } else {
+              alert('Link copied to clipboard!');
+            }
+          }}
+          className="w-9 h-9 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 press-scale"
+        >
           <Share2 size={18} />
         </button>
       </div>
@@ -79,21 +92,6 @@ const ProfessionalDetailPage = () => {
           </div>
         </div>
 
-        {/* Rating Section */}
-        <div className="flex items-center gap-2 bg-amber-50/70 border border-amber-100 rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center gap-0.5 text-amber-500">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <Star
-                key={s}
-                size={16}
-                fill={s <= Math.floor(activeProfessional.rating) ? 'currentColor' : 'none'}
-                className={s <= Math.floor(activeProfessional.rating) ? 'text-amber-500' : 'text-amber-200'}
-              />
-            ))}
-          </div>
-          <span className="text-[14px] font-black text-gray-800 ml-1">{activeProfessional.rating} / 5.0</span>
-          <span className="text-[11px] text-gray-500 font-bold">(24 Reviews)</span>
-        </div>
 
         {/* Description */}
         {activeProfessional.description && (

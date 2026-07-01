@@ -69,10 +69,10 @@ const DonatePaymentPage = () => {
     return (
       <div className="min-h-screen bg-surface flex flex-col items-center justify-center p-6 text-center">
         <ArrowLeft size={48} className="text-gray-300 mb-3" />
-        <h2 className="text-base font-bold text-text-primary">विवरण गायब हैं</h2>
-        <p className="text-xs text-text-secondary mt-1 mb-6">भुगतान प्रक्रिया जारी रखने के लिए विवरण पर्याप्त नहीं हैं।</p>
+        <h2 className="text-base font-bold text-text-primary">Details Missing</h2>
+        <p className="text-xs text-text-secondary mt-1 mb-6">Not enough details to continue the payment process.</p>
         <button onClick={() => navigate('/member/donation')} className="btn-primary py-2 px-6 text-xs">
-          योगदान डैशबोर्ड पर वापस जाएं
+          Go back to Donation Dashboard
         </button>
       </div>
     );
@@ -100,45 +100,45 @@ const DonatePaymentPage = () => {
           <button onClick={() => navigate(-1)} className="p-1 -ml-1 press-scale">
             <ArrowLeft size={22} className="text-text-primary" />
           </button>
-          <h1 className="text-base font-bold text-text-primary">भुगतान करें</h1>
+          <h1 className="text-base font-bold text-text-primary">Make Payment</h1>
         </div>
       </div>
 
       <div className="px-4 pt-5 max-w-xl mx-auto space-y-6">
         
-        {/* 1. Donation Details (योगदान विवरण) */}
+        {/* 1. Donation Details */}
         <div className="space-y-3">
-          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider">योगदान विवरण</h3>
+          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider">Donation Details</h3>
           
           <div className="bg-card rounded-2xl p-4.5 border border-gray-100 shadow-sm space-y-3.5 text-xs">
             <div className="flex justify-between pb-2.5 border-b border-gray-50">
-              <span className="font-semibold text-text-secondary">उद्देश्य:</span>
+              <span className="font-semibold text-text-secondary">Purpose:</span>
               <span className="font-bold text-purple-900">{purpose.title}</span>
             </div>
             <div className="flex justify-between pb-2.5 border-b border-gray-50">
-              <span className="font-semibold text-text-secondary">राशि:</span>
+              <span className="font-semibold text-text-secondary">Amount:</span>
               <span className="font-extrabold text-text-primary">₹{formatCurrency(amount)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="font-semibold text-text-secondary">योगदान का प्रकार:</span>
+              <span className="font-semibold text-text-secondary">Donation Type:</span>
               <span className="font-bold text-text-primary">{type}</span>
             </div>
           </div>
         </div>
 
-        {/* 2. Payment Summary (भुगतान सारांश) */}
+        {/* 2. Payment Summary */}
         <div className="space-y-3">
-          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider">भुगतान सारांश</h3>
+          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider">Payment Summary</h3>
           
           <div className="bg-card rounded-2xl p-4.5 border border-gray-100 shadow-sm flex justify-between items-center text-xs">
-            <span className="font-bold text-text-primary text-[13px]">कुल राशि:</span>
+            <span className="font-bold text-text-primary text-[13px]">Total Amount:</span>
             <span className="font-black text-purple-900 text-base">₹{formatCurrency(amount)}</span>
           </div>
         </div>
 
-        {/* 3. Pay Section (भुगतान करें) */}
+        {/* 3. Pay Section */}
         <div className="space-y-4">
-          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider">भुगतान करें</h3>
+          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider">Make Payment</h3>
           
           <div className="bg-card rounded-3xl p-6 border border-gray-100 shadow-sm flex flex-col items-center justify-center space-y-5 text-center">
             
@@ -147,15 +147,15 @@ const DonatePaymentPage = () => {
               <div className="w-full text-left space-y-4">
                 <div className="flex items-center gap-2 pb-2.5 border-b border-gray-150/50">
                   <Landmark size={18} className="text-purple-600" />
-                  <h4 className="text-xs font-bold text-text-primary">{selectedBankObj.name} - सुरक्षित लॉगिन</h4>
+                  <h4 className="text-xs font-bold text-text-primary">{selectedBankObj.name} - Secure Login</h4>
                 </div>
 
                 <div className="space-y-3.5">
                   <div>
-                    <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">यूज़र ID / कस्टमर ID</label>
+                    <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">User ID / Customer ID</label>
                     <input 
                       type="text" 
-                      placeholder="यूज़र ID दर्ज करें" 
+                      placeholder="Enter User ID" 
                       value={bankUserId}
                       onChange={(e) => setBankUserId(e.target.value)}
                       className="w-full bg-surface border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-purple-600"
@@ -163,10 +163,10 @@ const DonatePaymentPage = () => {
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">पासवर्ड</label>
+                    <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">Password</label>
                     <input 
                       type="password" 
-                      placeholder="पासवर्ड दर्ज करें" 
+                      placeholder="Enter Password" 
                       value={bankPassword}
                       onChange={(e) => setBankPassword(e.target.value)}
                       className="w-full bg-surface border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-purple-600"
@@ -180,7 +180,7 @@ const DonatePaymentPage = () => {
                     onClick={() => setNetBankingStep('select')}
                     className="flex-1 py-3 border border-gray-200 text-text-secondary text-xs font-bold rounded-xl press-scale hover:bg-gray-50"
                   >
-                    रद्द करें
+                    Cancel
                   </button>
                   <button 
                     type="button"
@@ -192,7 +192,7 @@ const DonatePaymentPage = () => {
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
                     }`}
                   >
-                    लॉगिन करें
+                    Login
                   </button>
                 </div>
               </div>
@@ -200,12 +200,12 @@ const DonatePaymentPage = () => {
               <div className="w-full text-left space-y-4">
                 <div className="flex items-center gap-2 pb-2.5 border-b border-gray-150/50">
                   <ShieldCheck size={18} className="text-emerald-600 animate-bounce" />
-                  <h4 className="text-xs font-bold text-text-primary">OTP सत्यापन</h4>
+                  <h4 className="text-xs font-bold text-text-primary">OTP Verification</h4>
                 </div>
 
                 <div className="space-y-3.5 text-center">
                   <p className="text-[10px] text-text-secondary leading-relaxed">
-                    सुरक्षित लेनदेन पूर्ण करने के लिए आपके पंजीकृत मोबाइल नंबर पर भेजा गया **6-अंकों का OTP** दर्ज करें।
+                    Enter the **6-digit OTP** sent to your registered mobile number to complete the secure transaction.
                   </p>
                   
                   <div className="max-w-[180px] mx-auto">
@@ -226,7 +226,7 @@ const DonatePaymentPage = () => {
                     onClick={() => setNetBankingStep('login')}
                     className="flex-1 py-3 border border-gray-200 text-text-secondary text-xs font-bold rounded-xl press-scale hover:bg-gray-50"
                   >
-                    वापस जाएं
+                    Go Back
                   </button>
                   <button 
                     type="button"
@@ -238,7 +238,7 @@ const DonatePaymentPage = () => {
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
                     }`}
                   >
-                    सत्यापित करें
+                    Verify
                   </button>
                 </div>
               </div>
@@ -257,7 +257,7 @@ const DonatePaymentPage = () => {
                             : 'text-text-secondary hover:text-text-primary'
                         }`}
                       >
-                        UPI एप्स
+                        UPI Apps
                       </button>
                       <button
                         type="button"
@@ -268,7 +268,7 @@ const DonatePaymentPage = () => {
                             : 'text-text-secondary hover:text-text-primary'
                         }`}
                       >
-                        QR कोड
+                        QR Code
                       </button>
                       <button
                         type="button"
@@ -285,7 +285,7 @@ const DonatePaymentPage = () => {
 
                     {upiMethod === 'apps' ? (
                       <div className="w-full text-left space-y-4 py-1">
-                        <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">भुगतान के लिए ऐप चुनें</label>
+                        <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">Select app for payment</label>
                         
                         <div className="grid grid-cols-2 gap-2.5">
                           {[
@@ -316,7 +316,7 @@ const DonatePaymentPage = () => {
                         </div>
                         
                         <div className="bg-purple-50/30 rounded-xl p-2.5 border border-purple-100/50 text-[10px] text-purple-800 text-center font-medium">
-                          चयनित ऐप द्वारा सुरक्षित भुगतान पूर्ण करने के लिए नीचे 'पेमेंट पूरा करें' पर क्लिक करें।
+                          Click 'Complete Payment' below to complete secure payment via the selected app.
                         </div>
                       </div>
                     ) : upiMethod === 'qr' ? (
@@ -358,13 +358,13 @@ const DonatePaymentPage = () => {
                             <QrCode size={15} className="text-purple-600" />
                             samaj@upi
                           </div>
-                          <p className="text-[10px] text-text-secondary">इस QR कोड को स्कैन करें या नीचे बटन पर क्लिक करें।</p>
+                          <p className="text-[10px] text-text-secondary">Scan this QR code or click the button below.</p>
                         </div>
                       </div>
                     ) : (
                       <div className="w-full text-left space-y-3.5 py-1">
                         <div>
-                          <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">अपनी UPI ID दर्ज करें</label>
+                          <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">Enter your UPI ID</label>
                           <div className="flex gap-2">
                             <input
                               type="text"
@@ -392,7 +392,7 @@ const DonatePaymentPage = () => {
                                   : 'bg-gray-50 border-gray-150 text-gray-400 cursor-not-allowed shadow-none'
                               }`}
                             >
-                              {verifyingUpi ? 'सत्यापन...' : 'वेरिफाई'}
+                              {verifyingUpi ? 'Verifying...' : 'Verify'}
                             </button>
                           </div>
                         </div>
@@ -401,8 +401,8 @@ const DonatePaymentPage = () => {
                           <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-[10px] text-emerald-800 flex items-center gap-2">
                             <ShieldCheck size={14} className="text-emerald-600 shrink-0" />
                             <div>
-                              <p className="font-bold">सत्यापित नाम: RAHUL SHARMA</p>
-                              <p className="text-[9px] text-emerald-700/80 mt-0.5">UPI ID सफलतापूर्वक सत्यापित हो गई है।</p>
+                              <p className="font-bold">Verified Name: RAHUL SHARMA</p>
+                              <p className="text-[9px] text-emerald-700/80 mt-0.5">UPI ID verified successfully.</p>
                             </div>
                           </div>
                         )}
@@ -413,15 +413,15 @@ const DonatePaymentPage = () => {
                   <div className="w-full text-left space-y-4">
                     <div className="flex items-center gap-2 pb-1.5 border-b border-gray-150/50">
                       <CreditCard size={18} className="text-purple-600" />
-                      <h4 className="text-xs font-bold text-text-primary">कार्ड विवरण दर्ज करें</h4>
+                      <h4 className="text-xs font-bold text-text-primary">Enter Card Details</h4>
                     </div>
                     
                     <div className="space-y-3">
                       <div>
-                        <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">कार्डधारक का नाम</label>
+                        <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">Cardholder Name</label>
                         <input 
                           type="text" 
-                          placeholder="नाम दर्ज करें" 
+                          placeholder="Enter Name" 
                           value={cardName}
                           onChange={(e) => setCardName(e.target.value)}
                           className="w-full bg-surface border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-text-primary outline-none focus:border-purple-600"
@@ -429,7 +429,7 @@ const DonatePaymentPage = () => {
                       </div>
 
                       <div>
-                        <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">कार्ड नंबर</label>
+                        <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">Card Number</label>
                         <input 
                           type="text" 
                           placeholder="XXXX XXXX XXXX XXXX" 
@@ -445,7 +445,7 @@ const DonatePaymentPage = () => {
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">वैधता (MM/YY)</label>
+                          <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">Expiry (MM/YY)</label>
                           <input 
                             type="text" 
                             placeholder="MM/YY" 
@@ -479,7 +479,7 @@ const DonatePaymentPage = () => {
                   <div className="w-full text-left space-y-4">
                     <div className="flex items-center gap-2 pb-1.5 border-b border-gray-150/50">
                       <Landmark size={18} className="text-purple-600" />
-                      <h4 className="text-xs font-bold text-text-primary">अपना बैंक चुनें</h4>
+                      <h4 className="text-xs font-bold text-text-primary">Select your bank</h4>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
@@ -508,7 +508,7 @@ const DonatePaymentPage = () => {
                     </div>
 
                     <div className="pt-1.5">
-                      <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">या अन्य बैंक चुनें</label>
+                      <label className="text-[10px] font-bold text-text-secondary uppercase block mb-1">Or select other bank</label>
                       
                       <div className="relative">
                         <button 
@@ -561,9 +561,9 @@ const DonatePaymentPage = () => {
                       <CreditCard size={28} />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-text-primary">सुरक्षित गेटवे रिडायरेक्ट</h4>
+                      <h4 className="text-xs font-bold text-text-primary">Secure Gateway Redirect</h4>
                       <p className="text-[10px] text-text-secondary mt-1 max-w-xs leading-normal">
-                        आप {method} द्वारा सुरक्षित भुगतान पूर्ण करने जा रहे हैं।
+                        You are going to complete secure payment via {method}.
                       </p>
                     </div>
                   </div>
@@ -579,12 +579,12 @@ const DonatePaymentPage = () => {
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
                   }`}
                 >
-                  पेमेंट पूरा करें
+                  Complete Payment
                 </button>
 
                 <div className="flex items-center justify-center gap-1.5 text-[10px] text-text-secondary font-medium">
                   <ShieldCheck size={14} className="text-emerald-600" />
-                  <span>आपका योगदान सुरक्षित और पारदर्शी है।</span>
+                  <span>Your donation is secure and transparent.</span>
                 </div>
               </>
             )}
