@@ -40,6 +40,7 @@ import MatrimonialShortlistPage from '../pages/matrimonial/MatrimonialShortlistP
 import MatrimonialSuccessStories from '../pages/matrimonial/MatrimonialSuccessStories';
 import { MatrimonialProvider } from '../pages/matrimonial/MatrimonialContext';
 import MatrimonialChatPage from '../pages/matrimonial/MatrimonialChatPage';
+import MatrimonialSubscriptionPage from '../pages/matrimonial/MatrimonialSubscriptionPage';
 import EditProfilePage from '../pages/profile/EditProfilePage';
 import FamilyPage from '../pages/profile/FamilyPage';
 import VerifyMembershipPage from '../pages/profile/VerifyMembershipPage';
@@ -128,6 +129,7 @@ export const MemberRoutes = () => {
             <Route path="stories" element={<AnimatedPage><MatrimonialSuccessStories /></AnimatedPage>} />
             <Route path=":profileId" element={<AnimatedPage><MatrimonialProfilePage /></AnimatedPage>} />
             <Route path="chat/:profileId" element={<AnimatedPage><MatrimonialChatPage /></AnimatedPage>} />
+            <Route path="subscription" element={<AnimatedPage><MatrimonialSubscriptionPage /></AnimatedPage>} />
           </Route>
           <Route path="directory" element={<AnimatedPage><DirectoryPage /></AnimatedPage>} />
           <Route path="profile" element={<AnimatedPage><MyProfilePage /></AnimatedPage>} />

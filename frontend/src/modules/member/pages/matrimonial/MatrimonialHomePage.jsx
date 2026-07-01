@@ -346,10 +346,84 @@ const MatrimonialHomePage = () => {
   const [myIncome, setMyIncome] = useState(currentUser?.income || "₹10-15 Lacs p.a");
   const [activePickerSheet, setActivePickerSheet] = useState(null); // null | 'gotra' | 'diet' | 'income' | 'partner-gotra' | 'partner-diet'
 
-  // User's own membership level (Can be switched dynamically for testing)
+  // Matrimony Subscription state helpers
+  const sub = currentUser?.matrimonySubscription;
+  const isCurrentlySubscribed = sub && sub.status === 'active';
+  const isCombo = isCurrentlySubscribed && sub.plan === 'Combo';
+
   const [userMembership, setUserMembership] = useState('Pro Max');
   const [isMembershipPopupOpen, setIsMembershipPopupOpen] = useState(false);
   const [selectedPlanToUpgrade, setSelectedPlanToUpgrade] = useState('Pro Supreme');
+
+  useEffect(() => {
+    if (isCurrentlySubscribed) {
+      setUserMembership(sub.plan + ' Plan');
+    } else {
+      setUserMembership('Normal');
+    }
+  }, [sub, isCurrentlySubscribed]);
+
+  // Sync state values with active profile (e.g. for Combo subscription)
+  useEffect(() => {
+    if (isCombo && sub?.profiles?.[sub.activeProfileType]) {
+      const p = sub.profiles[sub.activeProfileType];
+      setMyMatrimonialBio(p.bio || '');
+      setMyGotra(p.gotra || 'Garg');
+      setMyDiet(p.diet || 'Vegetarian');
+      setMyIncome(p.income || '₹10-15 Lacs p.a');
+      setMyPhotosCount(p.photosCount || 3);
+    } else {
+      setMyMatrimonialBio(currentUser?.matrimonialBio || '');
+      setMyGotra(currentUser?.gotra || 'Garg');
+      setMyDiet(currentUser?.diet || 'Vegetarian');
+      setMyIncome(currentUser?.income || '₹10-15 Lacs p.a');
+      setMyPhotosCount(currentUser?.photosCount || 3);
+    }
+  }, [sub?.activeProfileType, currentUser, isCombo]);
+
+  const handleSaveDetails = (updatedFields) => {
+    if (isCombo) {
+      const updatedProfiles = {
+        ...sub.profiles,
+        [sub.activeProfileType]: {
+          ...(sub.profiles?.[sub.activeProfileType] || {}),
+          ...updatedFields
+        }
+      };
+      updateProfile({
+        matrimonySubscription: {
+          ...sub,
+          profiles: updatedProfiles
+        }
+      });
+      showToast('Profile details saved successfully! 💖');
+    } else {
+      updateProfile(updatedFields);
+      showToast('Profile details saved successfully! 💖');
+    }
+  };
+
+  const handleSwitchActiveProfileType = (type) => {
+    updateProfile({
+      matrimonySubscription: {
+        ...sub,
+        activeProfileType: type
+      }
+    });
+    showToast(`Now editing ${type === 'groom' ? "Son's" : "Daughter's"} Matrimonial Profile 🔄`);
+  };
+
+  const handleToggleComboActiveProfile = () => {
+    if (!isCurrentlySubscribed || sub.plan !== 'Combo') return;
+    const nextActive = sub.activeProfileType === 'groom' ? 'bride' : 'groom';
+    updateProfile({
+      matrimonySubscription: {
+        ...sub,
+        activeProfileType: nextActive
+      }
+    });
+    showToast(`Switched active search to ${nextActive === 'groom' ? "Son's Matches (Viewing Brides)" : "Daughter's Matches (Viewing Grooms)"} 🔄`);
+  };
 
   // Sub-navigation view inside activity hub
   const [currentSubView, setCurrentSubView] = useState(null); // null (default bottom nav matches/activity) | 'visits' | 'shortlisted' | 'contacts'
@@ -537,11 +611,26 @@ const MatrimonialHomePage = () => {
                       <span className="text-[12.5px] font-black text-rose-500 uppercase">{currentUser?.initials || 'RA'}</span>
                     )}
                     <div className="absolute -bottom-1 -right-1 bg-rose-500 text-white rounded-full px-1 py-0.5 text-[7px] font-black border border-white uppercase tracking-tighter leading-none">
-                      {userMembership.split(' ').map(n=>n[0]).join('')}
+                      {isCurrentlySubscribed ? sub.plan.split(' ').map(n=>n[0]).join('') : 'N'}
                     </div>
                   </div>
                   <div className="flex flex-col">
-                    <h1 className="text-[17px] font-black text-slate-800 tracking-tight leading-tight">My matches</h1>
+                    <div className="flex items-center gap-2">
+                      <h1 className="text-[17px] font-black text-slate-800 tracking-tight leading-tight">
+                        {isCombo 
+                          ? (sub.activeProfileType === 'groom' ? "Son's Matches" : "Daughter's Matches") 
+                          : "My matches"}
+                      </h1>
+                      {isCombo && (
+                        <button
+                          onClick={handleToggleComboActiveProfile}
+                          className="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded-full text-[8.5px] font-black uppercase tracking-tight flex items-center gap-0.5 active:scale-95 transition-all"
+                          title="Switch active search profile"
+                        >
+                          <SwitchCamera size={10} /> Switch
+                        </button>
+                      )}
+                    </div>
                     <p className="text-[11px] font-bold text-slate-400 mt-0.5 flex items-center gap-1">
                       as per <span className="text-rose-500 font-extrabold">partner preferences</span>
                       <Pencil size={10} className="text-slate-400 stroke-[2.5]" />
@@ -597,6 +686,28 @@ const MatrimonialHomePage = () => {
             </div>
 
             <div className="p-4 space-y-5 flex-1 max-w-md mx-auto w-full">
+              {!isCurrentlySubscribed && (
+                <div className="p-5 bg-gradient-to-r from-rose-50 to-pink-50 rounded-3xl text-slate-800 shadow-[0_4px_18px_rgba(244,63,94,0.06)] flex flex-col gap-3 relative overflow-hidden border border-rose-100">
+                  <div className="absolute -right-6 -bottom-6 opacity-5 text-rose-500">
+                    <Heart size={90} fill="currentColor" />
+                  </div>
+                  <div className="relative z-10">
+                    <span className="bg-rose-100 text-rose-600 text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider border border-rose-200">
+                      Premium Matches
+                    </span>
+                    <h3 className="text-[14.5px] font-black mt-2 leading-tight text-indigo-950">Matrimonial Premium Plans</h3>
+                    <p className="text-[10px] text-slate-450 font-bold leading-normal mt-1">
+                      Access specialized directories, view contact details, search by gotra, and manage dual profiles!
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => navigate('/member/matrimonial/subscription')}
+                    className="self-start px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-[10.5px] font-black shadow-sm active:scale-95 transition-all uppercase tracking-wider"
+                  >
+                    Upgrade Now
+                  </button>
+                </div>
+              )}
               {filteredFeed.length > 0 ? (
                 filteredFeed.map(profile => {
                   const interestSent = matrimonialProfiles.find(p => p.id === profile.id || p.id === `mp_${profile.id}`)?.interests?.sent;
@@ -1747,7 +1858,7 @@ const MatrimonialHomePage = () => {
                   )}
                 </div>
                 <div className="absolute -bottom-1.5 -right-1.5 bg-rose-500 text-white rounded-full px-2 py-0.5 text-[8px] font-black border-2 border-white uppercase tracking-wider shadow-sm">
-                  {userMembership}
+                  {isCurrentlySubscribed ? `${sub.plan} Plan` : 'Normal'}
                 </div>
               </div>
               
@@ -1765,29 +1876,52 @@ const MatrimonialHomePage = () => {
                 <span>Income: <strong className="text-slate-700">{myIncome}</strong></span>
               </p>
               
-              {/* Switch Membership levels helper for interactive testing inside Profile section */}
-              <div className="mt-4 bg-slate-50 border border-slate-200/50 rounded-2xl p-3 w-full">
-                <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Change Membership Tier (Testing):</p>
-                <div className="grid grid-cols-4 gap-1.5 mt-2">
-                  {['Normal', 'Pro', 'Pro Max', 'Pro Supreme'].map(tier => (
-                    <button
-                      key={tier}
-                      onClick={() => {
-                        setUserMembership(tier);
-                        showToast(`Switched membership level to ${tier} 👑`);
-                      }}
-                      className={`py-1 text-[9px] font-black rounded-lg transition-all border ${
-                        userMembership === tier
-                          ? 'bg-rose-500 text-white border-rose-500 shadow-xs'
-                          : 'bg-white border-slate-200 text-slate-500 hover:border-slate-350'
-                      }`}
-                    >
-                      {tier}
-                    </button>
-                  ))}
-                </div>
+              {/* Matrimony Subscription Status and Links */}
+              <div className="mt-4 bg-rose-50/40 border border-rose-100 rounded-2xl p-3 w-full">
+                <p className="text-[10px] text-rose-550 font-black uppercase tracking-wider">Matrimony Subscription</p>
+                <p className="text-xs font-black text-slate-750 mt-1">
+                  Plan: {isCurrentlySubscribed ? `${sub.plan} Membership` : 'Free Account'}
+                </p>
+                <button
+                  onClick={() => navigate('/member/matrimonial/subscription')}
+                  className="mt-2.5 w-full py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase tracking-wider shadow-xs transition-colors active:scale-97"
+                >
+                  Manage Subscription
+                </button>
               </div>
             </div>
+
+            {/* Combo Profile Switcher (Conditional) */}
+            {isCombo && (
+              <div className="bg-white rounded-3xl border border-slate-200/50 p-4 shadow-[0_2px_12px_rgba(0,0,0,0.02)] space-y-3">
+                <p className="text-[10px] text-indigo-950 font-black uppercase tracking-wider text-center">Manage Dual Profiles</p>
+                <div className="bg-slate-50 rounded-2xl p-1 flex items-center justify-between border border-slate-250/20">
+                  <button
+                    onClick={() => handleSwitchActiveProfileType('groom')}
+                    className={`flex-1 text-center py-2 rounded-xl font-black text-[11px] border transition-all ${
+                      sub.activeProfileType === 'groom'
+                        ? 'bg-rose-500 border-rose-500 text-white shadow-sm'
+                        : 'bg-transparent border-transparent text-slate-500 hover:bg-slate-100'
+                    }`}
+                  >
+                    Son (Groom)
+                  </button>
+                  <button
+                    onClick={() => handleSwitchActiveProfileType('bride')}
+                    className={`flex-1 text-center py-2 rounded-xl font-black text-[11px] border transition-all ${
+                      sub.activeProfileType === 'bride'
+                        ? 'bg-rose-500 border-rose-500 text-white shadow-sm'
+                        : 'bg-transparent border-transparent text-slate-500 hover:bg-slate-100'
+                    }`}
+                  >
+                    Daughter (Bride)
+                  </button>
+                </div>
+                <p className="text-[9.5px] text-slate-450 font-extrabold text-center leading-none">
+                  Currently Editing Details For: <span className="text-rose-500 font-black">{sub.activeProfileType === 'groom' ? "Son's Profile" : "Daughter's Profile"}</span>
+                </p>
+              </div>
+            )}
 
             {/* Photo Upload Manager Simulation */}
             <div className="bg-white rounded-3xl border border-slate-200/50 p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
@@ -1804,7 +1938,9 @@ const MatrimonialHomePage = () => {
                     <img src={`https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&q=80`} alt="Uploaded" className="w-full h-full object-cover" />
                     <button 
                       onClick={() => {
-                        setMyPhotosCount(prev => Math.max(1, prev - 1));
+                        const nextCount = Math.max(1, myPhotosCount - 1);
+                        setMyPhotosCount(nextCount);
+                        handleSaveDetails({ photosCount: nextCount });
                         showToast('Photo removed.');
                       }}
                       className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
@@ -1816,7 +1952,9 @@ const MatrimonialHomePage = () => {
                 {myPhotosCount < 4 && (
                   <button 
                     onClick={() => {
-                      setMyPhotosCount(prev => Math.min(4, prev + 1));
+                      const nextCount = Math.min(4, myPhotosCount + 1);
+                      setMyPhotosCount(nextCount);
+                      handleSaveDetails({ photosCount: nextCount });
                       showToast('Photo uploaded successfully! 📸');
                     }}
                     className="aspect-[3/4] border-2 border-dashed border-slate-200 hover:border-rose-400 rounded-xl flex flex-col items-center justify-center text-slate-400 active:scale-95 transition-transform"
@@ -1840,7 +1978,7 @@ const MatrimonialHomePage = () => {
               />
               <button 
                 onClick={() => {
-                  updateProfile({ matrimonialBio: myMatrimonialBio });
+                  handleSaveDetails({ bio: myMatrimonialBio, matrimonialBio: myMatrimonialBio });
                   showToast('Matrimonial Bio Saved successfully! 💕');
                 }}
                 className="mt-3 w-full py-2.5 bg-rose-500 text-white rounded-xl text-[12px] font-black shadow-xs active:scale-95 transition-transform uppercase tracking-wider"
@@ -1888,6 +2026,11 @@ const MatrimonialHomePage = () => {
               </div>
               <button 
                 onClick={() => {
+                  handleSaveDetails({
+                    gotra: myGotra,
+                    diet: myDiet,
+                    income: myIncome
+                  });
                   showToast('Profile Parameters Saved successfully! ⭐');
                 }}
                 className="mt-4 w-full py-2.5 bg-rose-500 text-white rounded-xl text-[12px] font-black shadow-xs active:scale-95 transition-transform uppercase tracking-wider"
@@ -2223,10 +2366,10 @@ const MatrimonialHomePage = () => {
           {/* Upgrade Tab */}
           <div className="flex-1 h-full flex items-center justify-center">
             <div 
-              onClick={() => navigate('/member/profile/upgrade')}
-              className="bg-amber-100/50 hover:bg-amber-100 border border-amber-200/60 rounded-xl px-2.5 py-1.5 flex flex-col items-center justify-center cursor-pointer select-none active:scale-95 transition-transform"
+              onClick={() => navigate('/member/matrimonial/subscription')}
+              className="bg-rose-50 hover:bg-rose-100 border border-rose-250 rounded-xl px-2.5 py-1.5 flex flex-col items-center justify-center cursor-pointer select-none active:scale-95 transition-transform"
             >
-              <span className="text-[9px] font-extrabold text-amber-700 bg-amber-250 px-1 rounded uppercase tracking-wider leading-none">70% OFF</span>
+              <span className="text-[9px] font-extrabold text-rose-600 bg-rose-200 px-1 rounded uppercase tracking-wider leading-none">Premium</span>
               <span className="text-[9.5px] mt-0.5 font-bold text-amber-800 leading-none">Upgrade</span>
             </div>
           </div>

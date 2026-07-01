@@ -201,7 +201,19 @@ const adaptMatrimonial = (profilesList, currentUser) => {
   if (!currentUser) return profilesList;
   const community = currentUser.community;
   const surname = getCommunitySurname(community);
-  const oppositeGender = currentUser.gender === 'Male' ? 'Female' : 'Male';
+  
+  let oppositeGender = currentUser.gender === 'Male' ? 'Female' : 'Male';
+  
+  if (currentUser.matrimonySubscription && currentUser.matrimonySubscription.status === 'active') {
+    const sub = currentUser.matrimonySubscription;
+    if (sub.plan === 'Groom') {
+      oppositeGender = 'Female';
+    } else if (sub.plan === 'Bride') {
+      oppositeGender = 'Male';
+    } else if (sub.plan === 'Combo') {
+      oppositeGender = sub.activeProfileType === 'groom' ? 'Female' : 'Male';
+    }
+  }
 
   return profilesList
     .filter(p => p.gender === oppositeGender)
