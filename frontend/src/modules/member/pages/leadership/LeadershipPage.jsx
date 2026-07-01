@@ -60,25 +60,25 @@ const HeroBanner = ({ leader, language, onBack, navigate }) => {
   if (!leader) return null;
 
   return (
-    <div className="bg-gray-50 pt-12 pb-6 px-5 relative">
+    <div className="bg-gradient-to-b from-[#1e1145] via-[#25175a] to-surface pt-12 pb-6 px-5 relative">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6 relative z-20">
-        <button onClick={onBack} className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-700 active:scale-95 transition-transform shrink-0">
-          <ArrowLeft size={20} />
+        <button onClick={onBack} className="w-9 h-9 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-white active:scale-95 transition-transform shrink-0 hover:bg-white/15 press-scale">
+          <ArrowLeft size={18} strokeWidth={2.5} />
         </button>
         <div>
-          <h1 className="text-gray-900 text-[24px] font-extrabold tracking-tight">{t('Samaj Netrutva', language)}</h1>
-          <p className="text-gray-500 text-[13px] font-medium">{t('Our Leadership, Our Pride', language)}</p>
+          <h1 className="text-white text-[22px] font-bold tracking-tight">{t('Samaj Netrutva', language)}</h1>
+          <p className="text-purple-200/70 text-[12px] font-medium mt-0.5">{t('Our Leadership, Our Pride', language)}</p>
         </div>
       </div>
       
       {/* Split Details Container Card */}
-      <div className="bg-white rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-gray-100 p-5 flex flex-col gap-5">
+      <div className="card-neo bg-white/95 p-5 flex flex-col gap-5 shadow-xl shadow-purple-900/10">
         
         {/* Top Info Split: Photo on left, Info on right */}
         <div className="flex gap-5 items-start">
           {/* Left: Portrait Photo */}
-          <div className="w-[125px] h-[150px] shrink-0 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 relative">
+          <div className="w-[125px] h-[150px] shrink-0 rounded-2xl overflow-hidden bg-slate-50 border border-purple-100/20 relative shadow-sm">
             <img 
               src={`https://i.pravatar.cc/300?u=${leader.initials}`} 
               className="w-full h-full object-cover" 
@@ -88,33 +88,33 @@ const HeroBanner = ({ leader, language, onBack, navigate }) => {
           
           {/* Right: Text Information */}
           <div className="flex-1 flex flex-col justify-start">
-            <div className="flex items-center gap-1.5 mb-1.5">
+            <div className="flex items-center gap-1.5 mb-2">
               {['President', 'Patron'].includes(leader.role) && (
                 <Crown size={18} className="text-amber-500 fill-amber-500 shrink-0" />
               )}
-              <span className={`text-white text-[10px] font-black px-3.5 py-0.5 rounded-full uppercase tracking-wider ${getBadgeColor(leader.role)}`}>
+              <span className={`text-white text-[10px] font-black px-3.5 py-0.5 rounded-full uppercase tracking-wider ${getBadgeColor(leader.role)} shadow-sm`}>
                 {getHindiRole(leader.role)}
               </span>
             </div>
             
-            <h2 className="text-[20px] font-extrabold text-slate-800 leading-tight">
+            <h2 className="text-[19px] font-bold text-text-primary leading-tight tracking-tight">
               {leader.name}
             </h2>
             
-            <p className="text-[#f08c35] text-[13px] font-bold mt-1">
+            <p className="text-brand-accent text-[12px] font-bold mt-1">
               {getSubTitle(leader.role)}
             </p>
             
             {/* Phone & Location */}
-            <div className="flex flex-col gap-1.5 mt-3 text-slate-600 text-[12px] font-medium">
+            <div className="flex flex-col gap-1.5 mt-3.5 text-text-secondary text-[12px] font-medium">
               {leader.phone && (
                 <div className="flex items-center gap-2">
-                  <Phone size={13} className="text-slate-400 shrink-0" />
+                  <Phone size={13} className="text-purple-400 shrink-0" />
                   <span>{leader.phone}</span>
                 </div>
               )}
               <div className="flex items-center gap-2">
-                <MapPin size={13} className="text-slate-400 shrink-0" />
+                <MapPin size={13} className="text-purple-400 shrink-0" />
                 <span>{leader.city}</span>
               </div>
             </div>
@@ -122,19 +122,19 @@ const HeroBanner = ({ leader, language, onBack, navigate }) => {
         </div>
         
         {/* Divider */}
-        <div className="h-[1px] bg-gray-100 w-full" />
+        <div className="h-[1px] bg-purple-100/20 w-full" />
         
         {/* Bottom Actions: Call and Chat */}
         <div className="flex gap-4 w-full">
           <a 
             href={`tel:${leader.phone}`} 
-            className="flex-1 py-3 rounded-full border border-[#1e58b8] text-[#1e58b8] text-[13.5px] font-black flex items-center justify-center gap-2 hover:bg-blue-50 active:scale-95 transition-all text-center"
+            className="flex-1 py-3 rounded-xl border border-purple-200/60 text-brand-primary text-[13px] font-bold flex items-center justify-center gap-2 hover:bg-purple-50/50 active:scale-95 transition-all text-center press-scale"
           >
             <Phone size={15} /> कॉल करें
           </a>
           <button 
             onClick={() => navigate(`/member/chat/${leader.id}`)} 
-            className="flex-1 py-3 rounded-full bg-[#00a651] text-white text-[13.5px] font-black flex items-center justify-center gap-2 hover:bg-green-600 shadow-md shadow-green-900/10 active:scale-95 transition-all"
+            className="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[13px] font-bold flex items-center justify-center gap-2 hover:shadow-lg shadow-emerald-500/20 active:scale-95 transition-all press-scale"
           >
             <MessageCircle size={15} /> चैट करें
           </button>

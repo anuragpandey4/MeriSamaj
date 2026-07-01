@@ -107,66 +107,66 @@ const VerifyMembershipPage = () => {
 
   return (
     <div className="min-h-screen bg-surface flex flex-col pb-6 animate-fade-in">
-      {/* Header */}
-      <div className="bg-card border-b border-gray-100 flex items-center gap-3 px-4 h-14 sticky top-0 z-30 shadow-sm">
-        <button onClick={() => navigate(-1)} className="p-1 -ml-1 press-scale">
-          <ArrowLeft size={22} className="text-text-primary" />
+      {/* Header Bar — Glass morphism */}
+      <div className="bg-white/80 backdrop-blur-xl border-b border-purple-100/30 flex items-center gap-3 px-4 h-14 sticky top-0 z-30 shadow-[0_2px_12px_rgba(124,58,237,0.02)]">
+        <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-text-primary hover:bg-purple-50 transition-colors press-scale">
+          <ArrowLeft size={18} strokeWidth={2.5} />
         </button>
-        <h1 className="text-base font-semibold text-text-primary">Request Verification</h1>
+        <h1 className="text-base font-bold text-text-primary tracking-tight">Request Verification</h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 pt-6">
-        <div className="bg-emerald-50 rounded-2xl p-4 flex gap-3 mb-6 border border-emerald-100">
-          <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
+      <div className="flex-1 overflow-y-auto px-5 pt-6 max-w-md mx-auto w-full">
+        <div className="bg-emerald-50/50 rounded-2xl p-4 flex gap-3 mb-6 border border-emerald-100/60 shadow-sm">
+          <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0 border border-emerald-200">
             <ShieldCheck size={20} className="text-emerald-700" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-emerald-950 mb-1">Verify Your Profile</h3>
-            <p className="text-xs text-emerald-800 leading-relaxed">
+            <p className="text-xs text-emerald-800 leading-relaxed font-medium">
               Verified members receive a trust badge, can vote in community polls, apply for professional listing, and participate in matrimonial services.
             </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5 pb-6">
           <div>
-            <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Select ID Document</label>
+            <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">Select ID Document</label>
             <div className="relative mt-2">
               <select 
                 value={docType}
                 onChange={(e) => setDocType(e.target.value)}
-                className="w-full bg-card border border-gray-200 rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:border-brand-primary transition-all appearance-none"
+                className="w-full bg-white border border-purple-100/30 rounded-xl px-4 py-3.5 text-sm text-text-primary outline-none focus:border-brand-primary/45 focus:shadow-[0_0_0_3px_rgba(124,58,237,0.08)] transition-all appearance-none font-semibold shadow-sm"
               >
                 <option>Aadhaar Card</option>
                 <option>PAN Card</option>
                 <option>Voter ID</option>
                 <option>Passport</option>
               </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary text-xs">▼</div>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-brand-primary text-[10px] font-bold">▼</div>
             </div>
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">{docType} Number</label>
+            <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">{docType} Number</label>
             <input 
               required
               type="text" 
               placeholder={`Enter your ${docType} number`}
               value={docNumber}
               onChange={(e) => setDocNumber(e.target.value)}
-              className="w-full mt-2 bg-card border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-text-primary outline-none focus:border-brand-primary transition-all placeholder-gray-400"
+              className="w-full mt-2 bg-white border border-purple-100/30 rounded-xl px-4 py-3.5 text-sm text-text-primary outline-none focus:border-brand-primary/45 focus:shadow-[0_0_0_3px_rgba(124,58,237,0.08)] transition-all placeholder-gray-450 font-medium shadow-sm"
             />
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Upload Document Image</label>
+            <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">Upload Document Image</label>
             <div className="mt-2">
-              <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl p-6 bg-card cursor-pointer hover:border-brand-primary transition-all">
-                <UploadCloud size={32} className="text-gray-400 mb-2" />
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-purple-200/50 rounded-2xl p-6 bg-white cursor-pointer hover:border-brand-primary transition-all shadow-sm">
+                <UploadCloud size={32} className="text-purple-400 mb-2 animate-bounce" />
                 <p className="text-xs text-text-primary font-bold">
                   {fileAttached ? fileAttached : "Select file or capture image"}
                 </p>
-                <p className="text-[10px] text-text-secondary mt-1">Supports PNG, JPG (Max 5MB)</p>
+                <p className="text-[10px] text-text-secondary mt-1 font-medium">Supports PNG, JPG (Max 5MB)</p>
                 <input 
                   required
                   type="file" 
@@ -178,14 +178,14 @@ const VerifyMembershipPage = () => {
             </div>
           </div>
 
-          <div className="pt-6">
+          <div className="pt-4">
             <button 
               type="submit" 
-              className="w-full py-3.5 bg-brand-primary text-white rounded-xl text-sm font-semibold press-scale shadow-md flex justify-center items-center gap-2"
+              className="w-full py-3.5 bg-gradient-to-r from-brand-primary to-brand-glow text-white rounded-xl text-sm font-semibold press-scale shadow-md shadow-purple-500/25 flex justify-center items-center gap-2"
             >
               <FileText size={16} /> Submit Documents
             </button>
-            <p className="text-[10px] text-center text-text-secondary mt-3">
+            <p className="text-[10px] text-center text-text-muted mt-3 font-semibold">
               Your details are securely encrypted and reviewed only by verified community officials.
             </p>
           </div>

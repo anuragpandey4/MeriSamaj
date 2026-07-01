@@ -171,39 +171,36 @@ const ChatListPage = ({ isHub = false }) => {
   };
 
   return (
-    <div className={`flex flex-col bg-gray-50 ${isHub ? 'h-full' : 'min-h-screen pb-20'}`}>
+    <div className={`flex flex-col bg-surface ${isHub ? 'h-full' : 'min-h-screen pb-20'}`}>
       
-      {/* HEADER */}
-      <div className={`
-        ${isHub ? 'bg-white text-text-primary border-b border-gray-100' : 'bg-brand-primary text-white pt-12 shadow-md'}
-        pb-3 px-4 sticky top-0 z-30
-      `}>
+      {/* Header Bar — Glass morphism */}
+      <div className="bg-white/80 backdrop-blur-xl border-b border-purple-100/30 pb-3 px-4 sticky top-0 z-30 shadow-[0_2px_12px_rgba(124,58,237,0.02)]">
         {!isHub && (
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between pt-3 mb-2">
             <div>
-              <h1 className="text-[24px] font-bold tracking-tight">Chats</h1>
+              <h1 className="text-xl font-bold text-text-primary tracking-tight">Chats</h1>
               {totalUnread > 0 && (
-                <p className="text-white/80 text-[13px] font-medium">You have {totalUnread} unread messages</p>
+                <p className="text-brand-primary text-[11px] font-bold mt-0.5">You have {totalUnread} unread messages</p>
               )}
             </div>
             <div className="flex items-center gap-2 relative">
-              <button className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center active:bg-white/20 transition-colors">
-                <Search size={20} />
+              <button className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-text-primary hover:bg-purple-50 transition-colors press-scale">
+                <Search size={18} />
               </button>
               <button 
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center active:bg-white/20 transition-colors"
+                className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-text-primary hover:bg-purple-50 transition-colors press-scale"
               >
-                <MoreVertical size={20} />
+                <MoreVertical size={18} />
               </button>
               
               {/* Dropdown Menu */}
               {showDropdown && (
-                <div className="absolute top-12 right-0 bg-white rounded-xl shadow-xl border border-gray-100 w-48 py-2 z-50 animate-fade-in text-gray-800">
-                  <button className="w-full px-4 py-2.5 text-left text-[14px] font-semibold hover:bg-gray-50 flex items-center gap-3">
+                <div className="absolute top-11 right-0 bg-white rounded-xl shadow-xl border border-purple-100/30 w-48 py-2 z-50 animate-fade-in text-text-primary">
+                  <button className="w-full px-4 py-2.5 text-left text-[13px] font-bold hover:bg-purple-50 flex items-center gap-3">
                     <Users size={16} /> New Group
                   </button>
-                  <button className="w-full px-4 py-2.5 text-left text-[14px] font-semibold hover:bg-gray-50 flex items-center gap-3">
+                  <button className="w-full px-4 py-2.5 text-left text-[13px] font-bold hover:bg-purple-50 flex items-center gap-3">
                     <Archive size={16} /> Archived Chats
                   </button>
                 </div>
@@ -215,15 +212,13 @@ const ChatListPage = ({ isHub = false }) => {
         {/* Search & Filters */}
         <div className="mt-2 space-y-3">
           <div className="relative">
-            <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-purple-400" />
             <input
               type="text"
               placeholder="Search conversations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full rounded-2xl py-2.5 pl-10 pr-4 text-[15px] focus:outline-none transition-shadow ${
-                isHub ? 'bg-gray-100 text-gray-900 focus:bg-white focus:ring-2 focus:ring-brand-primary' : 'bg-white/10 text-white placeholder-white/60 focus:bg-white/20'
-              }`}
+              className="w-full rounded-2xl py-2.5 pl-10 pr-4 text-[13px] font-bold outline-none transition-all bg-white border border-purple-100/30 focus:border-brand-primary/45 focus:shadow-[0_0_0_3px_rgba(124,58,237,0.08)] focus:bg-white text-text-primary placeholder:text-text-secondary shadow-sm"
             />
           </div>
 
@@ -232,10 +227,10 @@ const ChatListPage = ({ isHub = false }) => {
               <button
                 key={f}
                 onClick={() => setFilterType(f)}
-                className={`px-4 py-1.5 rounded-full text-[13px] font-bold capitalize whitespace-nowrap transition-colors ${
+                className={`px-4 py-1.5 rounded-xl text-[12px] font-bold capitalize whitespace-nowrap transition-colors press-scale ${
                   filterType === f 
-                    ? (isHub ? 'bg-brand-primary text-white' : 'bg-white text-brand-primary') 
-                    : (isHub ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : 'bg-white/10 text-white/80 hover:bg-white/20')
+                    ? 'bg-brand-primary text-white shadow-md shadow-purple-300/40' 
+                    : 'bg-purple-50 text-brand-primary border border-purple-100/30 hover:bg-purple-100/40'
                 }`}
               >
                 {f}
@@ -246,7 +241,7 @@ const ChatListPage = ({ isHub = false }) => {
       </div>
 
       {/* CHAT LIST */}
-      <div className="flex-1 bg-white overflow-y-auto">
+      <div className="flex-1 bg-transparent overflow-y-auto">
         {filteredChats.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4 opacity-60">
             <MessageCircle size={48} className="text-gray-300" />

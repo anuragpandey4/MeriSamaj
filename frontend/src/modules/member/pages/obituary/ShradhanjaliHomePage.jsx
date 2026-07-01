@@ -203,9 +203,10 @@ const ShradhanjaliHomePage = () => {
       <div
         className="responsive-fixed-top z-40 border-b"
         style={{
-          background: 'rgba(255,255,255,0.97)',
-          backdropFilter: 'blur(20px)',
-          borderColor: 'rgba(212,175,55,0.15)',
+          background: 'rgba(255,255,255,0.82)',
+          backdropFilter: 'blur(24px)',
+          borderColor: 'rgba(212,175,55,0.22)',
+          boxShadow: '0 2px 14px rgba(124,92,46,0.04)',
           paddingTop: 'var(--spacing-safe-top)',
         }}
       >
@@ -217,21 +218,21 @@ const ShradhanjaliHomePage = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
-                className="flex-1 flex items-center gap-2 rounded-2xl px-3 py-2 border"
-                style={{ borderColor: 'rgba(212,175,55,0.4)', background: '#FAFAF8' }}
+                className="flex-1 flex items-center gap-2 rounded-2xl px-3.5 py-2 border shadow-inner"
+                style={{ borderColor: 'rgba(212,175,55,0.3)', background: 'rgba(253,248,240,0.5)' }}
               >
-                <Search size={16} className="text-gray-400 shrink-0" />
+                <Search size={16} className="text-amber-700/60 shrink-0" />
                 <input
                   autoFocus
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="नाम से खोजें..."
-                  className="flex-1 bg-transparent border-none text-[14px] text-gray-900 placeholder-gray-400 focus:outline-none"
+                  className="flex-1 bg-transparent border-none text-[14px] text-gray-900 placeholder-amber-900/40 focus:outline-none font-medium"
                 />
                 {search && (
                   <button onClick={() => setSearch('')}>
-                    <X size={14} className="text-gray-400" />
+                    <X size={14} className="text-amber-800" />
                   </button>
                 )}
               </motion.div>

@@ -114,14 +114,14 @@ const NotificationsPage = () => {
         }
       />
 
-      <div className="pt-16">
+      <div className="pt-16 max-w-lg mx-auto w-full">
         {showSettings && activePreferences.length > 0 && (
-          <div className="bg-white border border-gray-100 rounded-2xl mx-5 p-4 mb-4 shadow-sm animate-fade-in-down">
+          <div className="card-neo mx-5 p-4 mb-4 shadow-sm animate-fade-in-down">
             <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-3">Subscription Preferences</h3>
             <div className="space-y-3">
               {activePreferences.map(pref => (
                 <div key={pref.key} className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-text-primary">{pref.label}</span>
+                  <span className="text-sm font-bold text-text-primary">{pref.label}</span>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input 
                       type="checkbox" 
@@ -129,7 +129,7 @@ const NotificationsPage = () => {
                       onChange={() => toggleFollowedAnnouncement(pref.key)} 
                       className="sr-only peer" 
                     />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>
+                    <div className="w-9 h-5 bg-purple-100/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-purple-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>
                   </label>
                 </div>
               ))}
@@ -139,7 +139,7 @@ const NotificationsPage = () => {
 
         {filteredNotifications.length === 0 ? (
           <div className="text-center py-16 px-4">
-            <Megaphone size={36} className="text-gray-300 mx-auto mb-2" />
+            <Megaphone size={36} className="text-purple-200 mx-auto mb-2" />
             <p className="text-sm font-semibold text-text-secondary">No notifications matching your filters</p>
           </div>
         ) : (
@@ -148,21 +148,21 @@ const NotificationsPage = () => {
             return (
               <div
                 key={n.id}
-                className={`flex items-start gap-4 px-5 py-4 border-b border-gray-100 card-press animate-stagger-fade-in ${
-                  !n.isRead ? 'bg-brand-primary/[0.04]' : 'bg-white'
+                className={`flex items-start gap-4 px-5 py-4 border-b border-purple-100/10 animate-stagger-fade-in ${
+                  !n.isRead ? 'bg-purple-50/40' : 'bg-transparent'
                 }`}
                 style={{ animationDelay: `${i * 60}ms` }}
               >
-                <div className={`w-10 h-10 rounded-xl ${config.color} flex items-center justify-center shrink-0 mt-0.5`}>
+                <div className={`w-10 h-10 rounded-xl ${config.color} flex items-center justify-center shrink-0 mt-0.5 border border-purple-100/10`}>
                   <config.icon size={16} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <h4 className={`text-[15px] ${!n.isRead ? 'font-bold' : 'font-medium'} text-text-primary`}>{n.title}</h4>
+                    <h4 className={`text-[15px] ${!n.isRead ? 'font-bold' : 'font-semibold'} text-text-primary`}>{n.title}</h4>
                     {!n.isRead && <div className="w-2.5 h-2.5 bg-brand-primary rounded-full shrink-0 mt-1.5" />}
                   </div>
                   <p className="text-[13px] text-text-secondary mt-1 leading-relaxed">{n.message}</p>
-                  <p className="text-[12px] text-text-secondary font-medium mt-1.5">{n.time}</p>
+                  <p className="text-[11px] text-text-muted mt-1.5 font-bold">{n.time}</p>
                 </div>
               </div>
             );

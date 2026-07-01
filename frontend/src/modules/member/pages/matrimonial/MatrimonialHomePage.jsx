@@ -504,11 +504,11 @@ const MatrimonialHomePage = () => {
       {/* ─── MAIN MATCHES FEED VIEW ─── */}
       {activeBottomTab === 'matches' && (
         <>
-          {/* Header Bar */}
-          <div className="bg-white sticky top-0 z-45 border-b border-slate-100/80 shrink-0 px-4 h-15 flex items-center justify-between">
+          {/* Header Bar — Glass morphism */}
+          <div className="bg-white/80 backdrop-blur-xl sticky top-0 z-45 border-b border-purple-100/30 shrink-0 px-4 h-15 flex items-center justify-between shadow-[0_2px_12px_rgba(244,63,94,0.03)]">
             {isSearchOpen ? (
-              <div className="flex-1 flex items-center gap-3 bg-slate-100 px-3.5 py-2 rounded-xl">
-                <Search size={18} className="text-slate-450" />
+              <div className="flex-1 flex items-center gap-3 bg-rose-50/40 border border-rose-100/30 px-3.5 py-2 rounded-xl">
+                <Search size={18} className="text-rose-450" />
                 <input
                   type="text"
                   placeholder="Search matches..."
@@ -1026,12 +1026,12 @@ const MatrimonialHomePage = () => {
       {/* ─── SUBVIEW 1: PROFILE VISITS PAGE (Cloned from Images 1 & 3) ─── */}
       {currentSubView === 'visits' && (
         <div className="flex-1 flex flex-col bg-slate-50 overflow-hidden font-sans">
-          {/* Header */}
-          <div className="bg-white border-b border-slate-100 px-4 h-14 flex items-center gap-3 sticky top-0 z-35 shrink-0 shadow-sm">
-            <button onClick={() => setCurrentSubView(null)} className="p-1 active:opacity-60 text-slate-800">
-              <ArrowLeft size={22} />
+          {/* Header Bar — Glass morphism */}
+          <div className="bg-white/80 backdrop-blur-xl border-b border-purple-100/30 px-4 h-14 flex items-center gap-3 sticky top-0 z-35 shrink-0 shadow-[0_2px_12px_rgba(244,63,94,0.02)]">
+            <button onClick={() => setCurrentSubView(null)} className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-slate-800 hover:bg-rose-50 hover:text-rose-600 transition-colors press-scale">
+              <ArrowLeft size={18} strokeWidth={2.5} />
             </button>
-            <h1 className="text-[17px] font-black text-slate-800">Profile Visits</h1>
+            <h1 className="text-[17px] font-bold text-text-primary tracking-tight">Profile Visits</h1>
           </div>
 
           {/* Sub-tabs */}
@@ -1284,12 +1284,12 @@ const MatrimonialHomePage = () => {
       {/* ─── SUBVIEW 2: CONTACT VIEWS PAGE (Cloned from Image 4) ─── */}
       {currentSubView === 'contacts' && (
         <div className="flex-1 flex flex-col bg-slate-50 overflow-hidden font-sans">
-          {/* Header */}
-          <div className="bg-white border-b border-slate-100 px-4 h-14 flex items-center gap-3 sticky top-0 z-35 shrink-0 shadow-sm">
-            <button onClick={() => setCurrentSubView(null)} className="p-1 active:opacity-60 text-slate-800">
-              <ArrowLeft size={22} />
+          {/* Header Bar — Glass morphism */}
+          <div className="bg-white/80 backdrop-blur-xl border-b border-purple-100/30 px-4 h-14 flex items-center gap-3 sticky top-0 z-35 shrink-0 shadow-[0_2px_12px_rgba(244,63,94,0.02)]">
+            <button onClick={() => setCurrentSubView(null)} className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-slate-800 hover:bg-rose-50 hover:text-rose-600 transition-colors press-scale">
+              <ArrowLeft size={18} strokeWidth={2.5} />
             </button>
-            <h1 className="text-[17px] font-black text-slate-800">Contact Views</h1>
+            <h1 className="text-[17px] font-bold text-text-primary tracking-tight">Contact Views</h1>
           </div>
 
           {/* Subtabs */}
@@ -1360,12 +1360,12 @@ const MatrimonialHomePage = () => {
       {/* ─── SUBVIEW 3: SHORTLISTED LISTS (Cloned from Image 5) ─── */}
       {currentSubView === 'shortlisted' && (
         <div className="flex-1 flex flex-col bg-slate-50 overflow-hidden font-sans">
-          {/* Header */}
-          <div className="bg-white border-b border-slate-100 px-4 h-14 flex items-center gap-3 sticky top-0 z-35 shrink-0 shadow-sm">
-            <button onClick={() => setCurrentSubView(null)} className="p-1 active:opacity-60 text-slate-800">
-              <ArrowLeft size={22} />
+          {/* Header Bar — Glass morphism */}
+          <div className="bg-white/80 backdrop-blur-xl border-b border-purple-100/30 px-4 h-14 flex items-center gap-3 sticky top-0 z-35 shrink-0 shadow-[0_2px_12px_rgba(244,63,94,0.02)]">
+            <button onClick={() => setCurrentSubView(null)} className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-slate-800 hover:bg-rose-50 hover:text-rose-600 transition-colors press-scale">
+              <ArrowLeft size={18} strokeWidth={2.5} />
             </button>
-            <h1 className="text-[17px] font-black text-slate-800">Shortlisted</h1>
+            <h1 className="text-[17px] font-bold text-text-primary tracking-tight">Shortlisted</h1>
           </div>
 
           {/* Subtabs */}
