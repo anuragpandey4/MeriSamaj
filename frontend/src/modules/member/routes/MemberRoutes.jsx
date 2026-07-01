@@ -114,7 +114,7 @@ export const MemberRoutes = () => {
         <Route path="login" element={<LoginScreen />} />
 
         {/* Main App — with bottom nav */}
-        <Route path="/" element={<MemberLayout />}>
+        <Route path="" element={<MemberLayout />}>
           <Route index element={<Navigate to="home" replace />} />
 
           {/* Main Tabs */}
