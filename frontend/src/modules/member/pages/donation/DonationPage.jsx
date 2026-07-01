@@ -64,14 +64,14 @@ const DonationPage = () => {
           <button onClick={() => setMobileMenuOpen(true)} className="p-1 -ml-1 press-scale">
             <Menu size={22} className="text-text-primary" />
           </button>
-          <h1 className="text-base font-bold text-text-primary">योगदान</h1>
+          <h1 className="text-base font-bold text-text-primary">Donations</h1>
         </div>
         <div className="flex items-center gap-2">
           <button 
             onClick={() => navigate('/member/donation/my')}
             className="text-xs font-bold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-full border border-purple-100 press-scale"
           >
-            मेरे योगदान
+            My Donations
           </button>
           <button onClick={() => navigate('/member/notifications?module=donation')} className="p-1 press-scale relative">
             <Bell size={22} className="text-text-primary" />
@@ -91,7 +91,7 @@ const DonationPage = () => {
               <MapPin size={16} className="text-purple-600" />
             </div>
             <div>
-              <p className="text-[10px] text-text-secondary font-medium">शहर चुनें</p>
+              <p className="text-[10px] text-text-secondary font-medium">Select City</p>
               <p className="text-xs font-bold text-text-primary">{selectedCity}</p>
             </div>
           </div>
@@ -101,7 +101,7 @@ const DonationPage = () => {
               onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
               className="px-3 py-1.5 text-xs font-bold text-purple-700 bg-purple-50 rounded-full border border-purple-100 flex items-center gap-1 press-scale"
             >
-              बदलें <ChevronDown size={14} />
+              Change <ChevronDown size={14} />
             </button>
             
             {isCityDropdownOpen && (
@@ -134,9 +134,9 @@ const DonationPage = () => {
           <div className="flex items-center justify-between gap-4">
             <div className="space-y-4 max-w-[65%]">
               <div>
-                <h2 className="text-xl font-bold text-white tracking-tight">समाज के लिए योगदान दें</h2>
+                <h2 className="text-xl font-bold text-white tracking-tight">Contribute to the Society</h2>
                 <p className="text-xs text-purple-100/90 leading-relaxed mt-1">
-                  आपका योगदान समाज के विकास और जरूरतमंदों की सहायता में महत्वपूर्ण भूमिका निभाता है।
+                  Your contribution plays an important role in the development of the society and helping those in need.
                 </p>
               </div>
             </div>
@@ -157,7 +157,7 @@ const DonationPage = () => {
         {/* 3. Purposes Section (हमारे उद्देश्य) */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-text-primary">हमारे उद्देश्य ({selectedCity})</h3>
+            <h3 className="text-sm font-bold text-text-primary">Our Purposes ({selectedCity})</h3>
           </div>
           
           {filteredPurposes.length === 0 ? (
@@ -193,8 +193,8 @@ const DonationPage = () => {
 
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-end mb-1">
-                      <span className="text-xs font-bold text-text-primary">₹{formatCurrency(purpose.raised)} <span className="text-[10px] font-normal text-text-secondary">प्राप्त</span></span>
-                      <span className="text-[10px] font-medium text-text-secondary">लक्ष्य: ₹{formatCurrency(purpose.target)}</span>
+                      <span className="text-xs font-bold text-text-primary">₹{formatCurrency(purpose.raised)} <span className="text-[10px] font-normal text-text-secondary">Raised</span></span>
+                      <span className="text-[10px] font-medium text-text-secondary">Goal: ₹{formatCurrency(purpose.target)}</span>
                     </div>
                     {/* Progress bar */}
                     <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
@@ -204,7 +204,7 @@ const DonationPage = () => {
                       />
                     </div>
                     <div className="flex justify-end">
-                      <span className="text-[9px] font-bold text-purple-700">{purpose.percentage}% पूर्ण</span>
+                      <span className="text-[9px] font-bold text-purple-700">{purpose.percentage}% Completed</span>
                     </div>
                   </div>
                 </div>
@@ -216,11 +216,11 @@ const DonationPage = () => {
         {/* 4. Bottom panels block: Transparency, Top Donors & Impact */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          {/* Top Donors Panel (टॉप योगदानकर्ता) */}
+          {/* Top Donors Panel */}
           <div className="bg-card rounded-3xl p-5 border border-gray-100 shadow-sm space-y-4">
             <div className="border-b border-gray-100 pb-2.5 flex justify-between items-center">
-              <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">टॉप योगदानकर्ता</h3>
-              <span className="text-[9px] text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded">समाज गौरव</span>
+              <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">Top Contributors</h3>
+              <span className="text-[9px] text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded">Society Pride</span>
             </div>
 
             <div className="space-y-3.5 my-2">
@@ -241,15 +241,15 @@ const DonationPage = () => {
                 onClick={() => setShowAllTopDonors(!showAllTopDonors)}
                 className="w-full py-2 text-xs font-bold text-purple-700 bg-purple-50 rounded-xl press-scale"
               >
-                {showAllTopDonors ? 'कम दिखाएं' : 'सभी देखें'}
+                {showAllTopDonors ? 'Show Less' : 'View All'}
               </button>
             )}
           </div>
           
-          {/* Transparency Panel (पारदर्शिता और विश्वास) */}
+          {/* Transparency Panel */}
           <div className="bg-card rounded-3xl p-5 border border-gray-100 shadow-sm space-y-4 flex flex-col justify-between">
             <div className="border-b border-gray-100 pb-2.5">
-              <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">पारदर्शिता और विश्वास</h3>
+              <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">Transparency and Trust</h3>
             </div>
             
             <div className="space-y-3.5 my-2">
@@ -267,14 +267,14 @@ const DonationPage = () => {
             
             <div className="bg-amber-50 rounded-xl p-2.5 border border-amber-100 text-[10px] text-amber-700 flex gap-1.5 items-start mt-2">
               <AlertTriangle size={13} className="text-amber-600 shrink-0 mt-0.5" />
-              <span>सभी दान 80G आयकर अधिनियम के तहत छूट योग्य हैं।</span>
+              <span>All donations are tax-deductible under Section 80G.</span>
             </div>
           </div>
 
-          {/* Impact Panel (समाज पर प्रभाव) */}
+          {/* Impact Panel */}
           <div className="bg-card rounded-3xl p-5 border border-gray-100 shadow-sm space-y-4">
             <div className="border-b border-gray-100 pb-2.5">
-              <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">समाज पर प्रभाव</h3>
+              <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">Impact on Society</h3>
             </div>
 
             <div className="grid grid-cols-2 gap-3 my-2">
@@ -288,7 +288,7 @@ const DonationPage = () => {
             
             <div className="bg-emerald-50 rounded-xl p-2.5 border border-emerald-100 text-[10px] text-emerald-800 flex gap-1.5 items-start mt-2">
               <Info size={13} className="text-emerald-600 shrink-0 mt-0.5" />
-              <span>आपके सहयोग से समाज निरंतर प्रगति पथ पर अग्रसर है।</span>
+              <span>With your support, the society is continuously moving forward.</span>
             </div>
           </div>
 

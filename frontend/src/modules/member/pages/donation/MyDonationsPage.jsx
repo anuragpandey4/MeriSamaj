@@ -11,8 +11,8 @@ const MyDonationsPage = () => {
   const [activeTab, setActiveTab] = useState('all');
 
   const filteredHistory = donationHistory.filter(txn => {
-    if (activeTab === 'once') return txn.type === 'एक बार';
-    if (activeTab === 'regular') return txn.type === 'नियमित';
+    if (activeTab === 'once') return txn.type === 'One-time';
+    if (activeTab === 'regular') return txn.type === 'Regular';
     return true;
   });
 
@@ -30,15 +30,15 @@ const MyDonationsPage = () => {
           <button onClick={() => navigate('/member/donation')} className="p-1 -ml-1 press-scale">
             <ArrowLeft size={22} className="text-text-primary" />
           </button>
-          <h1 className="text-base font-bold text-text-primary">मेरे योगदान</h1>
+          <h1 className="text-base font-bold text-text-primary">My Donations</h1>
         </div>
         <div className="text-xs font-semibold text-text-secondary bg-gray-100 px-3 py-1 rounded-full">
-          कुल ({donationHistory.length})
+          Total ({donationHistory.length})
         </div>
       </div>
 
       <div className="px-4 pt-5 max-w-xl mx-auto space-y-5">
-        {/* Segmented control tabs (सभ, एक बार, नियमित matching Screen 5) */}
+        {/* Segmented control tabs */}
         <div className="flex bg-gray-100/80 p-1.5 rounded-2xl border border-gray-200/50">
           <button 
             onClick={() => setActiveTab('all')}
@@ -48,7 +48,7 @@ const MyDonationsPage = () => {
                 : 'text-text-secondary hover:text-text-primary'
             }`}
           >
-            सभी
+            All
           </button>
           <button 
             onClick={() => setActiveTab('once')}
@@ -58,7 +58,7 @@ const MyDonationsPage = () => {
                 : 'text-text-secondary hover:text-text-primary'
             }`}
           >
-            एक बार
+            One-time
           </button>
           <button 
             onClick={() => setActiveTab('regular')}
@@ -68,7 +68,7 @@ const MyDonationsPage = () => {
                 : 'text-text-secondary hover:text-text-primary'
             }`}
           >
-            नियमित
+            Regular
           </button>
         </div>
 
@@ -113,8 +113,8 @@ const MyDonationsPage = () => {
               <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-300">
                 <CheckCircle2 size={24} />
               </div>
-              <h4 className="text-xs font-bold text-text-primary">कोई योगदान नहीं मिला</h4>
-              <p className="text-[10px] text-text-secondary max-w-[200px] mx-auto">चयनित श्रेणी में वर्तमान में कोई लेनदेन इतिहास उपलब्ध नहीं है।</p>
+              <h4 className="text-xs font-bold text-text-primary">No donations found</h4>
+              <p className="text-[10px] text-text-secondary max-w-[200px] mx-auto">No transaction history currently available in the selected category.</p>
             </div>
           )}
         </div>
@@ -122,10 +122,10 @@ const MyDonationsPage = () => {
         {/* Load More Button */}
         {filteredHistory.length > 0 && (
           <button 
-            onClick={() => alert('सभी योगदान इतिहास प्रदर्शित हैं।')}
+            onClick={() => alert('All donation history is displayed.')}
             className="w-full py-3 bg-gray-50 hover:bg-gray-100 text-text-secondary text-xs font-bold rounded-2xl border border-gray-200/50 press-scale"
           >
-            और देखें
+            Load More
           </button>
         )}
 
