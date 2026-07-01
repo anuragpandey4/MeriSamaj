@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Camera, Check } from 'lucide-react';
 import { useData } from '../../context/DataProvider';
+import { Avatar } from '../../components/common/Avatar';
 
 const EditProfilePage = () => {
   const navigate = useNavigate();
@@ -49,12 +50,25 @@ const EditProfilePage = () => {
         {/* Photo */}
         <div className="flex justify-center mb-8">
           <div className="relative">
-            <div className="w-24 h-24 bg-brand-primary/10 rounded-full flex items-center justify-center text-3xl font-bold text-brand-primary">
-              {currentUser.initials}
-            </div>
-            <button className="absolute bottom-0 right-0 w-8 h-8 bg-brand-primary text-white rounded-full flex items-center justify-center shadow-md press-scale border-2 border-white">
+            <Avatar initials={currentUser.initials} src={currentUser.avatar} size="xl" color="bg-brand-primary/10 text-brand-primary border-2 border-brand-primary/20 text-3xl" />
+            <label className="absolute bottom-0 right-0 w-8 h-8 bg-brand-primary text-white rounded-full flex items-center justify-center shadow-md press-scale border-2 border-white cursor-pointer">
               <Camera size={14} />
-            </button>
+              <input 
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      updateProfile({ avatar: event.target.result });
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+            </label>
           </div>
         </div>
 

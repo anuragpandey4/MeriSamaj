@@ -4,25 +4,22 @@ import { motion } from 'framer-motion';
 const pageVariants = {
   initial: {
     opacity: 0,
-    y: 10,
-    scale: 0.98,
+    y: 8,
   },
   in: {
     opacity: 1,
     y: 0,
-    scale: 1,
   },
   out: {
     opacity: 0,
-    y: -10,
-    scale: 0.98,
+    y: -8,
   },
 };
 
 const pageTransition = {
   type: 'spring',
-  stiffness: 300,
-  damping: 30,
+  stiffness: 260,
+  damping: 28,
 };
 
 export const AnimatedPage = ({ children }) => {

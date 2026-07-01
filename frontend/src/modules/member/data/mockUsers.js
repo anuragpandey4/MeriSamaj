@@ -16,6 +16,7 @@ export const currentUser = {
   address: '42, Vijay Nagar, Indore, MP - 452010',
   memberSince: '2024-01-15',
   isVerified: true,
+  matrimonialBio: 'I run a fashion design studio in Indore. I spend...',
   familyMembers: [
     { id: 'f1', name: 'Sunita Agrawal', relation: 'Wife', age: 31, avatar: null, initials: 'SA' },
     { id: 'f2', name: 'Aarav Agrawal', relation: 'Son', age: 8, avatar: null, initials: 'AA' },
@@ -230,6 +231,7 @@ export const mockMembers = [
 export const mockAdmins = [
   // Level 0: Patron (Sanrakshak)
   { id: 'a0', name: 'Seth Govindram Agrawal', initials: 'GA', city: 'Indore', role: 'Patron', avatar: null, phone: '+91 98765 00000' },
+  { id: 'a0_j', name: 'Seth Kirodimal Agrawal', initials: 'KA', city: 'Jaipur', role: 'Patron', avatar: null, phone: '+91 98765 00001' },
 
   // Level 1: President (Adhyaksh)
   { id: 'a1', name: 'Shri Mohan Lal Agrawal', initials: 'MA', city: 'Indore', role: 'President', avatar: null, phone: '+91 98765 43210' },
@@ -241,15 +243,31 @@ export const mockAdmins = [
   { id: 'a12b', name: 'Shri Dinesh Kumar Agrawal', initials: 'DA', city: 'Indore', role: 'Joint Secretary', avatar: null, phone: '+91 98765 33334' },
   { id: 'a12', name: 'Shri Vinod Kumar Agrawal', initials: 'VA', city: 'Indore', role: 'Treasurer', avatar: null, phone: '+91 98765 33333' },
 
+  // Jaipur Core Committee
+  { id: 'a10_j', name: 'Shri Ramesh Chand Agrawal', initials: 'RA', city: 'Jaipur', role: 'Vice President', avatar: null, phone: '+91 98765 11111' },
+  { id: 'a11_j', name: 'Shri Suresh Kumar Agrawal', initials: 'SA', city: 'Jaipur', role: 'Secretary', avatar: null, phone: '+91 98765 22222' },
+  { id: 'a12b_j', name: 'Shri Dinesh Kumar Agrawal', initials: 'DA', city: 'Jaipur', role: 'Joint Secretary', avatar: null, phone: '+91 98765 33334' },
+  { id: 'a12_j', name: 'Shri Vinod Kumar Agrawal', initials: 'VA', city: 'Jaipur', role: 'Treasurer', avatar: null, phone: '+91 98765 33333' },
+
   // Level 3: Executive Board (Mantrimandal)
   { id: 'a13', name: 'Shri Ashok Kumar Agrawal', initials: 'AA', city: 'Indore', role: 'Minister (Education)', avatar: null, phone: '+91 98765 44444' },
   { id: 'a14', name: 'Shri Deepak Kumar Agrawal', initials: 'DA', city: 'Indore', role: 'Minister (Youth)', avatar: null, phone: '+91 98765 55555' },
   { id: 'a15', name: 'Smt. Seema Agrawal', initials: 'SA', city: 'Indore', role: 'Minister (Women Welfare)', avatar: null, phone: '+91 98765 66666' },
   { id: 'a16', name: 'Shri Mahesh Chand Agrawal', initials: 'MA', city: 'Indore', role: 'Minister (Social)', avatar: null, phone: '+91 98765 77777' },
 
+  // Jaipur Executive Board
+  { id: 'a13_j', name: 'Shri Ashok Kumar Agrawal', initials: 'AA', city: 'Jaipur', role: 'Minister (Education)', avatar: null, phone: '+91 98765 44444' },
+  { id: 'a14_j', name: 'Shri Deepak Kumar Agrawal', initials: 'DA', city: 'Jaipur', role: 'Minister (Youth)', avatar: null, phone: '+91 98765 55555' },
+  { id: 'a15_j', name: 'Smt. Seema Agrawal', initials: 'SA', city: 'Jaipur', role: 'Minister (Women Welfare)', avatar: null, phone: '+91 98765 66666' },
+  { id: 'a16_j', name: 'Shri Mahesh Chand Agrawal', initials: 'MA', city: 'Jaipur', role: 'Minister (Social)', avatar: null, phone: '+91 98765 77777' },
+
   // Level 4: Zonal Heads (Kshetriya Prabhari)
   { id: 'a20', name: 'Shri Ramakant Agrawal', initials: 'RA', city: 'Indore', role: 'Zonal Head', zone: 'East Zone', avatar: null, phone: '+91 98765 88881' },
   { id: 'a21', name: 'Shri Kamal Agrawal', initials: 'KA', city: 'Indore', role: 'Zonal Head', zone: 'West Zone', avatar: null, phone: '+91 98765 88882' },
+
+  // Jaipur Zonal Heads
+  { id: 'a20_j', name: 'Shri Ramakant Agrawal', initials: 'RA', city: 'Jaipur', role: 'Zonal Head', zone: 'East Zone', avatar: null, phone: '+91 98765 88881' },
+  { id: 'a21_j', name: 'Shri Kamal Agrawal', initials: 'KA', city: 'Jaipur', role: 'Zonal Head', zone: 'West Zone', avatar: null, phone: '+91 98765 88882' },
 
   // Level 5: Regional Delegates (Area Sub-Heads)
   { id: 'a4', name: 'Shri Prakashchand Agrawal', initials: 'PA', city: 'Indore', area: 'Vijay Nagar', role: 'Area Sub-Head', members: 142, avatar: null },
@@ -257,4 +275,11 @@ export const mockAdmins = [
   { id: 'a6', name: 'Shri Shankar Lal Agrawal', initials: 'SA', city: 'Indore', area: 'Rajwada', role: 'Area Sub-Head', members: 210, avatar: null },
   { id: 'a7', name: 'Shri Govind Agrawal', initials: 'GA', city: 'Indore', area: 'Bhawarkuan', role: 'Area Sub-Head', members: 156, avatar: null },
   { id: 'a8', name: 'Shri Bhanwarlal Agrawal', initials: 'BA', city: 'Indore', area: 'Sudama Nagar', role: 'Area Sub-Head', members: 312, avatar: null },
+
+  // Jaipur Regional Delegates
+  { id: 'a4_j', name: 'Shri Prakashchand Agrawal', initials: 'PA', city: 'Jaipur', area: 'Malviya Nagar', role: 'Area Sub-Head', members: 142, avatar: null },
+  { id: 'a5_j', name: 'Smt. Omprakash Agrawal', initials: 'OA', city: 'Jaipur', area: 'C-Scheme', role: 'Area Sub-Head', members: 89, avatar: null },
+  { id: 'a6_j', name: 'Shri Shankar Lal Agrawal', initials: 'SA', city: 'Jaipur', area: 'Vaishali Nagar', role: 'Area Sub-Head', members: 210, avatar: null },
+  { id: 'a7_j', name: 'Shri Govind Agrawal', initials: 'GA', city: 'Jaipur', area: 'Raja Park', role: 'Area Sub-Head', members: 156, avatar: null },
+  { id: 'a8_j', name: 'Shri Bhanwarlal Agrawal', initials: 'BA', city: 'Jaipur', area: 'Mansarovar', role: 'Area Sub-Head', members: 312, avatar: null },
 ];
