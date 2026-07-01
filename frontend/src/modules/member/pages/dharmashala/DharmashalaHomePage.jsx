@@ -54,49 +54,49 @@ export default function DharmashalaHomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col pb-24 font-sans">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-100 px-4 h-14 flex items-center justify-between sticky top-0 z-30 shadow-sm shrink-0">
+      {/* Header Bar — Glass morphism */}
+      <div className="bg-white/80 backdrop-blur-xl border-b border-purple-100/30 px-4 h-14 flex items-center justify-between sticky top-0 z-30 shadow-[0_2px_12px_rgba(124,58,237,0.02)] shrink-0">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => navigate('/member')} 
-            className="w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-700 transition-colors"
+            className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-text-primary hover:bg-purple-50 transition-colors press-scale"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={20} strokeWidth={2.5} />
           </button>
-          <h1 className="text-[17px] font-bold text-slate-800">धर्मशाला बुकिंग</h1>
+          <h1 className="text-[17px] font-bold text-text-primary tracking-tight">धर्मशाला बुकिंग</h1>
         </div>
         <button 
           onClick={handleOpenFilter}
-          className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${selectedLocation !== 'all' || selectedFacilities.ac || selectedFacilities.food ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-100 text-slate-700'}`}
+          className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all press-scale ${selectedLocation !== 'all' || selectedFacilities.ac || selectedFacilities.food ? 'bg-purple-50 text-brand-primary border border-purple-200/40' : 'bg-gray-50 text-text-primary hover:bg-purple-50'}`}
         >
-          <Filter size={20} />
+          <Filter size={18} />
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {/* Search Bar */}
-        <div className="p-4 bg-white border-b border-slate-100">
+        <div className="p-4 bg-white/40 backdrop-blur-md border-b border-purple-100/20">
           <div className="relative">
             <input 
               type="text" 
               placeholder="धर्मशाला खोजें..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-11 pr-4 py-3 text-[14px] font-bold outline-none focus:border-indigo-500 transition-colors text-slate-800"
+              className="w-full bg-white border border-purple-100/30 rounded-2xl pl-11 pr-4 py-3.5 text-[14px] font-bold outline-none focus:border-brand-primary/45 focus:shadow-[0_0_0_3px_rgba(124,58,237,0.08)] transition-all text-slate-800"
             />
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400" />
           </div>
         </div>
 
         {/* List */}
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-4 max-w-4xl mx-auto">
           {filtered.length === 0 ? (
-            <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm p-8 text-center text-slate-500 font-bold">
+            <div className="card-neo p-8 text-center text-slate-500 font-bold">
               कोई धर्मशाला नहीं मिली
             </div>
           ) : (
             filtered.map(d => (
-              <div key={d.id} className="bg-white rounded-[24px] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+              <div key={d.id} className="card-neo overflow-hidden flex flex-col">
                 <div className="flex p-4 gap-4">
                   <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 bg-slate-100">
                     <img src={d.image} alt={d.name} className="w-full h-full object-cover" />

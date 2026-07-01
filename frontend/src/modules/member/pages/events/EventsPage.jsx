@@ -88,7 +88,7 @@ const EventCard = ({ event, index, onNavigate }) => {
 
   return (
     <div
-      className="bg-white rounded-[20px] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 cursor-pointer active:scale-[0.98] transition-all animate-stagger-fade-in"
+      className="card-neo overflow-hidden cursor-pointer animate-stagger-fade-in"
       style={{ animationDelay: `${index * 60}ms` }}
       onClick={() => navigate(`/member/events/${event.id}`)}
     >
@@ -319,21 +319,21 @@ const EventsPage = () => {
   const hasActiveFilters = filters.category !== 'all' || filters.registration !== 'all';
 
   return (
-    <div className="min-h-screen bg-[#f5f6fa] pb-28">
-      {/* ─── Header ─── */}
-      <div className="bg-white sticky top-0 z-30 border-b border-gray-100">
+    <div className="min-h-screen bg-surface pb-28">
+      {/* Header Bar — Glass morphism */}
+      <div className="bg-white/80 backdrop-blur-xl sticky top-0 z-30 border-b border-purple-100/30 shadow-[0_2px_12px_rgba(124,58,237,0.02)]">
         <div className="flex items-center justify-between px-4 h-14">
-          <button onClick={() => navigate(-1)} className="p-1.5 -ml-1 active:scale-90 transition-transform">
-            <ArrowLeft size={22} className="text-gray-800" />
+          <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-text-primary hover:bg-purple-50 transition-colors press-scale">
+            <ArrowLeft size={18} strokeWidth={2.5} />
           </button>
-          <h1 className="text-[16px] font-extrabold text-gray-900">कार्यक्रम एवं इवेंट्स</h1>
+          <h1 className="text-base font-bold text-text-primary tracking-tight">कार्यक्रम एवं इवेंट्स</h1>
           <button
             onClick={() => setShowFilter(true)}
-            className={`relative p-2 rounded-xl transition-all active:scale-90 ${hasActiveFilters ? 'bg-brand-primary/10' : 'bg-gray-50'}`}
+            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all press-scale ${hasActiveFilters ? 'bg-purple-50 text-brand-primary border border-purple-200/40' : 'bg-gray-50 text-text-primary hover:bg-purple-50'}`}
           >
-            <Filter size={18} className={hasActiveFilters ? 'text-brand-primary' : 'text-gray-500'} />
+            <Filter size={18} />
             {hasActiveFilters && (
-              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-brand-primary rounded-full border-2 border-white" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-primary rounded-full" />
             )}
           </button>
         </div>
@@ -341,13 +341,13 @@ const EventsPage = () => {
         {/* Search Bar */}
         <div className="px-4 pb-3">
           <div className="relative">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-purple-400" />
             <input
               type="text"
               placeholder="इवेंट खोजें..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 rounded-2xl text-[13px] text-gray-800 placeholder:text-gray-400 border border-gray-100 focus:outline-none focus:border-brand-primary/30 focus:bg-white transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-white border border-purple-100/30 rounded-2xl text-[13px] text-text-primary font-bold placeholder:text-text-secondary outline-none focus:border-brand-primary/45 focus:shadow-[0_0_0_3px_rgba(124,58,237,0.08)] focus:bg-white transition-all shadow-sm"
             />
           </div>
         </div>

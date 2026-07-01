@@ -489,9 +489,9 @@ export const CensusPage = () => {
   return (
     <div className={`min-h-screen bg-gray-50/70 pb-24 ${printPreviewMode ? 'bg-white p-0 pb-0' : ''}`}>
       
-      {/* ─── HEADER / ACTION BAR ─── */}
+      {/* ─── HEADER / ACTION BAR — Glass morphism ─── */}
       {!printPreviewMode && (
-        <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 px-5 py-4 flex items-center justify-between shadow-sm">
+        <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-purple-100/30 px-5 py-3 flex items-center justify-between shadow-[0_2px_12px_rgba(124,58,237,0.02)]">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => {
@@ -500,12 +500,12 @@ export const CensusPage = () => {
                   setCurrentView(selectedFamily.type === 'Joint' ? 'joint-families' : 'nuclear-families');
                 } else setCurrentView('dashboard');
               }}
-              className="w-10 h-10 rounded-full border border-gray-150 flex items-center justify-center text-gray-700 bg-white active:scale-95 transition-transform"
+              className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-text-primary hover:bg-purple-50 transition-colors press-scale"
             >
-              <ArrowLeft size={18} />
+              <ArrowLeft size={18} strokeWidth={2.5} />
             </button>
             <div>
-              <h1 className="text-[17px] font-serif font-black text-gray-900 leading-tight">
+              <h1 className="text-[17px] font-bold text-text-primary leading-tight tracking-tight">
                 {currentView === 'dashboard' && (language === 'en' ? 'Community Census' : 'समाज विवरण')}
                 {currentView === 'males' && (language === 'en' ? 'Male Members' : 'पुरुष सदस्य')}
                 {currentView === 'females' && (language === 'en' ? 'Female Members' : 'महिला सदस्य')}
@@ -515,7 +515,7 @@ export const CensusPage = () => {
                 {currentView === 'family-details' && (language === 'en' ? 'Family Demographics' : 'परिवार विवरण')}
                 {currentView === 'cities' && (language === 'en' ? 'Active Cities' : 'सक्रिय शहर')}
               </h1>
-              <p className="text-[11px] font-semibold text-brand-primary tracking-wide">
+              <p className="text-[10px] font-bold text-brand-primary tracking-wide mt-0.5">
                 {currentUser?.community} · {currentUser?.city}
               </p>
             </div>
@@ -523,14 +523,14 @@ export const CensusPage = () => {
           <div className="flex items-center gap-2">
             <button 
               onClick={() => setIsUpdateModalOpen(true)}
-              className="w-9 h-9 rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 active:scale-90 transition-all hover:bg-orange-100"
+              className="w-9 h-9 rounded-xl bg-purple-50 border border-purple-100/50 flex items-center justify-center text-brand-primary hover:bg-purple-100/50 transition-all press-scale"
               title="Request Data Update"
             >
               <RefreshCw size={15} />
             </button>
             <button 
               onClick={() => setPrintPreviewMode(true)}
-              className="w-9 h-9 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-[#1e58b8] active:scale-90 transition-all hover:bg-blue-100"
+              className="w-9 h-9 rounded-xl bg-purple-50 border border-purple-100/50 flex items-center justify-center text-brand-primary hover:bg-purple-100/50 transition-all press-scale"
               title="Print Census Report"
             >
               <Printer size={15} />

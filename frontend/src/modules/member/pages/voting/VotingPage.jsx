@@ -34,44 +34,46 @@ const VotingPage = () => {
 
   return (
     <div className="min-h-screen bg-surface pb-16">
-      {/* 1. Header (Top Navigation matching Screen 1) */}
-      <div className="bg-card border-b border-gray-100 flex items-center justify-between px-4 h-14 sticky top-0 z-30">
+      {/* Header Bar — Glass morphism */}
+      <div className="bg-white/80 backdrop-blur-xl border-b border-purple-100/30 flex items-center justify-between px-4 h-14 sticky top-0 z-30 shadow-[0_2px_12px_rgba(124,58,237,0.02)]">
         <div className="flex items-center gap-3">
           <button onClick={() => setMobileMenuOpen(true)} className="p-1 -ml-1 press-scale">
             <Menu size={22} className="text-text-primary" />
           </button>
-          <h1 className="text-base font-bold text-text-primary">जय समाज</h1>
+          <h1 className="text-base font-bold text-text-primary tracking-tight">जय समाज</h1>
         </div>
         <button onClick={() => navigate('/member/notifications?module=voting')} className="p-1 press-scale relative">
           <Bell size={22} className="text-text-primary" />
           {getUnreadCountForModule('voting') > 0 && (
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-purple-600 rounded-full" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-primary rounded-full" />
           )}
         </button>
       </div>
 
       <div className="px-4 pt-4 max-w-4xl mx-auto space-y-6">
         
-        {/* 2. Purple Hero Banner (matching Screen 1) */}
-        <div className="bg-gradient-to-br from-purple-800 to-indigo-900 text-white rounded-3xl p-6 relative overflow-hidden shadow-lg border border-purple-700/30">
+        {/* Purple Hero Banner */}
+        <div className="bg-gradient-to-br from-[#4C1D95] via-[#6D28D9] to-[#7C3AED] text-white rounded-[28px] p-6 relative overflow-hidden shadow-xl shadow-purple-500/10 border border-purple-400/15">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-300/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4 pointer-events-none" />
           <div className="flex items-center justify-between gap-4">
             <div className="space-y-4 max-w-[65%]">
               <div>
                 <h2 className="text-xl font-bold text-white tracking-tight">समाज चुनाव</h2>
-                <p className="text-xs text-purple-100/90 leading-relaxed mt-1">
+                <p className="text-xs text-purple-100/80 leading-relaxed mt-1">
                   अपने समाज के उज्जवल भविष्य के लिए वोट करें
                 </p>
               </div>
               <button 
                 onClick={() => navigate('/member/voting/el1')}
-                className="bg-white text-purple-900 text-xs font-bold px-5 py-2.5 rounded-full shadow-md press-scale hover:bg-purple-50 transition-colors"
+                className="bg-white text-purple-900 text-xs font-bold px-5 py-2.5 rounded-xl shadow-md press-scale hover:bg-purple-50 transition-all hover:shadow-lg"
               >
                 अभी वोट करें
               </button>
             </div>
             
             {/* Ballot Placement Illustration SVG */}
-            <div className="shrink-0">
+            <div className="shrink-0 relative z-10">
               <svg viewBox="0 0 100 100" className="w-24 h-24 text-white opacity-95" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 {/* Ballot Box */}
                 <rect x="25" y="55" width="50" height="35" rx="3" fill="rgba(255,255,255,0.08)" className="stroke-white" />

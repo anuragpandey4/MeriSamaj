@@ -58,25 +58,25 @@ const DonationPage = () => {
 
   return (
     <div className="min-h-screen bg-surface pb-16 relative">
-      {/* 1. Header Bar */}
-      <div className="bg-card border-b border-gray-100 flex items-center justify-between px-4 h-14 sticky top-0 z-30">
+      {/* Header Bar — Glass morphism */}
+      <div className="bg-white/80 backdrop-blur-xl border-b border-purple-100/30 flex items-center justify-between px-4 h-14 sticky top-0 z-30 shadow-[0_2px_12px_rgba(124,58,237,0.02)]">
         <div className="flex items-center gap-3">
           <button onClick={() => setMobileMenuOpen(true)} className="p-1 -ml-1 press-scale">
             <Menu size={22} className="text-text-primary" />
           </button>
-          <h1 className="text-base font-bold text-text-primary">Donations</h1>
+          <h1 className="text-base font-bold text-text-primary tracking-tight">Donations</h1>
         </div>
         <div className="flex items-center gap-2">
           <button 
             onClick={() => navigate('/member/donation/my')}
-            className="text-xs font-bold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-full border border-purple-100 press-scale"
+            className="text-xs font-bold text-brand-primary bg-purple-50 px-3 py-1.5 rounded-full border border-purple-100/50 press-scale transition-colors hover:bg-purple-100/50"
           >
             My Donations
           </button>
           <button onClick={() => navigate('/member/notifications?module=donation')} className="p-1 press-scale relative">
             <Bell size={22} className="text-text-primary" />
             {getUnreadCountForModule('donation') > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-purple-650 rounded-full" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-primary rounded-full" />
             )}
           </button>
         </div>
@@ -85,21 +85,21 @@ const DonationPage = () => {
       <div className="px-4 pt-4 max-w-4xl mx-auto space-y-6">
         
         {/* City Filter Section */}
-        <div className="flex items-center justify-between bg-card p-3 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex items-center justify-between card-neo p-3.5">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-purple-50 rounded-full flex items-center justify-center shrink-0">
-              <MapPin size={16} className="text-purple-600" />
+            <div className="w-8 h-8 bg-purple-50 rounded-xl flex items-center justify-center shrink-0 border border-purple-100/30">
+              <MapPin size={16} className="text-brand-primary" />
             </div>
             <div>
-              <p className="text-[10px] text-text-secondary font-medium">Select City</p>
-              <p className="text-xs font-bold text-text-primary">{selectedCity}</p>
+              <p className="text-[10px] text-text-secondary font-bold uppercase tracking-wide">Select City</p>
+              <p className="text-xs font-bold text-text-primary mt-0.5">{selectedCity}</p>
             </div>
           </div>
           
           <div className="relative">
             <button 
               onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
-              className="px-3 py-1.5 text-xs font-bold text-purple-700 bg-purple-50 rounded-full border border-purple-100 flex items-center gap-1 press-scale"
+              className="px-3.5 py-1.5 text-xs font-bold text-brand-primary bg-purple-50 rounded-xl border border-purple-100/50 flex items-center gap-1 press-scale hover:bg-purple-100/50 transition-colors"
             >
               Change <ChevronDown size={14} />
             </button>
@@ -107,7 +107,7 @@ const DonationPage = () => {
             {isCityDropdownOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setIsCityDropdownOpen(false)} />
-                <div className="absolute right-0 top-full mt-2 w-40 bg-card rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden py-1">
+                <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-2xl shadow-xl border border-purple-100/25 z-50 overflow-hidden py-1.5 animate-scale-pop">
                   {availableCities.map(city => (
                     <button
                       key={city}
@@ -115,7 +115,7 @@ const DonationPage = () => {
                         setSelectedCity(city);
                         setIsCityDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-colors ${selectedCity === city ? 'bg-purple-50 text-purple-700 font-bold' : 'text-text-primary hover:bg-gray-50'}`}
+                      className={`w-full text-left px-4 py-2.5 text-xs font-bold transition-all ${selectedCity === city ? 'bg-purple-50 text-brand-primary' : 'text-text-primary hover:bg-purple-50/20'}`}
                     >
                       {city}
                     </button>
@@ -129,13 +129,15 @@ const DonationPage = () => {
           </div>
         </div>
 
-        {/* 2. Purple Hero Banner */}
-        <div className="bg-gradient-to-br from-purple-800 to-indigo-900 text-white rounded-3xl p-6 relative overflow-hidden shadow-lg border border-purple-700/30">
+        {/* Purple Hero Banner */}
+        <div className="bg-gradient-to-br from-[#4C1D95] via-[#6D28D9] to-[#7C3AED] text-white rounded-[28px] p-6 relative overflow-hidden shadow-xl shadow-purple-500/10 border border-purple-400/15">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-300/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4 pointer-events-none" />
           <div className="flex items-center justify-between gap-4">
             <div className="space-y-4 max-w-[65%]">
               <div>
                 <h2 className="text-xl font-bold text-white tracking-tight">Contribute to the Society</h2>
-                <p className="text-xs text-purple-100/90 leading-relaxed mt-1">
+                <p className="text-xs text-purple-100/80 leading-relaxed mt-1">
                   Your contribution plays an important role in the development of the society and helping those in need.
                 </p>
               </div>
